@@ -31,30 +31,40 @@ def handshake(ip, port, proxy_list,counter):
             
             for elements in proxy_list:
                 if elements.get("ip") == target_ip and elements.get("port") == target_port:
-                    elements["score"]= 100  #Set Score for successful handshake
-                    x = elements.get("score")
-                    print(f"Score set to {x}")
+                    
+                    elements["log_handshake"].append(1)#log successful handshake
+                    x = elements.get("log_handshake")
+                    print(f"Log Handshake set to {x}")
         else:
             print("SYN-ACK nicht empfangen. Handshake fehlgeschlagen.")
             
             for elements in proxy_list:
                 if elements.get("ip") == target_ip and elements.get("port") == target_port:
-                    elements["score"]= 0    #Set Score for unsuccessful handshake
-                    x = elements.get("score")
-                    print(f"Score set to {x}")
+                    
+                    elements["log_handshake"].append(0)#log unsuccessful handshake
+                    x = elements.get("log_handshake")
+                    print(f"Log Handshake set to {x}")
             
     else:
         print("Keine Antwort empfangen. Handshake fehlgeschlagen.")
         
         for elements in proxy_list:
             if elements.get("ip") == target_ip and elements.get("port") == target_port:
-                    elements["score"]= 0    #Set Score for unsuccessful handshake
-                    x = elements.get("score")
-                    print(f"Score set to {x}")
+                    
+                    elements["log_handshake"].append(0)#log unsuccessful handshake
+                    x = elements.get("log_handshake")
+                    print(f"Log Handshake set to {x}")
+
+def calc_score(proxy_list,input_handshake_tries):
+    for elements in proxy_list:
+        succ_handshakes = elements["log_handshake"].count(1)
+        handshake_rate = succ_handshakes / input_handshake_tries
+        score = handshake_rate * 100
+        elements["score"]= score
 
 
-def handshake_call(proxy_list,counter, handshake_tries):
-  while counter < handshake_tries: 
+def handshake_call(proxy_list,counter, input_handshake_tries):
+  while counter < input_handshake_tries: 
     counter += 1 
     for elements in proxy_list:
         
@@ -65,9 +75,9 @@ def handshake_call(proxy_list,counter, handshake_tries):
         
         targetport = int(targetport)
         handshake(targetip,targetport,proxy_list,counter) # Perform the TCP-Handshake with the proxy.
-        #TODO is_proxy_working mit Score anpassen
-
         
+    #TODO is_proxy_working mit Score anpassen
+    calc_score(proxy_list,input_handshake_tries)  
     print_proxy_list_dict(proxy_list) 
 
 
@@ -108,6 +118,7 @@ def init_proxy_list(input_number,proxy_list):
                     "is_proxy_working": False,
                     "error_rate" : 0,
                     "avg_resp_time" : 0,
+                    "log_handshake": []
                     }
         proxy_list.append(proxy_data)
 
