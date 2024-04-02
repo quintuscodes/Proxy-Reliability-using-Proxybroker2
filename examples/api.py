@@ -62,8 +62,24 @@ def calc_score(proxy_list,input_handshake_tries):
         handshake_rate = succ_handshakes / input_handshake_tries
         score = handshake_rate * 100
         elements["score"]= score
-    #Add Bonus of 3 Best Avg_resp_time to score
+    #Add Bonus of 3 Best Avg_resp_time to score ; 15 , 10 , 5 points
+        
+    """
+    proxy_list_copy = proxy_list
+    ranked_list = []
     
+    for i in range(0,2):
+        max_global= 1
+        best_proxy = 0
+        for elements in proxy_list_copy:
+            max_local = elements.get("avg_resp_time")
+            if max_local < max_global:
+                ranked_list.append(elements)
+                proxy_list_copy.remove(elements)
+                max_global = max_local
+            else:
+                max_global = max_local
+    """
 
 def handshake_call(proxy_list,counter, input_handshake_tries):
   while counter < input_handshake_tries: 
