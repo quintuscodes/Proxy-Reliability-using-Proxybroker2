@@ -62,7 +62,11 @@ def calc_score(proxy_list,input_handshake_tries):
         handshake_rate = succ_handshakes / input_handshake_tries
         score = handshake_rate * 100
         elements["score"]= score
+
+
     #Add Bonus of 3 Best Avg_resp_time to score ; 15 , 10 , 5 points
+
+      
         
     """
     proxy_list_copy = proxy_list
