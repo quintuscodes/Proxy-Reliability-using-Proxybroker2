@@ -56,12 +56,14 @@ def handshake(ip, port, proxy_list,counter):
                     print(f"Log Handshake set to {x}")
 
 def calc_score(proxy_list,input_handshake_tries):
+    #Calculate TCP-Handshake Score
     for elements in proxy_list:
         succ_handshakes = elements["log_handshake"].count(1)
         handshake_rate = succ_handshakes / input_handshake_tries
         score = handshake_rate * 100
         elements["score"]= score
-
+    #Add Bonus of 3 Best Avg_resp_time to score
+    
 
 def handshake_call(proxy_list,counter, input_handshake_tries):
   while counter < input_handshake_tries: 

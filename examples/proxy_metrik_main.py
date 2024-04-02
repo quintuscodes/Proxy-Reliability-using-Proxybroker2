@@ -15,23 +15,23 @@ def main():
     
     broker = Broker(proxies)
     proxy_list= []
-    input_number = int(input('How many proxys should be gathered?\n'))
-    handshake_tries = int(input('How many handshakes should be established?\n'))
-    init_proxy_list(input_number, proxy_list)
+    input_proxy_number = int(input('How many proxys should be gathered?\n'))
+    input_handshake_tries = int(input('How many handshakes should be established?\n'))
+    init_proxy_list(input_proxy_number, proxy_list)
     print_proxy_list_dict(proxy_list)
     
     #list_of_functions = [broker.find(types=[ 'SOCKS5'], limit=10, lvl = 'HIGH', strict = True), 
     #                    write_proxy_to_dict(proxies, proxy_list),broker.show_stats()]
     
-    tasks = asyncio.gather(broker.find( types=[ 'SOCKS5'],lvl = 'HIGH', strict = True,limit=input_number),
-                            write_proxy_to_dict(input_number,proxies, proxy_list)
+    tasks = asyncio.gather(broker.find( types=[ 'SOCKS5'],lvl = 'HIGH', strict = True,limit=input_proxy_number),
+                            write_proxy_to_dict(input_proxy_number,proxies, proxy_list)
     )
     #types=[ 'SOCKS5'],lvl = 'HIGH', strict = True
     loop = asyncio.get_event_loop()
     loop.run_until_complete(tasks)
 
     counter = 0
-    handshake_call(proxy_list, counter,handshake_tries)
+    handshake_call(proxy_list, counter,input_handshake_tries)
     
         
     
