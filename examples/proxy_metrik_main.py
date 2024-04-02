@@ -16,7 +16,7 @@ def main():
     broker = Broker(proxies)
     proxy_list= []
     input_number = int(input('How many proxys should be gathered?\n'))
-    handshake_tries = int(input('How many handshake tries should be established?\n'))
+    handshake_tries = int(input('How many handshakes should be established?\n'))
     init_proxy_list(input_number, proxy_list)
     print_proxy_list_dict(proxy_list)
     
