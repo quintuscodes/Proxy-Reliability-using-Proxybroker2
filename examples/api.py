@@ -1,4 +1,4 @@
-"""Find and show 10 working SOCKS5 proxies and perform a TCP Handshake individually."""
+"""Find and show 10 working SOCKS5 proxies perform a TCP Handshake individually."""
 
 from scapy.all import *
 from scapy.layers.inet import IP
@@ -8,30 +8,30 @@ from proxybroker import Broker, Proxy
 
 def handshake(ip, port, proxy_list,counter):
     print(f"#################################################### {counter} . RUNDE ###########################################################")
-# Ziel-IP-Adresse und Port des Proxy Servers
+# Target IP and Port Adress from gathered Proxy List
     target_ip = ip
     target_port = port
 
-# Erstellen des SYN-Pakets an Proxy
+# Create SYN-Paket to Proxy
     syn_packet = IP(dst=target_ip) / TCP(dport=target_port, flags="S")
 
-# Senden des SYN-Pakets und Empfangen der Antwort an/von Proxy
+# Transceive SYN-Paket and Receive Answer
     syn_ack_response = sr1(syn_packet, timeout=2, verbose=False)
 
     if syn_ack_response:
         if syn_ack_response.haslayer(TCP) and syn_ack_response[TCP].flags & 0x12:
             print("SYN-ACK empfangen. Handshake erfolgreich.")
-        # Erstellen des ACK-Pakets für den abschließenden Teil des Handshakes
+        # Create ACK-Paket to Proxy
             ack_packet = IP(dst=target_ip) / TCP(dport=target_port, flags="A",
                                               seq=syn_ack_response[TCP].ack,
                                               ack=syn_ack_response[TCP].seq + 1)
-        # Senden des ACK-Pakets
+        # Send ACK-Paket to Proxy
             send(ack_packet)
             print("ACK gesendet. Handshake abgeschlossen.")
             
             for elements in proxy_list:
                 if elements.get("ip") == target_ip and elements.get("port") == target_port:
-                    elements["score"]= 100
+                    elements["score"]= 100  #Set Score for successful handshake
                     x = elements.get("score")
                     print(f"Score set to {x}")
         else:
@@ -39,7 +39,7 @@ def handshake(ip, port, proxy_list,counter):
             
             for elements in proxy_list:
                 if elements.get("ip") == target_ip and elements.get("port") == target_port:
-                    elements["score"]= 0
+                    elements["score"]= 0    #Set Score for unsuccessful handshake
                     x = elements.get("score")
                     print(f"Score set to {x}")
             
@@ -48,7 +48,7 @@ def handshake(ip, port, proxy_list,counter):
         
         for elements in proxy_list:
             if elements.get("ip") == target_ip and elements.get("port") == target_port:
-                    elements["score"]= 0
+                    elements["score"]= 0    #Set Score for unsuccessful handshake
                     x = elements.get("score")
                     print(f"Score set to {x}")
 
@@ -64,7 +64,10 @@ def handshake_call(proxy_list,counter, handshake_tries):
         print(f"------------------------------Handshake fuer neuen Proxy mit IP: {targetip} und PORT: {targetport}----------------------------")
         
         targetport = int(targetport)
-        handshake(targetip,targetport,proxy_list,counter)
+        handshake(targetip,targetport,proxy_list,counter) # Perform the TCP-Handshake with the proxy.
+        #TODO is_proxy_working mit Score anpassen
+
+        
     print_proxy_list_dict(proxy_list) 
 
 
