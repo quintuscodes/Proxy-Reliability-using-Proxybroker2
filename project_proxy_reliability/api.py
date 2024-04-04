@@ -189,12 +189,15 @@ def balance_proxy_list(proxy_list):
 
     if proxy_list[0]["score"] == 100:
         
-        # DELETE Proxys with score < 60
+        #DELETE Proxys with score < 60
+        #TODO Still deletes not all proxys from list
         for elements in proxy_list:
-            if elements["score"] < 60:
+            if elements["score"] <= 60:
                 proxy_list.remove(elements)
                 print("Removed Proxys with score < 60 \n")
                 print_proxy_list_dict(proxy_list)
+             
+        #[proxy_list.remove(elements) for elements in proxy_list if elements["score"] <= 60]
         # FIND 3 new Proxys with score = 100
     """
     else:
