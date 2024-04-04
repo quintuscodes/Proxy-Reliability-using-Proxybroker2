@@ -24,7 +24,7 @@ def main():
     #                    write_proxy_to_dict(proxies, proxy_list),broker.show_stats()]
     
     tasks = asyncio.gather(broker.find( types=[ 'SOCKS5'],lvl = 'HIGH', strict = True,limit=input_proxy_number),
-                            write_proxy_to_dict(input_proxy_number,proxies, proxy_list)
+                            write_proxy_to_dict(input_proxy_number,proxies, proxy_list,input_handshake_tries),
     )
     
     loop = asyncio.get_event_loop()

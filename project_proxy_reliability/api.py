@@ -14,46 +14,59 @@ def handshake(ip, port, proxy_list,counter):
 
 # Create SYN-Paket to Proxy
     syn_packet = IP(dst=target_ip) / TCP(dport=target_port, flags="S")
+    print("Erstelle SYN- Paket: \n")
+    syn_packet.show()
 
 # Transceive SYN-Paket and Receive Answer
+    print("Sendet SYN- Paket\n")
     syn_ack_response = sr1(syn_packet, timeout=2, verbose=False)
+    
+    
 
     if syn_ack_response:
         if syn_ack_response.haslayer(TCP) and syn_ack_response[TCP].flags & 0x12:
-            print("SYN-ACK empfangen. Handshake erfolgreich.")
+            print("SYN-ACK empfangen. Handshake erfolgreich.\n")
+
         # Create ACK-Paket to Proxy
+
             ack_packet = IP(dst=target_ip) / TCP(dport=target_port, flags="A",
                                               seq=syn_ack_response[TCP].ack,
                                               ack=syn_ack_response[TCP].seq + 1)
+            
+        #Display Paket Answer to console
+
+            print("Die Antwort:\n")
+            syn_ack_response.show() 
+
         # Send ACK-Paket to Proxy
             send(ack_packet)
-            print("ACK gesendet. Handshake abgeschlossen.")
+            print("ACK gesendet. Handshake abgeschlossen.\n")
             
             for elements in proxy_list:
                 if elements.get("ip") == target_ip and elements.get("port") == target_port:
                     
                     elements["log_handshake"].append(1)#log successful handshake
                     x = elements.get("log_handshake")
-                    print(f"Log Handshake set to {x}")
+                    print(f"Log Handshake set to \n {x}\n")
         else:
-            print("SYN-ACK nicht empfangen. Handshake fehlgeschlagen.")
+            print("SYN-ACK nicht empfangen. Handshake fehlgeschlagen.\n")
             
             for elements in proxy_list:
                 if elements.get("ip") == target_ip and elements.get("port") == target_port:
                     
                     elements["log_handshake"].append(0)#log unsuccessful handshake
                     x = elements.get("log_handshake")
-                    print(f"Log Handshake set to {x}")
+                    print(f"Log Handshake set to \n {x}\n")
             
     else:
-        print("Keine Antwort empfangen. Handshake fehlgeschlagen.")
+        print("Keine Antwort empfangen. Handshake fehlgeschlagen.\n")
         
         for elements in proxy_list:
             if elements.get("ip") == target_ip and elements.get("port") == target_port:
                     
                     elements["log_handshake"].append(0)#log unsuccessful handshake
                     x = elements.get("log_handshake")
-                    print(f"Log Handshake set to {x}")
+                    print(f"Log Handshake set to \n {x}\n")
 
 def calc_score(proxy_list,input_handshake_tries):
     #Calculate TCP-Handshake Score
@@ -93,7 +106,7 @@ def handshake_call(proxy_list,counter, input_handshake_tries):
         targetip =  elements["ip"]
         targetport = elements["port"]
         
-        print(f"------------------------------Handshake fuer neuen Proxy mit IP: {targetip} und PORT: {targetport}----------------------------")
+        print(f"------------------------------Handshake fuer neuen Proxy mit IP: {targetip} und PORT: {targetport}----------------------------\n")
         
         targetport = int(targetport)
         handshake(targetip,targetport,proxy_list,counter) # Perform the TCP-Handshake with the proxy.
@@ -104,7 +117,7 @@ def handshake_call(proxy_list,counter, input_handshake_tries):
 
 
 
-async def write_proxy_to_dict(input_number,proxies, proxy_list):
+async def write_proxy_to_dict(input_number,proxies, proxy_list,input_handshake_tries):
         proxycount = 0
         while True:
             proxy = await proxies.get()
@@ -120,27 +133,38 @@ async def write_proxy_to_dict(input_number,proxies, proxy_list):
             
             proxy_list[proxycount]["ip"]=ip
             proxy_list[proxycount]["port"]=port
+            proxy_list[proxycount]["handshakes"]= input_handshake_tries
             proxy_list[proxycount]["error_rate"]=error_rate
             proxy_list[proxycount]["avg_resp_time"]=avg_response_time
             proxy_list[proxycount]["is_proxy_working"]=is_working
 
             x = proxy_list[proxycount].items()
-            print(f"FOUND PROXY:  {proxy.types}  and the actual proxy {x}")
+            print(f"FOUND PROXY:  {proxy.types}  and the actual proxy {x}\n")
             proxycount = proxycount + 1
 
 def print_proxy_list_dict(proxy_list):
+    print("\n \n ")
+    print("   __________________________________________________________________________________________________________________________________________________________________")
+    print("  |\n")
     for elements in proxy_list:
-        print(elements.items())          
+        index = proxy_list.index(elements)
+        index += 1
+        print(f"  > {index}. Proxy \n \n   {elements.items()}   \n")
+    print("  |__________________________________________________________________________________________________________________________________________________________________\n")
+
+    print("\n \n")            
 
 def init_proxy_list(input_number,proxy_list):
     for key in range(input_number):
         proxy_data = {"ip" : 0,
                     "port" :0,
                     "score" : 0,
+                    "handshakes" : 0,
+                    "log_handshake": [],
                     "is_proxy_working": False,
                     "error_rate" : 0,
                     "avg_resp_time" : 0,
-                    "log_handshake": []
+                    
                     }
         proxy_list.append(proxy_data)
 
