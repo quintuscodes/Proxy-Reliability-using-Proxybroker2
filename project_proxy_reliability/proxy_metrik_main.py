@@ -5,7 +5,7 @@ from scapy.layers.inet import IP
 from scapy.layers.inet import TCP
 import asyncio
 from proxybroker import Broker
-from api import init_proxy_list, print_proxy_list_dict, write_proxy_to_dict, handshake_call
+from api import *
 
 
 
@@ -32,7 +32,8 @@ def main():
 
     counter = 0
     handshake_call(proxy_list, counter,input_handshake_tries)
-    
+
+    balance_proxy_list(proxy_list)
         
     
 

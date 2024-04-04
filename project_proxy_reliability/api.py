@@ -23,7 +23,12 @@ def handshake(ip, port, proxy_list,counter):
     
     
 
+    
+
     if syn_ack_response:
+        syn_ack_time = syn_ack_response.time - syn_packet.sent_time
+        print(f"Response time for SYN-ACK: {syn_ack_time} seconds")
+
         if syn_ack_response.haslayer(TCP) and syn_ack_response[TCP].flags & 0x12:
             print("SYN-ACK empfangen. Handshake erfolgreich.\n")
 
@@ -46,6 +51,7 @@ def handshake(ip, port, proxy_list,counter):
                 if elements.get("ip") == target_ip and elements.get("port") == target_port:
                     
                     elements["log_handshake"].append(1)#log successful handshake
+                    elements["syn_ack_time"] = syn_ack_time
                     x = elements.get("log_handshake")
                     print(f"Log Handshake set to \n {x}\n")
         else:
@@ -53,7 +59,7 @@ def handshake(ip, port, proxy_list,counter):
             
             for elements in proxy_list:
                 if elements.get("ip") == target_ip and elements.get("port") == target_port:
-                    
+                    elements["syn_ack_time"] = syn_ack_time
                     elements["log_handshake"].append(0)#log unsuccessful handshake
                     x = elements.get("log_handshake")
                     print(f"Log Handshake set to \n {x}\n")
@@ -77,7 +83,7 @@ def calc_score(proxy_list,input_handshake_tries):
         elements["score"]= score
 
 
-    #Add Bonus of 3 Best Avg_resp_time to score ; 15 , 10 , 5 points
+    #TODO Add Bonus of 3 Best Avg_resp_time to score ; 15 , 10 , 5 points
 
       
         
@@ -128,15 +134,14 @@ async def write_proxy_to_dict(input_number,proxies, proxy_list,input_handshake_t
             port = proxy.port
             error_rate = proxy.error_rate
             avg_response_time = proxy.avg_resp_time
-            is_working = proxy.is_working
+            
             #string = "{}".format(proxycount)
             
             proxy_list[proxycount]["ip"]=ip
             proxy_list[proxycount]["port"]=port
             proxy_list[proxycount]["handshakes"]= input_handshake_tries
-            proxy_list[proxycount]["error_rate"]=error_rate
             proxy_list[proxycount]["avg_resp_time"]=avg_response_time
-            proxy_list[proxycount]["is_proxy_working"]=is_working
+            
 
             x = proxy_list[proxycount].items()
             print(f"FOUND PROXY:  {proxy.types}  and the actual proxy {x}\n")
@@ -161,10 +166,36 @@ def init_proxy_list(input_number,proxy_list):
                     "score" : 0,
                     "handshakes" : 0,
                     "log_handshake": [],
-                    "is_proxy_working": False,
                     "error_rate" : 0,
-                    "avg_resp_time" : 0,
+                    "syn_ack_time" : 0,
+                    "avg_resp_time" : 0
+                    
                     
                     }
         proxy_list.append(proxy_data)
 
+def balance_proxy_list(proxy_list):
+    # SORT List given the "score"-Field if a Proxy with score 100 is already available else --> FIND
+    #TODO SORT first that proxy with score 100 is on top
+    print("Vor Sortierung:\n")
+
+    print_proxy_list_dict(proxy_list)
+
+    proxy_list.sort(key=lambda e: e["score"], reverse=True)
+
+    print("Nach Sortierung:\n")
+
+    print_proxy_list_dict(proxy_list)
+
+    if proxy_list[0]["score"] == 100:
+        
+        # DELETE Proxys with score < 60
+        for elements in proxy_list:
+            if elements.proxy_data["score"] < 60:
+                proxy_list.remove(elements)
+        # FIND 3 new Proxys with score = 100
+    """
+    else:
+        proxy_list_slave = []
+        init_proxy_list(5, proxy_list_slave)
+    """
