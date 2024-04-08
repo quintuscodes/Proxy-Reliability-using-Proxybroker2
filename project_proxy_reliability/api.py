@@ -81,6 +81,7 @@ def calc_score(proxy_list,input_handshake_tries):
         handshake_rate = succ_handshakes / input_handshake_tries
         score = handshake_rate * 100
         elements["score"]= score
+        
 
 
     #TODO Add Bonus of 3 Best Avg_resp_time to score ; 15 , 10 , 5 points
@@ -166,7 +167,6 @@ def init_proxy_list(input_number,proxy_list):
                     "score" : 0,
                     "handshakes" : 0,
                     "log_handshake": [],
-                    "error_rate" : 0,
                     "syn_ack_time" : 0,
                     "avg_resp_time" : 0
                     
@@ -183,22 +183,28 @@ def balance_proxy_list(proxy_list):
 
     proxy_list.sort(key=lambda e: e["score"], reverse=True)
 
-    print("Nach Sortierung:\n")
-
-    print_proxy_list_dict(proxy_list)
-
-    if proxy_list[0]["score"] == 100:
+    
+    unbalanced = True
+    #if proxy_list[0]["score"] == 100:
         
         #DELETE Proxys with score < 60
         #TODO Still deletes not all proxys from list
+    while unbalanced:
         for elements in proxy_list:
-            if elements["score"] <= 60:
+            if elements["score"] <= 50:
                 proxy_list.remove(elements)
                 print("Removed Proxys with score < 60 \n")
                 print_proxy_list_dict(proxy_list)
+                balance_proxy_list(proxy_list)
+            else:
+                unbalanced = False
              
         #[proxy_list.remove(elements) for elements in proxy_list if elements["score"] <= 60]
         # FIND 3 new Proxys with score = 100
+    
+    print("Nach Sortierung:\n")
+
+    print_proxy_list_dict(proxy_list)
     """
     else:
         proxy_list_slave = []
