@@ -17,6 +17,7 @@ def main():
     proxy_list= []
     input_proxy_number = int(input('How many proxys should be gathered?\n'))
     input_handshake_tries = int(input('How many handshakes should be established?\n'))
+    data_size =1000
     init_proxy_list(input_proxy_number, proxy_list)
     print_proxy_list_dict(proxy_list)
     
@@ -31,7 +32,7 @@ def main():
     loop.run_until_complete(tasks)
 
     counter = 0
-    handshake_call(proxy_list, counter,input_handshake_tries)
+    handshake_call(proxy_list, counter,input_handshake_tries,data_size)
 
     balance_proxy_list(proxy_list)
         

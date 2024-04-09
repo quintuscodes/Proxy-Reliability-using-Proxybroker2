@@ -6,7 +6,7 @@ from scapy.layers.inet import TCP
 import asyncio
 from proxybroker import Broker, Proxy
 
-def handshake(ip, port, proxy_list,counter):
+def handshake(ip, port, proxy_list,counter,data_size):
     print(f"#################################################### {counter} . RUNDE ###########################################################")
 # Target IP and Port Adress from gathered Proxy List
     target_ip = ip
@@ -17,6 +17,35 @@ def handshake(ip, port, proxy_list,counter):
     print("Erstelle SYN- Paket: \n")
     #syn_packet.show()
 
+    #Data Packet for Measuring Transmission Time of 64Bytes of data
+    data_size = 1000
+    data_packet = IP(dst=target_ip)/TCP(dport=target_port)/Raw(RandString(size=data_size))
+    start_time = time.time()
+    response = sr1(data_packet, verbose=False, timeout=5)
+    end_time = time.time()
+
+    if response:
+        transmission_time = end_time - start_time
+        print(f"Transmission time for {data_size} bytes of data: {transmission_time} seconds")
+        
+        for elements in proxy_list:
+            if elements.get("ip") == target_ip and elements.get("port") == target_port:
+                    
+                    elements["log_transmission_time"].append(transmission_time)
+                    
+                    x = elements.get("log_transmision_time")
+                    print(f"Log Transmission TIme set to \n {x}\n")
+    else:
+        print("No response received.")
+        
+        for elements in proxy_list:
+            if elements.get("ip") == target_ip and elements.get("port") == target_port:
+                    
+                    elements["log_transmission_time"].append(0)
+                    
+                    x = elements.get("log_transmision_time")
+                    print(f"Log Transmission TIme set to \n {x}\n")
+
 # Transceive SYN-Paket and Receive Answer
     print("Sendet SYN- Paket\n")
     syn_ack_response = sr1(syn_packet, timeout=2, verbose=False)
@@ -26,6 +55,7 @@ def handshake(ip, port, proxy_list,counter):
     if syn_ack_response:
         syn_ack_time = syn_ack_response.time - syn_packet.sent_time
         print(f"Response time for SYN-ACK: {syn_ack_time} seconds")
+        
 
         if syn_ack_response.haslayer(TCP) and syn_ack_response[TCP].flags & 0x12:
             print("SYN-ACK empfangen. Handshake erfolgreich.\n")
@@ -88,7 +118,11 @@ def calc_score(proxy_list,input_handshake_tries):
         elements["log_syn_ack_time"].clear()
         if elements["avg_syn_ack_time"] == 0.0:
             proxy_list.remove(elements)
-    
+    #TODO calc transmission time
+        sum_transmission_time = sum(elements["log_transmission_time"])
+        avg_transmission_time = sum_transmission_time / input_handshake_tries
+        elements["avg_transmission_time"] = avg_transmission_time
+        elements["log_transmission_time"].clear()
     
     print("Vor SYN ACK Sortierung \n")
     print_proxy_list_dict(proxy_list)
@@ -103,12 +137,13 @@ def calc_score(proxy_list,input_handshake_tries):
     print("Nach SYN ACK SCore Anpassung\n")
     print_proxy_list_dict(proxy_list)
         
-    #TODO Speed Score calculation
+    #TODO Transmission Time Score calculation
+    
 
     #TODO Throughput Score calculation
 
 
-def handshake_call(proxy_list,counter, input_handshake_tries):
+def handshake_call(proxy_list,counter, input_handshake_tries,data_size):
   while counter < input_handshake_tries: 
     counter += 1 
     for elements in proxy_list:
@@ -119,7 +154,7 @@ def handshake_call(proxy_list,counter, input_handshake_tries):
         print(f"------------------------------Handshake fuer neuen Proxy mit IP: {targetip} und PORT: {targetport}----------------------------\n")
         
         targetport = int(targetport)
-        handshake(targetip,targetport,proxy_list,counter) # Perform the TCP-Handshake with the proxy.
+        handshake(targetip,targetport,proxy_list,counter,data_size) # Perform the TCP-Handshake with the proxy.
         
     
     calc_score(proxy_list,input_handshake_tries)  
@@ -169,9 +204,11 @@ def init_proxy_list(input_number,proxy_list):
                     "port" :0,
                     "score" : 0,
                     "avg_syn_ack_time" : 0,
+                    "avg_transmission_time" : 0,
                     "handshakes" : 0,
                     "log_handshake": [],
                     "log_syn_ack_time" : [],
+                    "log_transmission_time": []
                     
                     
                     
