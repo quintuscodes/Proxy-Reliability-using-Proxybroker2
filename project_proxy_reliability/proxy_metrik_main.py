@@ -9,12 +9,14 @@ from api import *
 
 
 
+
 def main():
-    
+    Ready_for_connection = False
     proxies = asyncio.Queue()
     
     broker = Broker(proxies)
     proxy_list= []
+    proxy_list_slave = []
     input_proxy_number = int(input('How many proxys should be gathered?\n'))
     input_handshake_tries = int(input('How many handshakes should be established?\n'))
     data_size =1000
@@ -34,7 +36,8 @@ def main():
     counter = 0
     handshake_call(proxy_list, counter,input_handshake_tries,data_size)
 
-    balance_proxy_list(proxy_list)
+    sort_proxy_list(proxy_list)
+    refresh_proxy_list(Ready_for_connection,proxy_list,proxy_list_slave)
         
     
 
