@@ -1,4 +1,4 @@
-"""Find and show 10 working SOCKS5 proxies perform a TCP Handshake individually."""
+"""Find and show 10 working SOCKS5 proxies and evaluate them individually."""
 
 from scapy.all import *
 from scapy.layers.inet import IP
