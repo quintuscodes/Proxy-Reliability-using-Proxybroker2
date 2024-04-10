@@ -33,7 +33,7 @@ def handshake(ip, port, proxy_list,counter,data_size):
                     
                     elements["log_transmission_time"].append(transmission_time)
                     
-                    x = elements.get("log_transmision_time")
+                    x = elements.get("log_transmission_time")
                     print(f"Log Transmission TIme set to \n {x}\n")
     else:
         print("No response received.")
@@ -106,7 +106,7 @@ def handshake(ip, port, proxy_list,counter,data_size):
 def calc_score(proxy_list,input_handshake_tries):
     
     for elements in proxy_list:
-    #Calculate TCP-Handshake Score
+    #Calculate TCP-Handshake-Rate Score
         succ_handshakes = elements["log_handshake"].count(1)
         handshake_rate = succ_handshakes / input_handshake_tries
         score = handshake_rate * 100
@@ -115,32 +115,49 @@ def calc_score(proxy_list,input_handshake_tries):
         sum_syn_ack = sum(elements["log_syn_ack_time"])
         avg_syn_ack_time = sum_syn_ack / input_handshake_tries
         elements["avg_syn_ack_time"] = avg_syn_ack_time
-        elements["log_syn_ack_time"].clear()
         if elements["avg_syn_ack_time"] == 0.0:
-            proxy_list.remove(elements)
-    #TODO calc transmission time
+            elements["avg_syn_ack_time"] = 999
+        elements["log_syn_ack_time"].clear()
+        #if elements["avg_syn_ack_time"] == 0.0:
+           # proxy_list.remove(elements)
+    #TODO calc AVG transmission time
         sum_transmission_time = sum(elements["log_transmission_time"])
         avg_transmission_time = sum_transmission_time / input_handshake_tries
         elements["avg_transmission_time"] = avg_transmission_time
+        if elements["avg_transmission_time"] == 0.0:
+            elements["avg_transmission_time"] = 999
         elements["log_transmission_time"].clear()
+
+    #TODO calc AVG Throughput score
+
     
     print("Vor SYN ACK Sortierung \n")
     print_proxy_list_dict(proxy_list)
     
 
     proxy_list.sort(key=lambda e: e["avg_syn_ack_time"], reverse=False) 
-    print("Nach SYN-ACK Sortierung\n")
+    print("Nach AVG SYN-ACK Sortierung\n")
     print_proxy_list_dict(proxy_list)
     proxy_list[0]["score"] += 15
     proxy_list[1]["score"] += 10
     proxy_list[2]["score"] += 5
-    print("Nach SYN ACK SCore Anpassung\n")
+    print("Nach SYN ACK Score Anpassung\n")
     print_proxy_list_dict(proxy_list)
         
     #TODO Transmission Time Score calculation
-    
+    proxy_list.sort(key=lambda e: e["avg_transmission_time"], reverse=False)
+    print("Nach AVG Transmission Time Sortierung\n")
+    print_proxy_list_dict(proxy_list)
+    proxy_list[0]["score"] += 15
+    proxy_list[1]["score"] += 10
+    proxy_list[2]["score"] += 5
+    print("Nach AVG Transmission Time Score Anpassung\n")
+    print_proxy_list_dict(proxy_list)
+    print("Nach Score Sortierung\n")
+    proxy_list.sort(key=lambda e: e["score"], reverse=True)
+    print_proxy_list_dict(proxy_list)
 
-    #TODO Throughput Score calculation
+    #TODO AVG Throughput Score calculation
 
 
 def handshake_call(proxy_list,counter, input_handshake_tries,data_size):
