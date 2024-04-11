@@ -149,14 +149,19 @@ def calc_score(proxy_list,input_handshake_tries):
     proxy_list.sort(key=lambda e: e["avg_transmission_time"], reverse=False)
     print("Nach AVG Transmission Time Sortierung\n")
     print_proxy_list_dict(proxy_list)
-    proxy_list[0]["score"] += 15
-    proxy_list[1]["score"] += 10
-    proxy_list[2]["score"] += 5
-    print("Nach AVG Transmission Time Score Anpassung\n")
-    print_proxy_list_dict(proxy_list)
-    print("Nach Score Sortierung\n")
-    proxy_list.sort(key=lambda e: e["score"], reverse=True)
-    print_proxy_list_dict(proxy_list)
+    try:
+        proxy_list[0]["score"] += 15
+        proxy_list[1]["score"] += 10
+        proxy_list[2]["score"] += 5
+        print("Nach AVG Transmission Time Score Anpassung\n")
+        print_proxy_list_dict(proxy_list)
+        print("Nach Score Sortierung\n")
+    
+    except IndexError:
+        proxy_list.sort(key=lambda e: e["score"], reverse=True)
+
+    finally:
+        print_proxy_list_dict(proxy_list)
 
     #TODO AVG Throughput Score calculation
 
