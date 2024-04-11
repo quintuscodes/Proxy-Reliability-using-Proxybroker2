@@ -300,17 +300,16 @@ def init_proxy_list(input_number,proxy_list):
         proxy_list.append(proxy_data)
 
 def sort_proxy_list(proxy_list):
-    # SORT List given the "score"-Field if a Proxy with score 100 is already available else --> FIND
-    #TODO SORT first that proxy with score 100 is on top
+    
+    #TODO SORT first, so that proxy with score 100 is on top
     
     proxy_list.sort(key=lambda e: e["score"], reverse=True)
 
     
     unbalanced = True
-    #if proxy_list[0]["score"] == 100:
+    
         
-        #DELETE Proxys with score < 60
-        #TODO Still deletes not all proxys from list
+    #DELETE Proxys with score < 60
     while unbalanced:
         for elements in proxy_list:
             if elements["score"] <= 50:
@@ -320,15 +319,6 @@ def sort_proxy_list(proxy_list):
                 sort_proxy_list(proxy_list)
             
             else: unbalanced = False
-             
-        #[proxy_list.remove(elements) for elements in proxy_list if elements["score"] <= 60]
-        # FIND 3 new Proxys with score = 100
-    
-    print("Nach Sortierung:\n")
-
-    print_proxy_list_dict(proxy_list)
-
-
 
 def refresh_proxy_list(Ready_for_connection: bool,proxy_list: list,proxy_list_slave:list):
         "A function for refilling the proxy list with new evaluated Proxys"
