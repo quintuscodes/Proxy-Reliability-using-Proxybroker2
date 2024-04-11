@@ -13,12 +13,9 @@ def evaluate(ip, port, proxy_list,counter,data_size):
     target_ip = ip
     target_port = port
 
-# Create SYN-Paket to Proxy
-    syn_packet = IP(dst=target_ip) / TCP(dport=target_port, flags="S")
-    print("Erstelle SYN- Paket: \n")
-    #syn_packet.show()
 
-    #Data Packet for Measuring Transmission Time of 64Bytes of data
+
+    #Data Packet for Measuring Transmission Time of 1000 Bytes of data
     data_size = 1000
     data_packet = IP(dst=target_ip)/TCP(dport=target_port)/Raw(RandString(size=data_size))
     start_time = time.time()
@@ -46,6 +43,28 @@ def evaluate(ip, port, proxy_list,counter,data_size):
                     
                     x = elements.get("log_transmision_time")
                     print(f"Log Transmission TIme set to \n {x}\n")
+
+    # Data Packet for Measuring Throughput
+    throughput_packet = IP(dst=target_ip)/TCP(dport=target_port)/Raw(RandString(size=data_size))
+
+    #Send 10 data packets through proxy and measure time for 10 * 1000Bytes
+    start_time = time.time()
+    for packet in range(10):
+        send(throughput_packet, verbose=False)
+    end_time = time.time()
+
+    # Calculate throughput
+    total_data_size = data_size * 10
+    throughput = total_data_size / (end_time - start_time)
+    print(f"Throughput: {throughput} bytes per second")
+
+
+
+
+# Create SYN-Paket to Proxy
+    syn_packet = IP(dst=target_ip) / TCP(dport=target_port, flags="S")
+    print("Erstelle SYN- Paket: \n")
+    #syn_packet.show()
 
 # Transceive SYN-Paket and Receive Answer
     print("Sendet SYN- Paket\n")
@@ -149,6 +168,7 @@ def calc_score(proxy_list,input_handshake_tries):
     proxy_list.sort(key=lambda e: e["avg_transmission_time"], reverse=False)
     print("Nach AVG Transmission Time Sortierung\n")
     print_proxy_list_dict(proxy_list)
+    
     try:
         proxy_list[0]["score"] += 15
         proxy_list[1]["score"] += 10
