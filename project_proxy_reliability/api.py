@@ -56,9 +56,15 @@ def evaluate(ip, port, proxy_list,counter,data_size):
     # Calculate throughput
     total_data_size = data_size * 10
     throughput = total_data_size / (end_time - start_time)
-    print(f"Throughput: {throughput} bytes per second")
+    print(f"Throughput: {throughput / 1000} KBytes per second")
 
-
+    for elements in proxy_list:
+            if elements.get("ip") == target_ip and elements.get("port") == target_port:
+                    throughput = throughput / 1000
+                    elements["log_throughput"].append(throughput)
+                    
+                    x = elements.get("log_throughput")
+                    print(f"Log Throughput set to \n {x} in KB/second \n")
 
 
 # Create SYN-Paket to Proxy
@@ -149,6 +155,12 @@ def calc_score(proxy_list,input_handshake_tries):
         elements["log_transmission_time"].clear()
 
     #TODO calc AVG Throughput score
+        sum_throughput = sum(elements["log_throughput"])
+        avg_throughput = sum_throughput / input_handshake_tries
+        elements["avg_throughput"] = avg_throughput
+        #if elements["avg_transmission_time"] == 0.0:
+        #   elements["avg_transmission_time"] = 999
+        #elements["log_transmission_time"].clear()
 
     
     print("Vor SYN ACK Sortierung \n")
@@ -158,11 +170,18 @@ def calc_score(proxy_list,input_handshake_tries):
     proxy_list.sort(key=lambda e: e["avg_syn_ack_time"], reverse=False) 
     print("Nach AVG SYN-ACK Sortierung\n")
     print_proxy_list_dict(proxy_list)
-    proxy_list[0]["score"] += 15
-    proxy_list[1]["score"] += 10
-    proxy_list[2]["score"] += 5
-    print("Nach SYN ACK Score Anpassung\n")
-    print_proxy_list_dict(proxy_list)
+    try:
+        proxy_list[0]["score"] += 15
+        proxy_list[1]["score"] += 10
+        proxy_list[2]["score"] += 5
+        print("Nach SYN ACK Score Anpassung\n")
+
+    except IndexError:
+        print("IndexError Occured!")
+    
+    finally:
+        proxy_list.sort(key=lambda e: e["score"], reverse=True)
+        print_proxy_list_dict(proxy_list)
         
     #TODO Transmission Time Score calculation
     proxy_list.sort(key=lambda e: e["avg_transmission_time"], reverse=False)
@@ -178,23 +197,42 @@ def calc_score(proxy_list,input_handshake_tries):
         print("Nach Score Sortierung\n")
     
     except IndexError:
-        proxy_list.sort(key=lambda e: e["score"], reverse=True)
+        print("Index Error Occurred!")
 
     finally:
+        proxy_list.sort(key=lambda e: e["score"], reverse=True)
         print_proxy_list_dict(proxy_list)
 
     #TODO AVG Throughput Score calculation
+    proxy_list.sort(key=lambda e: e["avg_throughput"], reverse=True)
+    print("Nach AVG Throughput Sortierung\n")
+    print_proxy_list_dict(proxy_list)
+    
+    try:
+        proxy_list[0]["score"] += 15
+        proxy_list[1]["score"] += 10
+        proxy_list[2]["score"] += 5
+        print("Nach AVG Throughput Score Anpassung\n")
+        print_proxy_list_dict(proxy_list)
+        print("Nach Score Sortierung\n")
+    
+    except IndexError:
+        print("Index Error Occurred!")
 
+    finally:
+        proxy_list.sort(key=lambda e: e["score"], reverse=True)
+        print_proxy_list_dict(proxy_list)
 
 def evaluate_call(proxy_list,counter, input_handshake_tries,data_size):
   while counter < input_handshake_tries: 
     counter += 1 
     for elements in proxy_list:
-        
+        index = proxy_list.index(elements)
+        index += 1
         targetip =  elements["ip"]
         targetport = elements["port"]
         
-        print(f"------------------------------Handshake fuer neuen Proxy mit IP: {targetip} und PORT: {targetport}----------------------------\n")
+        print(f"------------------------------Handshake fuer {index}. Proxy mit IP: {targetip} und PORT: {targetport}----------------------------\n")
         
         targetport = int(targetport)
         evaluate(targetip,targetport,proxy_list,counter,data_size) # Perform the TCP-Handshake with the proxy.
