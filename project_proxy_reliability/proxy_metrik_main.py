@@ -34,7 +34,7 @@ def main():
     loop.run_until_complete(tasks)
 
     counter = 0
-    handshake_call(proxy_list, counter,input_handshake_tries,data_size)
+    evaluate_call(proxy_list, counter,input_handshake_tries,data_size)
 
     sort_proxy_list(proxy_list)
     refresh_proxy_list(Ready_for_connection,proxy_list,proxy_list_slave)
