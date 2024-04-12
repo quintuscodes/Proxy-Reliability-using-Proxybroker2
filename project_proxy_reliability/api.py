@@ -132,6 +132,10 @@ def evaluate(ip, port, proxy_list,counter,data_size):
                     print(f"Log Handshake set to \n {x}\n")
 
 def calc_score(proxy_list,input_handshake_tries):
+    """
+    A function to calculate the score given the parameters TCP Handshake Hit Ratio, [Syn_ACK] Response Time, Transmission Time, Throughput
+    """
+
     
     for elements in proxy_list:
     #Calculate TCP-Handshake-Rate Score
@@ -226,6 +230,9 @@ def calc_score(proxy_list,input_handshake_tries):
         print_proxy_list_dict(proxy_list)
 
 def evaluate_call(proxy_list,counter, input_handshake_tries,data_size):
+  """
+  A function to initialize the evaluation of the Proxy 
+  """
   while counter < input_handshake_tries: 
     counter += 1 
     for elements in proxy_list:
@@ -246,6 +253,9 @@ def evaluate_call(proxy_list,counter, input_handshake_tries,data_size):
 
 
 async def write_proxy_to_dict(input_number,proxies, proxy_list,input_handshake_tries):
+        """"
+        Query the Parameters to the dictionary --> TODO IMPL Object Orientated 
+        """
         proxycount = 0
         while True:
             proxy = await proxies.get()
@@ -270,6 +280,10 @@ async def write_proxy_to_dict(input_number,proxies, proxy_list,input_handshake_t
             proxycount = proxycount + 1
 
 def print_proxy_list_dict(proxy_list):
+    """
+    A function to print the actual proxy_list
+    """
+
     print("\n \n ")
     print("   __________________________________________________________________________________________________________________________________________________________________")
     print("  |\n")
@@ -282,6 +296,9 @@ def print_proxy_list_dict(proxy_list):
     print("\n \n")            
 
 def init_proxy_list(input_number,proxy_list):
+    """
+    A function to initialize a Proxy Object from the proxybroker queue and store it in a dict -> TODO IMPL OOP
+    """
     for key in range(input_number):
         proxy_data = {"ip" : 0,
                     "port" :0,
@@ -302,7 +319,8 @@ def init_proxy_list(input_number,proxy_list):
         proxy_list.append(proxy_data)
 
 def sort_proxy_list(proxy_list):
-    
+    """A Function for sorting the List and remove proxys with a 70 score threshold
+    """
     #TODO SORT first, so that proxy with score 100 is on top
     
     proxy_list.sort(key=lambda e: e["score"], reverse=True)
