@@ -1,10 +1,8 @@
 """Find and show 10 working SOCKS5 proxies and perform a TCP Handshake individually."""
-
 from scapy.all import *
 from scapy.layers.inet import IP
 from scapy.layers.inet import TCP
 import asyncio
-from proxybroker import Broker
 from api import *
 
 
@@ -17,8 +15,17 @@ def main():
     broker = Broker(proxies)
     proxy_list= []
     proxy_list_slave = []
-    input_proxy_number = int(input('How many proxys should be gathered?\n'))
-    input_handshake_tries = int(input('How many handshakes should be established?\n'))
+
+    input_proxy_number = 0
+    
+    while input_proxy_number < 10: 
+        input_proxy_number = int(input('How many proxys >= 10 should be gathered? At least 10 for a realiable list configuration!\n'))
+    
+    input_handshake_tries = 0
+
+    while input_handshake_tries < 6:
+        input_handshake_tries = int(input('How many handshakes >= 6 should be established? At least 6 for a realiable list configuration.\n'))
+    
     data_size =1000
     init_proxy_list(input_proxy_number, proxy_list)
     print_proxy_list_dict(proxy_list)
@@ -39,7 +46,7 @@ def main():
     sort_proxy_list(proxy_list)
     refresh_proxy_list(Ready_for_connection,proxy_list,proxy_list_slave)
         
-    
-
+    #requests methode für WEbanfrage mit Proxy
+    #request(proxy_list)
 if __name__ == '__main__':
     main()

@@ -7,6 +7,8 @@ from scapy.layers.inet import TCP
 import asyncio
 from proxybroker import Broker, Proxy
 
+#from requests import *
+
 def evaluate(ip, port, proxy_list,counter,data_size):
     print(f"#################################################### {counter} . RUNDE ###########################################################")
 # Target IP and Port Adress from gathered Proxy List
@@ -312,9 +314,9 @@ def sort_proxy_list(proxy_list):
     #DELETE Proxys with score < 60
     while unbalanced:
         for elements in proxy_list:
-            if elements["score"] <= 50:
+            if elements["score"]<= 70:
                 proxy_list.remove(elements)
-                print("Removed Proxys with score < 60 \n")
+                print("Removed Proxys with score < 70 \n")
                 print_proxy_list_dict(proxy_list)
                 sort_proxy_list(proxy_list)
             
@@ -353,5 +355,16 @@ def refresh_proxy_list(Ready_for_connection: bool,proxy_list: list,proxy_list_sl
 def checker_proxy_list():
     "Perform an Evaluation Iteration on the Proxy List every 10 seconds"
 
-            
-            
+def request(proxy_list):
+    """
+    url = ["https://ipinfo.io/ ,  "https://httpbin.org/#/Response_inspection"]
+
+    ip = proxy_list[0]["ip"]
+
+    proxy_for_connection = {
+            "socks5": f"{ip}"
+     }
+    
+    response = requests.get()
+
+    """
