@@ -18,12 +18,12 @@ def main():
 
     input_proxy_number = 0
     
-    while input_proxy_number < 10: 
+    while input_proxy_number < 1: 
         input_proxy_number = int(input('How many proxys >= 10 should be gathered? At least 10 for a realiable list configuration!\n'))
     
     input_handshake_tries = 0
 
-    while input_handshake_tries < 6:
+    while input_handshake_tries < 2:
         input_handshake_tries = int(input('How many handshakes >= 6 should be established? At least 6 for a realiable list configuration.\n'))
     
     data_size =1000

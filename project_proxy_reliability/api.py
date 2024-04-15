@@ -244,8 +244,10 @@ def evaluate_call(proxy_list,counter, input_handshake_tries,data_size):
         print(f"------------------------------Handshake fuer {index}. Proxy mit IP: {targetip} und PORT: {targetport}----------------------------\n")
         
         targetport = int(targetport)
-        evaluate(targetip,targetport,proxy_list,counter,data_size) # Perform the TCP-Handshake with the proxy.
-        
+        if targetip and targetport != 0:
+            evaluate(targetip,targetport,proxy_list,counter,data_size) # Perform the TCP-Handshake with the proxy if there are still valid adresses in list
+        else:
+            break
     
     calc_score(proxy_list,input_handshake_tries)  
     print_proxy_list_dict(proxy_list) 
@@ -330,7 +332,7 @@ def sort_proxy_list(proxy_list):
     
         
     #DELETE Proxys with score < 60
-    while unbalanced:
+    while unbalanced and len(proxy_list) > 0:
         for elements in proxy_list:
             if elements["score"]<= 70:
                 proxy_list.remove(elements)
@@ -343,9 +345,9 @@ def sort_proxy_list(proxy_list):
 def refresh_proxy_list(Ready_for_connection: bool,proxy_list: list,proxy_list_slave:list):
         "A function for refilling the proxy list with new evaluated Proxys"
         if Ready_for_connection == False:
-            if  proxy_list[0]["score"] < 120 and proxy_list[1]["score"] < 120: # and proxy_list[2]["score"] < 100 or proxy_list[0] == None:
+            if  len(proxy_list) <= 2 or proxy_list[0]["score"] < 130 or proxy_list[1]["score"] < 120: # and proxy_list[2]["score"] < 100 or proxy_list[0] == None:
                 print("Refreshing the Proxy List \n")
-                asyncio.sleep(5)
+                #asyncio.sleep(5)
                 print("Refreshing the Proxy List \n")
 
                 Ready_for_connection = False
@@ -354,22 +356,36 @@ def refresh_proxy_list(Ready_for_connection: bool,proxy_list: list,proxy_list_sl
 
             
                 init_proxy_list(5, proxy_list_slave)
-                broker.find( types=[ 'SOCKS5'],lvl = 'HIGH', strict = True,limit=5)
-                write_proxy_to_dict(5,proxies, proxy_list_slave,6)
+
+                tasks = asyncio.gather(broker.find( types=[ 'SOCKS5'],lvl = 'HIGH', strict = True,limit=5),
+                            write_proxy_to_dict(5,proxies, proxy_list_slave,6),)
+    
+                loop = asyncio.get_event_loop()
+                loop.run_until_complete(tasks)
+
                 counter = 0
-                evaluate_call(proxy_list, counter,5,1000)
+                evaluate_call(proxy_list_slave, counter,6,1000)
                 sort_proxy_list(proxy_list_slave)
                 for elements in proxy_list_slave:
                     if elements["score"] >= 100:
                         proxy_list.append(elements)
                         print("Proxy ATTACHED to MASTER List")
-            
-                refresh_proxy_list(Ready_for_connection,proxy_list,proxy_list_slave)
+
+                print_proxy_list_dict(proxy_list)
+
+                if len(proxy_list) <= 2 and proxy_list[0]["score"] < 130 or proxy_list[1]["score"] < 120:
+                    refresh_proxy_list(Ready_for_connection,proxy_list,proxy_list_slave)
+                else:
+                    Ready_for_connection = True
+                    refresh_proxy_list(Ready_for_connection,proxy_list,proxy_list_slave)
 
             else:
                 Ready_for_connection = True
                 print("Proxy List is ready for Connection")
-
+        else:
+                Ready_for_connection = True
+                print("Proxy List is ready for Connection")
+                
 def checker_proxy_list():
     "Perform an Evaluation Iteration on the Proxy List every 10 seconds"
 
