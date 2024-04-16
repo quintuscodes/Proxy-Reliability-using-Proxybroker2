@@ -1,5 +1,7 @@
-"This is the python class for Proxy Manager"
 
+"""
+This is the class for managing a single proxy 
+"""
 
 class Proxy:
 
