@@ -3,16 +3,17 @@
 
 class Proxy:
 
-  def __init__(self,ip,port,score,avg_syn_ack_time,avg_transmission_time,avg_throughput,handshakes,log_handshakes,log_syn_ack_time,log_transmission_timelog_throughput):
-    self.ip = 0
-    self.port = 0
-    self.score = 0
-    self.avg_syn_ack_time = 0
-    self.avg_transmission_time = 0
-    self.avg_throughput = 0
-    self.handshakes = 0
+  def __init__(self,_ip,_port,_score,_avg_syn_ack_time,_avg_transmission_time,_avg_throughput,_handshakes,_log_handshakes,_log_syn_ack_time,_log_transmission_time,_log_throughput):
+    self.ip = _ip
+    self.port =_port
+    self.score = _score
+    self.avg_syn_ack_time = _avg_syn_ack_time
+    self.avg_transmission_time = _avg_transmission_time
+    self.avg_throughput = _avg_throughput
+    self.handshakes = _handshakes
     self.log_handshake = []
     self.log_syn_ack_time = []
     self.log_transmission_time = []
     self.log_throughput = []
+    self.proxy_list = []
           
