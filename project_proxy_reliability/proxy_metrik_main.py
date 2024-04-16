@@ -4,7 +4,8 @@ from scapy.layers.inet import IP
 from scapy.layers.inet import TCP
 import asyncio
 from api import *
-
+from proxy_class import *
+from proxy_manager import *
 
 
 

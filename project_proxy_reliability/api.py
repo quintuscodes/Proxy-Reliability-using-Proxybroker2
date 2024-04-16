@@ -382,9 +382,11 @@ def refresh_proxy_list(Ready_for_connection: bool,proxy_list: list,proxy_list_sl
 
             else:
                 Ready_for_connection = True
+                sort_proxy_list(proxy_list)
                 print("Proxy List is ready for Connection")
         else:
                 Ready_for_connection = True
+                sort_proxy_list(proxy_list)
                 print("Proxy List is ready for Connection")
                 
 def checker_proxy_list():
