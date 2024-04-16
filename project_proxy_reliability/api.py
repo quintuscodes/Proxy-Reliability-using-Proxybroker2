@@ -370,7 +370,8 @@ def refresh_proxy_list(Ready_for_connection: bool,proxy_list: list,proxy_list_sl
                     if elements["score"] >= 100:
                         proxy_list.append(elements)
                         print("Proxy ATTACHED to MASTER List")
-
+                
+                sort_proxy_list(proxy_list)
                 print_proxy_list_dict(proxy_list)
 
                 if len(proxy_list) <= 2 and proxy_list[0]["score"] < 130 or proxy_list[1]["score"] < 120:
