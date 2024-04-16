@@ -14,10 +14,21 @@ def main():
     proxies = asyncio.Queue()
     
     broker = Broker(proxies)
-    proxy_list= []
+    global proxy_list 
+    proxy_list = []
     proxy_list_slave = []
+    
+    
 
+
+
+
+    
     input_proxy_number = 0
+
+
+
+
     
     while input_proxy_number < 1: 
         input_proxy_number = int(input('How many proxys >= 10 should be gathered? At least 10 for a realiable list configuration!\n'))
@@ -28,19 +39,20 @@ def main():
         input_handshake_tries = int(input('How many handshakes >= 6 should be established? At least 6 for a realiable list configuration.\n'))
     
     data_size =1000
-    init_proxy_list(input_proxy_number, proxy_list)
-    print_proxy_list_dict(proxy_list)
+    #init_proxy_list(input_proxy_number, proxy_list)
+    #print_proxy_list_dict(proxy_list)
     
     #list_of_functions = [broker.find(types=[ 'SOCKS5'], limit=10, lvl = 'HIGH', strict = True), 
     #                    write_proxy_to_dict(proxies, proxy_list),broker.show_stats()]
     
     tasks = asyncio.gather(broker.find( types=[ 'SOCKS5'],lvl = 'HIGH', strict = True,limit=input_proxy_number),
-                            write_proxy_to_dict(input_proxy_number,proxies, proxy_list,input_handshake_tries),
+                            write_proxy_to_class('SOCKS5',input_proxy_number, proxies,input_handshake_tries,proxy_list),
     )
     
     loop = asyncio.get_event_loop()
     loop.run_until_complete(tasks)
-
+    print_proxy_list_dict(proxy_list)
+    """
     counter = 0
     evaluate_call(proxy_list, counter,input_handshake_tries,data_size)
 
@@ -49,6 +61,6 @@ def main():
         
     #requests methode für WEbanfrage mit Proxy
     #request(proxy_list)
-    
+    """
 if __name__ == '__main__':
     main()

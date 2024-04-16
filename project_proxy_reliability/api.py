@@ -6,7 +6,8 @@ from scapy.layers.inet import IP
 from scapy.layers.inet import TCP
 import asyncio
 from proxybroker import Broker, Proxy
-
+from proxy_class import *
+from proxy_manager import *
 #from requests import *
 
 def evaluate(ip, port, proxy_list,counter,data_size):
@@ -252,7 +253,18 @@ def evaluate_call(proxy_list,counter, input_handshake_tries,data_size):
     calc_score(proxy_list,input_handshake_tries)  
     print_proxy_list_dict(proxy_list) 
 
-
+async def write_proxy_to_class(_type, input_number, proxies,input_handshake_tries,proxy_list):
+        proxycount = 0
+        while True:
+            proxy = await proxies.get()
+            if proxy is None:
+                break
+            
+            ip = proxy.host
+            port = proxy.port
+            type = _type
+            p = Proxy(type,ip,port,input_handshake_tries)
+            p.add_to_list(proxy_list)
 
 async def write_proxy_to_dict(input_number,proxies, proxy_list,input_handshake_tries):
         """"
@@ -292,11 +304,15 @@ def print_proxy_list_dict(proxy_list):
     for elements in proxy_list:
         index = proxy_list.index(elements)
         index += 1
-        print(f"  > {index}. Proxy \n \n   {elements.items()}   \n")
+        attrs = vars(elements)
+        print(f"  > {index}. Proxy \n \n" + ', \n'.join("%s: %s" % item for item in attrs.items()) + "\n")
+        #print(f', \n'.join("%s: %s" % item for item in attrs.items()) + "\n")
     print("  |__________________________________________________________________________________________________________________________________________________________________\n")
 
     print("\n \n")            
 
+    
+    
 def init_proxy_list(input_number,proxy_list):
     """
     A function to initialize a Proxy Object from the proxybroker queue and store it in a dict -> TODO IMPL OOP
