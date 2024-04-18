@@ -17,7 +17,7 @@ def main():
     global proxy_list 
     proxy_list = []
     proxy_list_slave = []
-    
+    p = Proxy_Manager("SOCKS5")
     
 
 
@@ -46,12 +46,12 @@ def main():
     #                    write_proxy_to_dict(proxies, proxy_list),broker.show_stats()]
     
     tasks = asyncio.gather(broker.find( types=[ 'SOCKS5'],lvl = 'HIGH', strict = True,limit=input_proxy_number),
-                            write_proxy_to_class('SOCKS5',input_proxy_number, proxies,input_handshake_tries,proxy_list),
+                            p.write_proxy_to_class('SOCKS5',input_proxy_number, proxies,input_handshake_tries),
     )
     
     loop = asyncio.get_event_loop()
     loop.run_until_complete(tasks)
-    print_proxy_list_dict(proxy_list)
+    print_proxy_list_dict(p.proxy_list)
     """
     counter = 0
     evaluate_call(proxy_list, counter,input_handshake_tries,data_size)

@@ -252,8 +252,8 @@ def evaluate_call(proxy_list,counter, input_handshake_tries,data_size):
     
     calc_score(proxy_list,input_handshake_tries)  
     print_proxy_list_dict(proxy_list) 
-
-async def write_proxy_to_class(_type, input_number, proxies,input_handshake_tries,proxy_list):
+"""
+async def write_proxy_to_class(_type, input_number, proxies,input_handshake_tries,proxy_list,Proxy_Manager):
         proxycount = 0
         while True:
             proxy = await proxies.get()
@@ -265,7 +265,7 @@ async def write_proxy_to_class(_type, input_number, proxies,input_handshake_trie
             type = _type
             p = Proxy(type,ip,port,input_handshake_tries)
             p.add_to_list(proxy_list)
-
+"""
 async def write_proxy_to_dict(input_number,proxies, proxy_list,input_handshake_tries):
         """"
         Query the Parameters to the dictionary --> TODO IMPL Object Orientated 
