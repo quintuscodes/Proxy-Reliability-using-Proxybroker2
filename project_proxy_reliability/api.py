@@ -299,13 +299,14 @@ def print_proxy_list_dict(proxy_list):
     """
 
     print("\n \n ")
+    print("   Proxy - Liste")
     print("   __________________________________________________________________________________________________________________________________________________________________")
     print("  |\n")
     for elements in proxy_list:
         index = proxy_list.index(elements)
         index += 1
         attrs = vars(elements)
-        print(f"  > {index}. Proxy \n \n" + ', \n'.join("%s: %s" % item for item in attrs.items()) + "\n")
+        print(f"      > {index}. Proxy \n \n      " + ', \n      '.join("%s: %s" % item for item in attrs.items()) + "\n")
         #print(f', \n'.join("%s: %s" % item for item in attrs.items()) + "\n")
     print("  |__________________________________________________________________________________________________________________________________________________________________\n")
 
