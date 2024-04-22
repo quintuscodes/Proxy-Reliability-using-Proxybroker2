@@ -1,6 +1,6 @@
 
 """
-This is the class for managing a single proxy 
+A Class for managing a single proxy fetched from the proxybroker2 python tool.
 """
 
 class Proxy:
@@ -28,3 +28,4 @@ class Proxy:
     attrs = vars(self)
     print(f"\nAdded to List:\n" + ', \n'.join("%s: %s" % item for item in attrs.items()) + "\n")
        
+#TODO Implement getter and setter for proxy

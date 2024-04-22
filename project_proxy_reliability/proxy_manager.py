@@ -12,17 +12,14 @@ from proxy_manager import *
 #from requests import *
 
 class Proxy_Manager:
-
   """
-  #proxy_list :: dict/ list
-  
-  
+  A Class for Managing Proxy List and Evaluation
   """
   def __init__(self,_protocol):
     self.protocol = _protocol
     self.master_proxy_list = []
     self.proxy_list = []
-
+    
 
 
 
@@ -77,4 +74,28 @@ class Proxy_Manager:
     print("  |__________________________________________________________________________________________________________________________________________________________________\n \n \n")
     print("|")
     print(" _____________________________________________________________________________________________________________________________________________________________________")
-    print("\n \n")  
+    print("\n \n") 
+
+  def evaluate_call(self,counter, input_handshake_tries,data_size):
+    """
+    A Method to initialize the evaluation of the Proxy 
+    
+    """
+    while counter < input_handshake_tries: 
+      counter += 1 
+      for elements in self.proxy_list:
+          index = self.proxy_list.index(elements)
+          index += 1
+          targetip =  elements.get_ip
+          targetport = elements.get_port
+          
+          print(f"------------------------------Handshake fuer {index}. Proxy mit IP: {targetip} und PORT: {targetport}----------------------------\n")
+          
+          targetport = int(targetport)
+          if targetip and targetport != 0:
+              evaluate(targetip,targetport,self.proxy_list,counter,data_size) # Perform the TCP-Handshake with the proxy if there are still valid adresses in list
+          else:
+              break
+      
+      calc_score(proxy_list,input_handshake_tries)  
+      print_proxy_list_dict(proxy_list) 
