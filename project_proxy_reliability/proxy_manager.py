@@ -9,7 +9,8 @@ import asyncio
 from proxybroker import Broker, Proxy
 from proxy_class import *
 from proxy_manager import *
-#from requests import *
+
+#import requests
 
 class Proxy_Manager:
   """
@@ -22,10 +23,20 @@ class Proxy_Manager:
     
 
 
-
-  def perform_request():
+  """
+  def perform_request(self):
     "Perform the Request with [1] in master list"
-  
+    
+       
+    proxies = {
+       f"{self.protocol.lower()}": f"{self.proxy_list[0].get_ip()}:{self.proxy_list[0].get_port()}",
+       f"{self.protocol.lower()}": f"{self.proxy_list[1].get_ip()}:{self.proxy_list[1].get_port()}"
+
+    }
+
+    response = requests.get("https://httpbin.org/get", proxies=proxies)
+    print(response.text)
+  """
   async def write_proxy_to_class(self,_type, input_number, proxies,input_handshake_tries):
         proxycount = 0
         while True:

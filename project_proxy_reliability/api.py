@@ -8,7 +8,7 @@ import asyncio
 from proxybroker import Broker, Proxy
 from proxy_class import *
 from proxy_manager import *
-#from requests import *
+
 
 def evaluate(ip, port, proxy_list,counter,data_size):
     print(f"#################################################### {counter} . RUNDE ###########################################################")
@@ -376,7 +376,7 @@ def refresh_proxy_list(Ready_for_connection: bool,proxy_list: list,proxy_list_sl
                 init_proxy_list(5, proxy_list_slave)
 
                 tasks = asyncio.gather(broker.find( types=[ 'SOCKS5'],lvl = 'HIGH', strict = True,limit=5),
-                            write_proxy_to_dict(5,proxies, proxy_list_slave,6),)
+                            write_proxy_to_(5,proxies, proxy_list_slave,6),)
     
                 loop = asyncio.get_event_loop()
                 loop.run_until_complete(tasks)
@@ -406,20 +406,8 @@ def refresh_proxy_list(Ready_for_connection: bool,proxy_list: list,proxy_list_sl
                 Ready_for_connection = True
                 sort_proxy_list(proxy_list)
                 print("Proxy List is ready for Connection")
-                
+
+"""         
 def checker_proxy_list():
     "Perform an Evaluation Iteration on the Proxy List every 10 seconds"
-
-def request(proxy_list):
-    """
-    url = ["https://ipinfo.io/ ,  "https://httpbin.org/#/Response_inspection"]
-
-    ip = proxy_list[0]["ip"]
-
-    proxy_for_connection = {
-            "socks5": f"{ip}"
-     }
-    
-    response = requests.get()
-
-    """
+""" 

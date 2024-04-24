@@ -3,7 +3,7 @@ from scapy.all import *
 from scapy.layers.inet import IP
 from scapy.layers.inet import TCP
 import asyncio
-from api import *
+
 from proxy_class import *
 from proxy_manager import *
 
@@ -32,6 +32,8 @@ def main():
     socks.fetch_proxys_write_to_class(input_proxy_number,input_handshake_tries,data_size)
     http.fetch_proxys_write_to_class(input_proxy_number,input_handshake_tries,data_size)
     
+    #http.perform_request()
+
     """
     evaluate_call(proxy_list, counter,input_handshake_tries,data_size)
 
@@ -41,5 +43,6 @@ def main():
     #requests methode für WEbanfrage mit Proxy
     #request(proxy_list)
     """
+
 if __name__ == '__main__':
     main()

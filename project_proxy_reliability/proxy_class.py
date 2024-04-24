@@ -3,7 +3,7 @@ from scapy.all import *
 from scapy.layers.inet import IP
 from scapy.layers.inet import TCP
 import asyncio
-from api import *
+
 """
 A Class for managing a single proxy fetched from the proxybroker2 python tool.
 """
