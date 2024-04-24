@@ -72,11 +72,10 @@ class Proxy_Manager:
         print(f"      > {index}. Proxy \n \n      " + ', \n      '.join("%s: %s" % item for item in attrs.items()) + "\n")
         #print(f', \n'.join("%s: %s" % item for item in attrs.items()) + "\n")
     print("  |__________________________________________________________________________________________________________________________________________________________________\n \n \n")
-    print("|")
-    print(" _____________________________________________________________________________________________________________________________________________________________________")
+    print("|_____________________________________________________________________________________________________________________________________________________________________")
     print("\n \n") 
 
-  def evaluate_call(self,counter, input_handshake_tries,data_size):
+  def evaluate_proxy_list(self,counter, input_handshake_tries,data_size):
     """
     A Method to initialize the evaluation of the Proxys in Proxy-List
     
@@ -89,13 +88,9 @@ class Proxy_Manager:
           targetip =  elements.get_ip()
           targetport = elements.get_port()
           
-          print(f"------------------------------Handshake fuer {index}. Proxy mit IP: {targetip} und PORT: {targetport}----------------------------\n")
+          #create async master_evaluate tasks for one proxy object each,so that all proxys start to be evaluated at once.
           
-          targetport = int(targetport)
-          if targetip and targetport != 0:
-              evaluate(targetip,targetport,self.proxy_list,counter,data_size) # Perform the TCP-Handshake with the proxy if there are still valid adresses in list
-          else:
-              break
+          elements.master_evaluate(index)
       
       #calc_score(proxy_list,input_handshake_tries)  
       #print_proxy_list_dict(proxy_list) 
