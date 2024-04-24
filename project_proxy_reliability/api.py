@@ -266,10 +266,11 @@ async def write_proxy_to_class(_type, input_number, proxies,input_handshake_trie
             p = Proxy(type,ip,port,input_handshake_tries)
             p.add_to_list(proxy_list)
 """
+"""
 async def write_proxy_to_dict(input_number,proxies, proxy_list,input_handshake_tries):
-        """"
+        
         Query the Parameters to the dictionary --> TODO IMPL Object Orientated 
-        """
+        
         proxycount = 0
         while True:
             proxy = await proxies.get()
@@ -292,7 +293,7 @@ async def write_proxy_to_dict(input_number,proxies, proxy_list,input_handshake_t
             x = proxy_list[proxycount].items()
             print(f"FOUND PROXY:  {proxy.types}  and the actual proxy {x}\n")
             proxycount = proxycount + 1
-
+"""
 def print_proxy_list_dict(proxy_list):
     """
     A function to print the actual proxy_list

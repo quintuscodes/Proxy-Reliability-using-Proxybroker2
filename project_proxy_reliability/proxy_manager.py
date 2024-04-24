@@ -78,7 +78,7 @@ class Proxy_Manager:
 
   def evaluate_call(self,counter, input_handshake_tries,data_size):
     """
-    A Method to initialize the evaluation of the Proxy 
+    A Method to initialize the evaluation of the Proxys in Proxy-List
     
     """
     while counter < input_handshake_tries: 
@@ -86,8 +86,8 @@ class Proxy_Manager:
       for elements in self.proxy_list:
           index = self.proxy_list.index(elements)
           index += 1
-          targetip =  elements.get_ip
-          targetport = elements.get_port
+          targetip =  elements.get_ip()
+          targetport = elements.get_port()
           
           print(f"------------------------------Handshake fuer {index}. Proxy mit IP: {targetip} und PORT: {targetport}----------------------------\n")
           
@@ -97,5 +97,11 @@ class Proxy_Manager:
           else:
               break
       
-      calc_score(proxy_list,input_handshake_tries)  
-      print_proxy_list_dict(proxy_list) 
+      #calc_score(proxy_list,input_handshake_tries)  
+      #print_proxy_list_dict(proxy_list) 
+
+      """
+      for proxy in proxy_list:
+        async create task(proxy.master_evaluate)
+      """
+
