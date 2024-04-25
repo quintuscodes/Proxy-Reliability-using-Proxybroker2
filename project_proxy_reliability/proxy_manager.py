@@ -60,15 +60,15 @@ class Proxy_Manager:
     
     loop = asyncio.get_event_loop()
     loop.run_until_complete(tasks)
-    self.print_proxy_list_dict()
+    self.print_proxy_list()
     
 
-  def print_proxy_list_dict(self):
+  def print_proxy_list(self):
     """
     A function to print the actual proxy_list
     """
     
-
+    
     print("\n \n ")
     print(f"{self.protocol} Proxy - Manager")
     print(" ____________________________________________________________________________________________________________________________________________________________________")
@@ -86,23 +86,35 @@ class Proxy_Manager:
     print("|_____________________________________________________________________________________________________________________________________________________________________")
     print("\n \n") 
 
-  def evaluate_proxy_list(self,counter, input_handshake_tries,data_size):
+  async def evaluate_proxy_list(self,counter, input_handshake_tries,data_size):
     """
     A Method to initialize the evaluation of the Proxys in Proxy-List
     
     """
     while counter < input_handshake_tries: 
       counter += 1 
-      for elements in self.proxy_list:
-          index = self.proxy_list.index(elements)
+      for proxy in self.proxy_list:
+          index = self.proxy_list.index(proxy)
           index += 1
-          targetip =  elements.get_ip()
-          targetport = elements.get_port()
+          targetip =  proxy.get_ip()
+          targetport = proxy.get_port()
           
           #create async master_evaluate tasks for one proxy object each,so that all proxys start to be evaluated at once.
           
-          elements.master_evaluate(index)
+          #for each proxy create_task(proxy.master_evaluate())
+
+          await asyncio.to_thread(proxy.master_evaluate(index))
       
+
+
+
+
+
+
+
+
+
+
       #calc_score(proxy_list,input_handshake_tries)  
       #print_proxy_list_dict(proxy_list) 
 

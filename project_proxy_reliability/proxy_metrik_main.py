@@ -9,7 +9,7 @@ from proxy_manager import *
 
 
 
-def main():
+async def main():
     Ready_for_connection = False
     data_size =1000
     proxy_list_slave = []
@@ -32,8 +32,19 @@ def main():
     socks.fetch_proxys_write_to_class(input_proxy_number,input_handshake_tries,data_size)
     http.fetch_proxys_write_to_class(input_proxy_number,input_handshake_tries,data_size)
     
+    await asyncio.gather(socks.evaluate_proxy_list(counter, input_handshake_tries,data_size),
+    http.evaluate_proxy_list(counter,input_handshake_tries,data_size))
+    
+    
+    #asyncio.run(main())
+    
+    
+    
+    
+    
+    
     #http.perform_request()
-
+    
     """
     evaluate_call(proxy_list, counter,input_handshake_tries,data_size)
 

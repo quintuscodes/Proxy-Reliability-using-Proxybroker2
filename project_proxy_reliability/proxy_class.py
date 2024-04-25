@@ -80,8 +80,22 @@ class Proxy:
   async def master_evaluate(self,index):
     #Function to call async Task Group evaluate functions asynchronously  - not sure to declare here or in proxy_Manager
     print(f"------------------------------START MASTER EVALUATE fuer {index}. Proxy mit IP: {self.ip} und PORT: {self.port}----------------------------\n")
+
+    #TODO Schedule Tasks with Asyncio to perform evaluation concurrently
+
     tasks = [ self.evaluate_handshakes(),self.evaluate_transmission_time(),self.evaluate_throughput()]
-  
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(*tasks)
+
+    #asyncio.gather()
+    #asyncio Taskgroup 
+
+
+
+
+
+
   async def evaluate_handshakes(self):
      #Coroutine Function to evaluate the handshake
 
@@ -92,7 +106,8 @@ class Proxy:
       
       # Transceive SYN-Paket and Receive Answer
       print("Sendet SYN- Paket\n")
-      syn_ack_response = sr1(syn_packet, timeout=2, verbose=False)
+      syn_ack_response = await send_paket(syn_packet)
+      #syn_ack_response = sr1(syn_packet, timeout=2, verbose=False)
       
       if syn_ack_response:
           syn_ack_time = syn_ack_response.time - syn_packet.sent_time
@@ -145,7 +160,8 @@ class Proxy:
     data_size = 1000
     data_packet = IP(dst=self.ip)/TCP(dport=self.port)/Raw(RandString(size=data_size))
     start_time = time.time()
-    response = sr1(data_packet, verbose=False, timeout=5)
+    response = await send_paket(data_packet)
+    #response = sr1(data_packet, verbose=False, timeout=5)
     end_time = time.time()
 
     if response:
@@ -168,8 +184,12 @@ class Proxy:
 
     #Send 10 data packets through proxy and measure time for 10 * 1000Bytes
     start_time = time.time()
+
     for packet in range(10):
         send(throughput_packet, verbose=False)
+    
+    #await asyncio.gather(*[send_paket(throughput_packet) for send in range(10)])
+
     end_time = time.time()
 
     # Calculate throughput
@@ -181,4 +201,5 @@ class Proxy:
     self.set_log_throughput(throughput)
     print(f"Log Throughput set to \n {self.get_log_throughput()} in KB/second \n")
 
-  
+async def send_paket(packet):
+   return await asyncio.get_event_loop().run_in_executor(None,sr1,packet,verbose=False,timeout=5)
