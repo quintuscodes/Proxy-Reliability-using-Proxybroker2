@@ -51,17 +51,21 @@ class Proxy_Manager:
             p = Proxy(type,ip,port,input_handshake_tries)
             p.add_to_list(self.proxy_list)
 
-  def fetch_proxys_write_to_class(self,input_proxy_number,input_handshake_tries,data_size):
+  async def fetch_proxys_write_to_class(self,input_proxy_number,input_handshake_tries,data_size):
     
     proxies = asyncio.Queue()
     broker = Broker(proxies)
-    tasks = asyncio.gather(broker.find( types=[ f'{self.protocol}'],lvl = 'HIGH', strict = True,limit=input_proxy_number),
-                            self.write_proxy_to_class(f'{self.protocol}',input_proxy_number, proxies,input_handshake_tries))
     
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(tasks)
+    await asyncio.gather(broker.find( types=[ f'{self.protocol}'],lvl = 'HIGH', strict = True,limit=input_proxy_number),
+              self.write_proxy_to_class(f'{self.protocol}',input_proxy_number, proxies,input_handshake_tries))
+    
+    
     self.print_proxy_list()
     
+
+
+
+
 
   def print_proxy_list(self):
     """
@@ -103,9 +107,9 @@ class Proxy_Manager:
           
           #for each proxy create_task(proxy.master_evaluate())
 
-          await asyncio.to_thread(proxy.master_evaluate(index))
-      
-
+          
+          asyncio.create_task(proxy.master_evaluate(index))
+          
 
 
 
