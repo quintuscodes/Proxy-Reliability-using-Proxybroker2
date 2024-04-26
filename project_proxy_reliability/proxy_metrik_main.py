@@ -31,12 +31,10 @@ def main():
     loop = asyncio.get_event_loop()
     
     
-    tasks = [loop.create_task(socks.fetch_proxys_write_to_class(input_proxy_number,input_handshake_tries,data_size))]
+    task1 = loop.create_task(socks.fetch_proxys_write_to_class(input_proxy_number,input_handshake_tries,data_size))
     
 
-   
-    
-    loop.run_until_complete(*tasks)
+    loop.run_until_complete(task1)
     
     
     
@@ -46,7 +44,7 @@ def main():
     #http.perform_request()
     
     """
-    evaluate_call(proxy_list, counter,input_handshake_tries,data_size)
+    
 
     sort_proxy_list(proxy_list)
     refresh_proxy_list(Ready_for_connection,proxy_list,proxy_list_slave)
