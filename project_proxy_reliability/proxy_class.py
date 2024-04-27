@@ -79,15 +79,14 @@ class Proxy:
   
   async def master_evaluate(self,index):
     #Function to call async Task Group evaluate functions asynchronously  - not sure to declare here or in proxy_Manager
-    print(f"------------------------------START MASTER EVALUATE fuer {index}. Proxy mit IP: {self.ip} und PORT: {self.port}----------------------------\n")
-
+    task = asyncio.create_task(print(f"------------------------------START MASTER EVALUATE fuer {index}. Proxy mit IP: {self.ip} und PORT: {self.port}----------------------------\n"))
+ 
     #TODO Schedule Tasks with Asyncio to perform evaluation concurrently
+    
+    tasks = [task, self.evaluate_handshakes(),self.evaluate_transmission_time(),self.evaluate_throughput()]
 
-    tasks = [ self.evaluate_handshakes(),self.evaluate_transmission_time(),self.evaluate_throughput()]
-
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(*tasks)
-
+    await asyncio.gather(*tasks)
+  
     #asyncio.gather()
     #asyncio Taskgroup 
 
@@ -152,6 +151,8 @@ class Proxy:
           print(f"Log Handshake set to \n {self.get_log_handshake()}\n")
           self.set_log_syn_ack_time(0)
           print(f"Log SYN_ACK set to \n {self.get_log_syn_ack_time()}\n")
+      
+      return self
 
   async def evaluate_transmission_time(self):
     #Coroutine Function to evaluate the transmission time
@@ -175,6 +176,8 @@ class Proxy:
         print(f"Transmission time for {data_size} bytes of data: {transmission_time} seconds")
         self.set_log_transmission_time(0)
         print(f"Log Transmission TIme set to \n {self.get_log_transmission_time()}\n")
+
+    return self 
   
   async def evaluate_throughput(self):
     #Coroutine Function to evaluate the througput
@@ -201,5 +204,7 @@ class Proxy:
     self.set_log_throughput(throughput)
     print(f"Log Throughput set to \n {self.get_log_throughput()} in KB/second \n")
 
+    return self
+  
 async def send_paket(packet):
    return await asyncio.get_event_loop().run_in_executor(None,sr1,packet,verbose=False,timeout=5)
