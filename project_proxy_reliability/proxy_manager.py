@@ -95,9 +95,10 @@ class Proxy_Manager:
     A Method to initialize the evaluation of the Proxys in Proxy-List
     
     """
-    
+    loop = asyncio.get_running_loop()
     while counter < input_handshake_tries: 
       counter += 1 
+      
       for proxy in self.proxy_list:
           index = self.proxy_list.index(proxy)
           index += 1
@@ -109,7 +110,7 @@ class Proxy_Manager:
           #for each proxy create_task(proxy.master_evaluate())
 
           
-          await asyncio.create_task(proxy.master_evaluate(index))
+          loop.create_future(proxy.master_evaluate(index))
 
 
 
