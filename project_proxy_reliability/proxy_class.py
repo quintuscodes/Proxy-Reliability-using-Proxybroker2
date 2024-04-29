@@ -31,7 +31,10 @@ class Proxy:
     print(f"Initiated Proxy: \nIP: {self.ip}   , Port:  {self.port},  Protokoll:  {self.protocol}, ")
 
   #TODO Getter and Setter for Proxy
-
+  def get_object(self):
+     
+     return self
+  
   def get_ip(self):
     return self.ip
   
@@ -80,16 +83,14 @@ class Proxy:
   async def master_evaluate(self,index):
     #Function to call async Task Group evaluate functions asynchronously  - not sure to declare here or in proxy_Manager
     print(f"------------------------------START MASTER EVALUATE fuer {index}. Proxy mit IP: {self.ip} und PORT: {self.port}----------------------------\n")
- 
+    
     #TODO Schedule Tasks with Asyncio to perform evaluation concurrently
-    """
+    
     tasks = [ self.evaluate_handshakes(),self.evaluate_transmission_time(),self.evaluate_throughput()]
 
     await asyncio.gather(*tasks)
   
-    #asyncio.gather()
-    #asyncio Taskgroup 
-    """
+    
 
 
 

@@ -20,7 +20,8 @@ class Proxy_Manager:
     self.protocol = _protocol
     self.master_proxy_list = []
     self.proxy_list = []
-    
+  
+  
 
 
   """
@@ -95,7 +96,9 @@ class Proxy_Manager:
     A Method to initialize the evaluation of the Proxys in Proxy-List
     
     """
-    loop = asyncio.get_running_loop()
+    
+    
+    
     while counter < input_handshake_tries: 
       counter += 1 
       
@@ -108,12 +111,11 @@ class Proxy_Manager:
           #create async master_evaluate tasks for one proxy object each,so that all proxys start to be evaluated at once.
           
           #for each proxy create_task(proxy.master_evaluate())
-
           
-          loop.create_future(proxy.master_evaluate(index))
+          
+          proxy.master_evaluate(index)
 
-
-
+      
 
 
 
