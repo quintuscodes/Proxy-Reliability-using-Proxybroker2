@@ -34,10 +34,11 @@ class Proxy_Manager:
        f"{self.protocol.lower()}": f"{self.proxy_list[1].get_ip()}:{self.proxy_list[1].get_port()}"
 
     }
-
+  
     response = requests.get("https://httpbin.org/get", proxies=proxies)
     print(response.text)
   """
+
   async def write_proxy_to_class(self,_type, input_number, proxies,input_handshake_tries):
         proxycount = 0
         while True:
@@ -56,19 +57,18 @@ class Proxy_Manager:
     
     proxies = asyncio.Queue()
     broker = Broker(proxies)
+    print("test")
+    await broker.find( types=[ f'{self.protocol}'],lvl = 'HIGH', strict = True,limit=input_proxy_number)
+    await self.write_proxy_to_class(f'{self.protocol}',input_proxy_number, proxies,input_handshake_tries)
     
-    await asyncio.gather(broker.find( types=[ f'{self.protocol}'],lvl = 'HIGH', strict = True,limit=input_proxy_number),
-              self.write_proxy_to_class(f'{self.protocol}',input_proxy_number, proxies,input_handshake_tries))
-    
-    
-    self.print_proxy_list()
+    await self.print_proxy_list()
     
 
 
 
 
 
-  def print_proxy_list(self):
+  async def print_proxy_list(self):
     """
     A function to print the actual proxy_list
     """

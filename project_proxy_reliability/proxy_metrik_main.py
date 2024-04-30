@@ -9,7 +9,7 @@ from proxy_manager import *
 
 
 
-def main():
+async def main():
     
     Ready_for_connection = False
     data_size =1000
@@ -29,27 +29,32 @@ def main():
         input_handshake_tries = int(input('How many handshakes >= 6 should be established? At least 6 for a realiable list configuration.\n'))
     
 
-    loop = asyncio.get_event_loop()
+    #loop = asyncio.get_event_loop()
+
     try:
 
-        loop.create_task(socks.fetch_proxys_write_to_class(input_proxy_number,input_handshake_tries,data_size))
-        loop.create_task(http.fetch_proxys_write_to_class(input_proxy_number,input_handshake_tries,data_size))
-        loop.create_task(socks.evaluate_proxy_list(counter, input_handshake_tries,data_size))
-        loop.run_forever()
-    
-    
+        await socks.fetch_proxys_write_to_class(input_proxy_number,input_handshake_tries,data_size)
+        #loop.create_task(http.fetch_proxys_write_to_class(input_proxy_number,input_handshake_tries,data_size))
+        # loop.create_task(socks.evaluate_proxy_list(counter, input_handshake_tries,data_size))
+        
+        #loop.run_forever()
     
 
     except KeyboardInterrupt:
+        #loop.stop()
         pass
 
     finally: 
         print("Closing Loop")
-        loop.stop()
-        loop.close()
         
         
+        
+        
+    """
+    await asyncio.create_task(socks.fetch_proxys_write_to_class(input_proxy_number,input_handshake_tries,data_size))
+    await asyncio.create_task(socks.evaluate_proxy_list(counter,input_handshake_tries,data_size))                 
     
+    """
     
     
     
@@ -69,4 +74,4 @@ def main():
     """
 
 if __name__ == '__main__':
-   main()
+   asyncio.run(main())
