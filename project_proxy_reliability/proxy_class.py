@@ -80,18 +80,20 @@ class Proxy:
 
 
   
-  async def master_evaluate(self,index):
+  async def master_evaluate(self,index,queue):
     #Function to call async Task Group evaluate functions asynchronously  - not sure to declare here or in proxy_Manager
-    print(f"------------------------------START MASTER EVALUATE fuer {index}. Proxy mit IP: {self.ip} und PORT: {self.port}----------------------------\n")
+    while True:
+      work_item = queue.get()
+      print(f"------------------------------START MASTER EVALUATE fuer {index}. Proxy mit IP: {self.ip} und PORT: {self.port}----------------------------\n")
     
-    #TODO Schedule Tasks with Asyncio to perform evaluation concurrently
-    
-    tasks = [ self.evaluate_handshakes(),self.evaluate_transmission_time(),self.evaluate_throughput()]
+      #TODO Schedule Tasks with Asyncio to perform evaluation concurrently
+      """
+      tasks = [ self.evaluate_handshakes(),self.evaluate_transmission_time(),self.evaluate_throughput()]
 
-    await asyncio.gather(*tasks)
-  
+      await asyncio.gather(*tasks)
+      """
     
-
+      queue.task_done()
 
 
 

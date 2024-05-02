@@ -23,7 +23,10 @@ class Proxy_Manager:
   
   
 
-
+  def get_proxy(self, index):
+     proxy = self.proxy_list[index]
+     
+     return proxy
   """
   def perform_request(self):
     "Perform the Request with [1] in master list"
@@ -39,7 +42,7 @@ class Proxy_Manager:
     print(response.text)
   """
 
-  async def write_proxy_to_class(self,_type, input_number, proxies,input_handshake_tries):
+  async def write_proxy_to_class(self,_type, input_number, proxies,input_evaluation_rounds):
         proxycount = 0
         while True:
             proxy = await proxies.get()
@@ -50,16 +53,16 @@ class Proxy_Manager:
             port = proxy.port
             type = _type
             self.protocol = _type
-            p = Proxy(type,ip,port,input_handshake_tries)
+            p = Proxy(type,ip,port,input_evaluation_rounds)
             p.add_to_list(self.proxy_list)
 
-  async def fetch_proxys_write_to_class(self,input_proxy_number,input_handshake_tries,data_size):
+  async def fetch_proxys_write_to_class(self,input_proxy_number,input_evaluation_rounds,data_size):
     
     proxies = asyncio.Queue()
     broker = Broker(proxies)
     print("test")
     await broker.find( types=[ f'{self.protocol}'],lvl = 'HIGH', strict = True,limit=input_proxy_number)
-    await self.write_proxy_to_class(f'{self.protocol}',input_proxy_number, proxies,input_handshake_tries)
+    await self.write_proxy_to_class(f'{self.protocol}',input_proxy_number, proxies,input_evaluation_rounds)
     
     await self.print_proxy_list()
     
@@ -91,7 +94,7 @@ class Proxy_Manager:
     print("|_____________________________________________________________________________________________________________________________________________________________________")
     print("\n \n") 
 
-  async def evaluate_proxy_list(self,counter, input_handshake_tries,data_size):
+  async def evaluate_proxy_list(self,counter, input_evaluation_rounds,data_size, input_proxy_number):
     """
     A Method to initialize the evaluation of the Proxys in Proxy-List
     
@@ -99,27 +102,39 @@ class Proxy_Manager:
     
     
     
-    while counter < input_handshake_tries: 
+    while counter < input_evaluation_rounds: 
       counter += 1 
       
-      for proxy in self.proxy_list:
-          index = self.proxy_list.index(proxy)
+      queue = asyncio.Queue(maxsize=input_proxy_number)
+
+      tasks = []
+      
+      for i in range(self.proxy_list.len()):
+          index = self.proxy_list.index(i)
+          proxy = self.get_proxy(i)
           index += 1
-          targetip =  proxy.get_ip()
-          targetport = proxy.get_port()
+          
+          task = asyncio.create_task(proxy.master_evaluate(index,queue))
+          tasks.append(task)
+          
           
           #create async master_evaluate tasks for one proxy object each,so that all proxys start to be evaluated at once.
           
           #for each proxy create_task(proxy.master_evaluate())
           
-          
-          proxy.master_evaluate(index)
+      await queue.join() 
+
+      for task in tasks:
+        task.cancel()
+        # Wait until all worker tasks are cancelled.
+      
+      await asyncio.gather(*tasks, return_exceptions=True)
 
       
 
 
 
-    #calc_score(proxy_list,input_handshake_tries)  
+    #calc_score(proxy_list,input_evaluation_rounds)  
     #print_proxy_list_dict(proxy_list) 
 
     """
