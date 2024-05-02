@@ -23,7 +23,7 @@ class Proxy_Manager:
   
   
 
-  def get_proxy(self, index):
+  def get_proxy(self, index) -> Proxy:
      proxy = self.proxy_list[index]
      
      return proxy
@@ -106,18 +106,26 @@ class Proxy_Manager:
       counter += 1 
       
       queue = asyncio.Queue(maxsize=input_proxy_number)
-
+      """
+      What exactly needs to be added to the queue?
+      """
       tasks = []
       
       for i in range(self.proxy_list.len()):
           index = self.proxy_list.index(i)
+
           proxy = self.get_proxy(i)
+
           index += 1
           
-          task = asyncio.create_task(proxy.master_evaluate(index,queue))
-          tasks.append(task)
-          
-          
+          task1 = asyncio.create_task(proxy.evaluate_handshakes(queue))
+          task2 = asyncio.create_task(proxy.evaluate_transmission_time(queue))
+          task3 = asyncio.create_task(proxy.evaluate_throughput(queue))
+
+          tasks.append(task1)
+          tasks.append(task2)
+          tasks.append(task3)
+
           #create async master_evaluate tasks for one proxy object each,so that all proxys start to be evaluated at once.
           
           #for each proxy create_task(proxy.master_evaluate())
