@@ -111,6 +111,10 @@ class Proxy_Manager:
       """
       tasks = []
       
+      queue.put_nowait(Proxy.evaluate_handshakes())
+      queue.put_nowait(Proxy.evaluate_throughput())
+      queue.put_nowait(Proxy.evaluate_transmission_time())
+
       for i in range(self.proxy_list.len()):
           index = self.proxy_list.index(i)
 
@@ -118,17 +122,11 @@ class Proxy_Manager:
 
           index += 1
           
-          task1 = asyncio.create_task(proxy.evaluate_handshakes(queue))
-          task2 = asyncio.create_task(proxy.evaluate_transmission_time(queue))
-          task3 = asyncio.create_task(proxy.evaluate_throughput(queue))
+          #task = asyncio.ensure_future(proxy.master_evaluate(index,queue))
+          task = asyncio.create_task(proxy.master_evaluate(index,queue))
 
-          tasks.append(task1)
-          tasks.append(task2)
-          tasks.append(task3)
-
-          #create async master_evaluate tasks for one proxy object each,so that all proxys start to be evaluated at once.
+          tasks.append(task)
           
-          #for each proxy create_task(proxy.master_evaluate())
           
       await queue.join() 
 

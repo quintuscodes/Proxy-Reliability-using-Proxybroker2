@@ -35,18 +35,20 @@ def main():
 
         loop.create_task(socks.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size))
         #loop.create_task(http.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size))
-        #loop.create_task(socks.evaluate_proxy_list(counter, input_evaluation_rounds,data_size,input_proxy_number))
+        loop.create_task(socks.evaluate_proxy_list(counter, input_evaluation_rounds,data_size,input_proxy_number))
         
         loop.run_forever()
     
 
     except KeyboardInterrupt:
-        loop.stop()
+        loop.close()
+        print("Closing Loop")
+        pass
         
 
     finally: 
-        print("Closing Loop")
-        
+        print("Stopping Loop")
+        loop.stop()
         
         
         
