@@ -110,7 +110,7 @@ class Proxy_Manager:
       What exactly needs to be added to the queue?
       """
       tasks = []
-      
+      print("Test Queue")
       queue.put_nowait(Proxy.evaluate_handshakes())
       queue.put_nowait(Proxy.evaluate_throughput())
       queue.put_nowait(Proxy.evaluate_transmission_time())
