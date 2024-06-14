@@ -6,6 +6,7 @@ from scapy.all import *
 from scapy.layers.inet import IP
 from scapy.layers.inet import TCP
 import asyncio
+import aiohttp
 from proxybroker import Broker, Proxy
 from proxy_class import *
 from proxy_manager import *
@@ -59,11 +60,13 @@ class Proxy_Manager:
   async def fetch_proxys_write_to_class(self,input_proxy_number,input_evaluation_rounds,data_size):
     
     proxies = asyncio.Queue()
+
+   
     broker = Broker(proxies)
     print("test")
     await broker.find( types=[ f'{self.protocol}'],lvl = 'HIGH', strict = True,limit=input_proxy_number)
     await self.write_proxy_to_class(f'{self.protocol}',input_proxy_number, proxies,input_evaluation_rounds)
-    
+      
     await self.print_proxy_list()
     
 
@@ -111,20 +114,24 @@ class Proxy_Manager:
       """
       tasks = []
       print("Test Queue")
-      queue.put_nowait(Proxy.evaluate_handshakes())
-      queue.put_nowait(Proxy.evaluate_throughput())
-      queue.put_nowait(Proxy.evaluate_transmission_time())
+      
 
-      for i in range(self.proxy_list.len()):
-          index = self.proxy_list.index(i)
+      for Proxy in self.proxy_list:
+         
+        queue.put_nowait(Proxy.evaluate_handshakes)
+        queue.put_nowait(Proxy.evaluate_throughput)
+        queue.put_nowait(Proxy.evaluate_transmission_time)
+  
+      for i in range(len(self.proxy_list)):
+          
 
-          proxy = self.get_proxy(i)
+          proxy = self.proxy_list[i]
 
-          index += 1
+          
           
           #task = asyncio.ensure_future(proxy.master_evaluate(index,queue))
-          task = asyncio.create_task(proxy.master_evaluate(index,queue))
-
+          task = asyncio.create_task(proxy.master_evaluate(self.proxy_list[i],queue))
+          print("Queue Task created")
           tasks.append(task)
           
           

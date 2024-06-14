@@ -83,7 +83,7 @@ class Proxy:
   async def master_evaluate(self,index,queue):
     #Worker Function to call async Task Group evaluate functions asynchronously 
     
-    while True:
+    while not queue.empty():
 
       print(f"------------------------------START MASTER EVALUATE fuer {index}. Proxy mit IP: {self.ip} und PORT: {self.port}----------------------------\n")
     
@@ -94,17 +94,16 @@ class Proxy:
       await task
 
       queue.task_done()
-      if task is None:
-        break
+      
 
 
 
 
   async def evaluate_handshakes(self):
     
-    return await print(f"Coroutine Function to evaluate the handshake for ip: {self.ip} , port: {self.port}")
     
-    """
+    
+    
      # Create SYN-Paket to Proxy
       syn_packet = IP(dst=self.ip) / TCP(dport=self.port, flags="S")
       print("Erstelle SYN- Paket: \n")
@@ -158,13 +157,13 @@ class Proxy:
           print(f"Log Handshake set to \n {self.get_log_handshake()}\n")
           self.set_log_syn_ack_time(0)
           print(f"Log SYN_ACK set to \n {self.get_log_syn_ack_time()}\n")
-      """
+      
       
 
   async def evaluate_transmission_time(self):
-    return await print(f"Coroutine Function to evaluate the transmission time for ip: {self.ip} , port: {self.port}")
+   
     
-    """
+    
     #Data Packet for Measuring Transmission Time of 1000 Bytes of data
     data_size = 1000
     data_packet = IP(dst=self.ip)/TCP(dport=self.port)/Raw(RandString(size=data_size))
@@ -214,7 +213,7 @@ class Proxy:
     self.set_log_throughput(throughput)
     print(f"Log Throughput set to \n {self.get_log_throughput()} in KB/second \n")
 
-    """
+    
   
 async def send_paket(packet):
-   return await asyncio.get_event_loop().run_in_executor(None,sr1,packet,verbose=False,timeout=5)
+   return await asyncio.get_running_loop().run_in_executor(None,sr1,packet,verbose=False,timeout=5)

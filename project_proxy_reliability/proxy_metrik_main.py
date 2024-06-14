@@ -9,7 +9,7 @@ from proxy_manager import *
 
 
 
-def main():
+async def main():
     
     Ready_for_connection = False
     data_size =1000
@@ -28,35 +28,38 @@ def main():
     while input_evaluation_rounds < 2:
         input_evaluation_rounds = int(input('How many handshakes >= 6 should be established? At least 6 for a realiable list configuration.\n'))
     
+    #TODO Set up two event loops one for gathering proxys, one for doing the evaluation
 
+    await socks.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size)
+    await socks.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number)
+
+    """
     loop = asyncio.get_event_loop()
 
     try:
-
         loop.create_task(socks.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size))
-        #loop.create_task(http.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size))
+
         loop.create_task(socks.evaluate_proxy_list(counter, input_evaluation_rounds,data_size,input_proxy_number))
         
-        loop.run_forever()
+        loop.run_in_executor()
     
-
     except KeyboardInterrupt:
-        loop.close()
+        
         print("Closing Loop")
-        pass
+        
         
 
     finally: 
         print("Stopping Loop")
-        loop.stop()
+        loop.close()
+    """    
         
         
-        
-    """
+"""
     await asyncio.create_task(socks.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size))
     await asyncio.create_task(socks.evaluate_proxy_list(counter,input_evaluation_rounds,data_size))                 
     
-    """
+    
     
     
     
@@ -65,7 +68,7 @@ def main():
     
     #http.perform_request()
     
-    """
+
     
 
     sort_proxy_list(proxy_list)
@@ -73,7 +76,8 @@ def main():
         
     #requests methode für WEbanfrage mit Proxy
     #request(proxy_list)
-    """
+"""
 
 if __name__ == '__main__':
-   main()
+   loop = asyncio.get_event_loop()
+   loop.run_until_complete(main())
