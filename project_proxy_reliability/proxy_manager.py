@@ -116,11 +116,10 @@ class Proxy_Manager:
       print("Test Queue")
       
 
-      for Proxy in self.proxy_list:
-         
-        queue.put_nowait(Proxy.evaluate_handshakes)
-        queue.put_nowait(Proxy.evaluate_throughput)
-        queue.put_nowait(Proxy.evaluate_transmission_time)
+      
+      queue.put_nowait(Proxy.evaluate_handshakes)
+      queue.put_nowait(Proxy.evaluate_throughput)
+      queue.put_nowait(Proxy.evaluate_transmission_time)
   
       for i in range(len(self.proxy_list)):
           

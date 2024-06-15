@@ -184,12 +184,12 @@ class Proxy:
         self.set_log_transmission_time(0)
         print(f"Log Transmission TIme set to \n {self.get_log_transmission_time()}\n")
 
-    """
+    
   
   async def evaluate_throughput(self):
-    return await print(f"Coroutine Function to evaluate the througput for ip: {self.ip} , port: {self.port}")
     
-    """
+    
+    
     # Data Packet for Measuring Throughput
     data_size = 1000
     throughput_packet = IP(dst=self.ip)/TCP(dport=self.port)/Raw(RandString(size=data_size))
