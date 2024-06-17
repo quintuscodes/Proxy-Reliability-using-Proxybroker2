@@ -78,20 +78,23 @@ class Proxy:
     attrs = vars(self)
     print(f"\nAdded to List:\n" + ', \n'.join("%s: %s" % item for item in attrs.items()) + "\n")
 
+  async def send_paket(packet):
+    return await asyncio.get_running_loop().run_in_executor(None,sr1,packet,verbose=False,timeout=5)
 
   
-  async def master_evaluate(self,index,queue):
+  
+  async def master_evaluate(self,index,queue,proxy_list):
     #Worker Function to call async Task Group evaluate functions asynchronously 
     
     while not queue.empty():
-
+     
       print(f"------------------------------START MASTER EVALUATE fuer {index}. Proxy mit IP: {self.ip} und PORT: {self.port}----------------------------\n")
     
       #TODO Schedule Tasks with Asyncio to perform evaluation concurrently
     
-      task = await queue.get()
+      await queue.get()
     
-      await task
+     
 
       queue.task_done()
       
@@ -111,7 +114,7 @@ class Proxy:
       
       # Transceive SYN-Paket and Receive Answer
       print("Sendet SYN- Paket\n")
-      syn_ack_response = await send_paket(syn_packet)
+      syn_ack_response = await self.send_paket(syn_packet)
       #syn_ack_response = sr1(syn_packet, timeout=2, verbose=False)
       
       if syn_ack_response:
@@ -168,7 +171,7 @@ class Proxy:
     data_size = 1000
     data_packet = IP(dst=self.ip)/TCP(dport=self.port)/Raw(RandString(size=data_size))
     start_time = time.time()
-    response = await send_paket(data_packet)
+    response = await self.send_paket(data_packet)
     #response = sr1(data_packet, verbose=False, timeout=5)
     end_time = time.time()
 
@@ -213,7 +216,3 @@ class Proxy:
     self.set_log_throughput(throughput)
     print(f"Log Throughput set to \n {self.get_log_throughput()} in KB/second \n")
 
-    
-  
-async def send_paket(packet):
-   return await asyncio.get_running_loop().run_in_executor(None,sr1,packet,verbose=False,timeout=5)

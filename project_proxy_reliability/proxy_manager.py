@@ -7,7 +7,7 @@ from scapy.layers.inet import IP
 from scapy.layers.inet import TCP
 import asyncio
 import aiohttp
-from proxybroker import Broker, Proxy
+from proxybroker import Broker, Proxy # type: ignore
 from proxy_class import *
 from proxy_manager import *
 
@@ -108,29 +108,39 @@ class Proxy_Manager:
     while counter < input_evaluation_rounds: 
       counter += 1 
       
-      queue = asyncio.Queue(maxsize=input_proxy_number)
+      queue = asyncio.Queue()
       """
       What exactly needs to be added to the queue?
       """
       tasks = []
-      print("Test Queue")
+      print(f"Test Queue Evaluation Round Nr. {counter}")
       
 
-      
-      queue.put_nowait(Proxy.evaluate_handshakes)
-      queue.put_nowait(Proxy.evaluate_throughput)
-      queue.put_nowait(Proxy.evaluate_transmission_time)
+      for i in range(len(self.proxy_list)):
+        proxy = self.get_proxy(i)
+
+        queue.put_nowait(proxy.evaluate_handshakes)
+
+        print("Queue Evaluate Handshake added")
+
+        queue.put_nowait(proxy.evaluate_throughput)
+
+        print("Queue Evaluate Throughput added")
+
+        #queue.put_nowait(proxy.evaluate_transmission_time)
+
+        #print("Queue Evaluate TTM added\n")
   
       for i in range(len(self.proxy_list)):
+          index = i + 1
+
+          proxy = self.get_proxy(i)
           
-
-          proxy = self.proxy_list[i]
-
           
           
           #task = asyncio.ensure_future(proxy.master_evaluate(index,queue))
-          task = asyncio.create_task(proxy.master_evaluate(self.proxy_list[i],queue))
-          print("Queue Task created")
+          task = asyncio.create_task(proxy.master_evaluate(index,queue,self.proxy_list))
+          print(f"Master Evaluate Proxy Task created - evaluate async Proxy IP: {proxy.ip} ")
           tasks.append(task)
           
           

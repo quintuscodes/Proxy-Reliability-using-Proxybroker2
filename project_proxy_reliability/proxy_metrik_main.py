@@ -25,52 +25,19 @@ async def main():
     while input_proxy_number < 1: 
         input_proxy_number = int(input('How many proxys >= 10 should be gathered? At least 10 for a realiable list configuration!\n'))
     
-    while input_evaluation_rounds < 2:
+    while input_evaluation_rounds < 1:
         input_evaluation_rounds = int(input('How many handshakes >= 6 should be established? At least 6 for a realiable list configuration.\n'))
     
     #TODO Set up two event loops one for gathering proxys, one for doing the evaluation
 
     await socks.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size)
     await socks.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number)
-
-    """
-    loop = asyncio.get_event_loop()
-
-    try:
-        loop.create_task(socks.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size))
-
-        loop.create_task(socks.evaluate_proxy_list(counter, input_evaluation_rounds,data_size,input_proxy_number))
-        
-        loop.run_in_executor()
     
-    except KeyboardInterrupt:
-        
-        print("Closing Loop")
-        
-        
-
-    finally: 
-        print("Stopping Loop")
-        loop.close()
-    """    
+    
         
         
 """
-    await asyncio.create_task(socks.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size))
-    await asyncio.create_task(socks.evaluate_proxy_list(counter,input_evaluation_rounds,data_size))                 
-    
-    
-    
-    
-    
-    
-    
-    
     #http.perform_request()
-    
-
-    
-
     sort_proxy_list(proxy_list)
     refresh_proxy_list(Ready_for_connection,proxy_list,proxy_list_slave)
         
