@@ -78,21 +78,22 @@ class Proxy:
     attrs = vars(self)
     print(f"\nAdded to List:\n" + ', \n'.join("%s: %s" % item for item in attrs.items()) + "\n")
 
-  async def send_paket(packet):
-    return await asyncio.get_running_loop().run_in_executor(None,sr1,packet,verbose=False,timeout=5)
+  async def send_paket(self,packet):
+    return await asyncio.get_running_loop().run_in_executor(None,sr1,packet)
 
   
   
   async def master_evaluate(self,index,queue,proxy_list):
     #Worker Function to call async Task Group evaluate functions asynchronously 
     
-    while not queue.empty():
+    while True:
      
       print(f"------------------------------START MASTER EVALUATE fuer {index}. Proxy mit IP: {self.ip} und PORT: {self.port}----------------------------\n")
-    
+      print(queue)
       #TODO Schedule Tasks with Asyncio to perform evaluation concurrently
     
-      await queue.get()
+      task = await queue.get()
+      await task()
     
      
 

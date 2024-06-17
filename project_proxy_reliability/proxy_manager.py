@@ -3,6 +3,8 @@ A Class for managing Proxy Evaluation and performing Request. This is the target
 
 """
 from scapy.all import *
+import queue
+import threading
 from scapy.layers.inet import IP
 from scapy.layers.inet import TCP
 import asyncio
@@ -119,6 +121,8 @@ class Proxy_Manager:
       for i in range(len(self.proxy_list)):
         proxy = self.get_proxy(i)
 
+
+
         queue.put_nowait(proxy.evaluate_handshakes)
 
         print("Queue Evaluate Handshake added")
@@ -139,9 +143,11 @@ class Proxy_Manager:
           
           
           #task = asyncio.ensure_future(proxy.master_evaluate(index,queue))
-          task = asyncio.create_task(proxy.master_evaluate(index,queue,self.proxy_list))
+          print(queue.qsize())
+          await proxy.master_evaluate(index,queue,self.proxy_list)
+          #task = asyncio.create_task()
           print(f"Master Evaluate Proxy Task created - evaluate async Proxy IP: {proxy.ip} ")
-          tasks.append(task)
+          #tasks.append(task)
           
           
       await queue.join() 
