@@ -131,9 +131,9 @@ class Proxy_Manager:
 
         print("Queue Evaluate Throughput added")
 
-        #queue.put_nowait(proxy.evaluate_transmission_time)
+        queue.put_nowait(proxy.evaluate_transmission_time)
 
-        #print("Queue Evaluate TTM added\n")
+        print("Queue Evaluate TTM added\n")
   
       for i in range(len(self.proxy_list)):
           index = i + 1

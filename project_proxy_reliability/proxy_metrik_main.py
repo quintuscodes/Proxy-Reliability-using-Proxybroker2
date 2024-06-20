@@ -32,7 +32,7 @@ async def main():
 
     await socks.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size)
     await socks.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number)
-    
+    await socks.print_proxy_list()
     
         
         

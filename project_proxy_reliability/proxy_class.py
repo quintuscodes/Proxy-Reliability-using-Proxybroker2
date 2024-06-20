@@ -78,8 +78,15 @@ class Proxy:
     attrs = vars(self)
     print(f"\nAdded to List:\n" + ', \n'.join("%s: %s" % item for item in attrs.items()) + "\n")
 
-  async def send_paket(self,packet):
-    return await asyncio.get_running_loop().run_in_executor(None,sr1,packet)
+  async def send_paket(self,packet,timeout=2):
+    loop = asyncio.get_running_loop()
+    try:
+       future =  loop.run_in_executor(None, sr1, packet)
+       return await asyncio.wait_for(future,timeout)
+    
+    except asyncio.TimeoutError:
+      print(f"TimeoutError: Keine Antwort vom Proxy {self.ip}:{self.port} erhalten.")
+      return None
 
   
   
@@ -93,11 +100,19 @@ class Proxy:
       #TODO Schedule Tasks with Asyncio to perform evaluation concurrently
     
       task = await queue.get()
-      await task()
+
+      try:
+        await task()
+
+      except Exception as e:
+                print(f"Error während der Ausführung des Tasks: {e}")
+      
+      finally:
+         queue.task_done()
     
      
 
-      queue.task_done()
+      
       
 
 
@@ -105,7 +120,7 @@ class Proxy:
 
   async def evaluate_handshakes(self):
     
-    
+      print(f"START HANDSHAKE IP:  {self.ip}  PORT:  {self.port}\n")
     
     
      # Create SYN-Paket to Proxy
@@ -115,7 +130,7 @@ class Proxy:
       
       # Transceive SYN-Paket and Receive Answer
       print("Sendet SYN- Paket\n")
-      syn_ack_response = await self.send_paket(syn_packet)
+      syn_ack_response = await self.send_paket(syn_packet,timeout=2)
       #syn_ack_response = sr1(syn_packet, timeout=2, verbose=False)
       
       if syn_ack_response:
@@ -166,13 +181,13 @@ class Proxy:
 
   async def evaluate_transmission_time(self):
    
-    
+    print(f"START TTM IP:  {self.ip}  PORT:  {self.port}\n")
     
     #Data Packet for Measuring Transmission Time of 1000 Bytes of data
     data_size = 1000
     data_packet = IP(dst=self.ip)/TCP(dport=self.port)/Raw(RandString(size=data_size))
     start_time = time.time()
-    response = await self.send_paket(data_packet)
+    response = await self.send_paket(data_packet,timeout=5)
     #response = sr1(data_packet, verbose=False, timeout=5)
     end_time = time.time()
 
@@ -192,7 +207,7 @@ class Proxy:
   
   async def evaluate_throughput(self):
     
-    
+    print(f"START Throughput IP:  {self.ip}  PORT:  {self.port}\n")
     
     # Data Packet for Measuring Throughput
     data_size = 1000
@@ -201,19 +216,24 @@ class Proxy:
     #Send 10 data packets through proxy and measure time for 10 * 1000Bytes
     start_time = time.time()
 
-    for packet in range(10):
-        send(throughput_packet, verbose=False)
+    try:
+       
+      for packet in range(10):
+          await self.send_paket(throughput_packet, timeout=2)
     
-    #await asyncio.gather(*[send_paket(throughput_packet) for send in range(10)])
+      #await asyncio.gather(*[send_paket(throughput_packet) for send in range(10)])
 
-    end_time = time.time()
+      end_time = time.time()
 
-    # Calculate throughput
-    total_data_size = data_size * 10
-    throughput = total_data_size / (end_time - start_time)
-    print(f"Throughput: {throughput / 1000} KBytes per second")
+      # Calculate throughput
+      total_data_size = data_size * 10
+      throughput = total_data_size / (end_time - start_time)
+      print(f"Throughput: {throughput / 1000} KBytes per second")
 
-    throughput = throughput / 1000
-    self.set_log_throughput(throughput)
-    print(f"Log Throughput set to \n {self.get_log_throughput()} in KB/second \n")
-
+      throughput = throughput / 1000
+      self.set_log_throughput(throughput)
+      print(f"Log Throughput set to \n {self.get_log_throughput()} in KB/second \n")
+     
+    except asyncio.TimeoutError:
+            print(f"TimeoutError: Throughput-Berechnung fehlgeschlagen für Proxy {self.ip}:{self.port}.")
+            self.set_log_throughput(0)
