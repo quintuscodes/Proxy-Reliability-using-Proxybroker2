@@ -26,13 +26,17 @@ async def main():
         input_proxy_number = int(input('How many proxys >= 10 should be gathered? At least 10 for a realiable list configuration!\n'))
     
     while input_evaluation_rounds < 1:
-        input_evaluation_rounds = int(input('How many handshakes >= 6 should be established? At least 6 for a realiable list configuration.\n'))
+        input_evaluation_rounds = int(input('How many handshakes >= 6 should be established? At least 6 for a reliable list configuration.\n'))
     
-    #TODO Set up two event loops one for gathering proxys, one for doing the evaluation
-
+    
     await socks.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size)
+    await http.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size)
     await socks.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number)
+    await http.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number)
+    
     await socks.print_proxy_list()
+    await http.print_proxy_list()
+
     
         
         

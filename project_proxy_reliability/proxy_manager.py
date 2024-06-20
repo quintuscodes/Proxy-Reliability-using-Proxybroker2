@@ -120,9 +120,21 @@ class Proxy_Manager:
 
       for i in range(len(self.proxy_list)):
         proxy = self.get_proxy(i)
+        tasks.append(proxy.evaluate_handshakes())
+        tasks.append(proxy.evaluate_throughput())
+        tasks.append(proxy.evaluate_transmission_time())
+        #task calculate score per proxy
+        
 
+      await asyncio.gather(*tasks)
+    
+    for i in range(len(self.proxy_list)):
+        proxy = self.get_proxy(i)
+        proxy.calc_score(input_evaluation_rounds)
 
+    
 
+    """
         queue.put_nowait(proxy.evaluate_handshakes)
 
         print("Queue Evaluate Handshake added")
@@ -142,14 +154,14 @@ class Proxy_Manager:
           
           
           
-          #task = asyncio.ensure_future(proxy.master_evaluate(index,queue))
+          
           print(queue.qsize())
           await proxy.master_evaluate(index,queue,self.proxy_list)
           #task = asyncio.create_task()
           print(f"Master Evaluate Proxy Task created - evaluate async Proxy IP: {proxy.ip} ")
           #tasks.append(task)
           
-          
+        
       await queue.join() 
 
       for task in tasks:
@@ -157,8 +169,8 @@ class Proxy_Manager:
         # Wait until all worker tasks are cancelled.
       
       await asyncio.gather(*tasks, return_exceptions=True)
-
       
+      """
 
 
 

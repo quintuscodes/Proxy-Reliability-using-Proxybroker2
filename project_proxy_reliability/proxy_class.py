@@ -120,7 +120,7 @@ class Proxy:
 
   async def evaluate_handshakes(self):
     
-      print(f"START HANDSHAKE IP:  {self.ip}  PORT:  {self.port}\n")
+      print(f"START HANDSHAKE PROT: {self.protocol} IP:  {self.ip}  PORT:  {self.port}\n")
     
     
      # Create SYN-Paket to Proxy
@@ -181,13 +181,13 @@ class Proxy:
 
   async def evaluate_transmission_time(self):
    
-    print(f"START TTM IP:  {self.ip}  PORT:  {self.port}\n")
+    print(f"START TTM PROT: {self.protocol} IP:  {self.ip}  PORT:  {self.port}\n")
     
     #Data Packet for Measuring Transmission Time of 1000 Bytes of data
     data_size = 1000
     data_packet = IP(dst=self.ip)/TCP(dport=self.port)/Raw(RandString(size=data_size))
     start_time = time.time()
-    response = await self.send_paket(data_packet,timeout=5)
+    response = await self.send_paket(data_packet,timeout=2)
     #response = sr1(data_packet, verbose=False, timeout=5)
     end_time = time.time()
 
@@ -199,15 +199,16 @@ class Proxy:
         
     else:
         print("No response received.")
-        print(f"Transmission time for {data_size} bytes of data: {transmission_time} seconds")
+  
         self.set_log_transmission_time(0)
         print(f"Log Transmission TIme set to \n {self.get_log_transmission_time()}\n")
 
-    
+   
+      
   
   async def evaluate_throughput(self):
     
-    print(f"START Throughput IP:  {self.ip}  PORT:  {self.port}\n")
+    print(f"START Throughput PROT: {self.protocol} IP:  {self.ip}  PORT:  {self.port}\n")
     
     # Data Packet for Measuring Throughput
     data_size = 1000
@@ -237,3 +238,12 @@ class Proxy:
     except asyncio.TimeoutError:
             print(f"TimeoutError: Throughput-Berechnung fehlgeschlagen für Proxy {self.ip}:{self.port}.")
             self.set_log_throughput(0)
+
+  def calc_score(self,input_evaluation_rounds):
+    """
+    A function to calculate the score given the parameters TCP Handshake Hit Ratio, [Syn_ACK] Response Time, Transmission Time, Throughput
+    """
+    succ_handshakes = self.log_handshake.count(1)
+    handshake_rate = succ_handshakes / input_evaluation_rounds
+    score = handshake_rate * 100
+    self.score = score
