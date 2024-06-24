@@ -3,6 +3,7 @@ from scapy.all import *
 from scapy.layers.inet import IP
 from scapy.layers.inet import TCP
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 """
 A Class for managing a single proxy fetched from the proxybroker2 python tool.
@@ -114,7 +115,14 @@ class Proxy:
 
       
       
-
+  async def evaluate(self):
+     #Asynchron Wrapping um Thread Pool Executor der synchronen Evaluierungsmethoden
+    loop = asyncio._get_running_loop()
+    with ThreadPoolExecutor() as pool:
+       await loop.run_in_executor(pool, self.evaluate_handshakes)
+       await loop.run_in_executor(pool,self.evaluate_throughput)
+       await loop.run_in_executor(pool,self.evaluate_transmission_time)
+       
 
 
 
