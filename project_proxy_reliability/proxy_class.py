@@ -126,7 +126,7 @@ class Proxy:
 
 
 
-  async def evaluate_handshakes(self):
+  def evaluate_handshakes(self):
     
       print(f"START HANDSHAKE PROT: {self.protocol} IP:  {self.ip}  PORT:  {self.port}\n")
     
@@ -138,9 +138,10 @@ class Proxy:
       
       # Transceive SYN-Paket and Receive Answer
       print("Sendet SYN- Paket\n")
-      syn_ack_response = await self.send_paket(syn_packet,timeout=2)
+      syn_ack_response = sr1(syn_packet,timeout=2,verbose=False)
       #syn_ack_response = sr1(syn_packet, timeout=2, verbose=False)
       
+      #TODO dieses if statement erneut anschauen
       if syn_ack_response:
           syn_ack_time = syn_ack_response.time - syn_packet.sent_time
           print(f"Response time for SYN-ACK: {syn_ack_time} seconds")
@@ -187,7 +188,7 @@ class Proxy:
       
       
 
-  async def evaluate_transmission_time(self):
+  def evaluate_transmission_time(self):
    
     print(f"START TTM PROT: {self.protocol} IP:  {self.ip}  PORT:  {self.port}\n")
     
@@ -195,8 +196,8 @@ class Proxy:
     data_size = 1000
     data_packet = IP(dst=self.ip)/TCP(dport=self.port)/Raw(RandString(size=data_size))
     start_time = time.time()
-    response = await self.send_paket(data_packet,timeout=2)
-    #response = sr1(data_packet, verbose=False, timeout=5)
+    #response = await self.send_paket(data_packet,timeout=2)
+    response = sr1(data_packet, timeout=5,verbose=False)
     end_time = time.time()
 
     if response:
@@ -214,7 +215,7 @@ class Proxy:
    
       
   
-  async def evaluate_throughput(self):
+  def evaluate_throughput(self):
     
     print(f"START Throughput PROT: {self.protocol} IP:  {self.ip}  PORT:  {self.port}\n")
     
@@ -225,27 +226,24 @@ class Proxy:
     #Send 10 data packets through proxy and measure time for 10 * 1000Bytes
     start_time = time.time()
 
-    try:
-       
-      for packet in range(10):
-          await self.send_paket(throughput_packet, timeout=2)
+    
+    for packet in range(10):
+          send(throughput_packet,verbose=False)
     
       #await asyncio.gather(*[send_paket(throughput_packet) for send in range(10)])
 
-      end_time = time.time()
+    end_time = time.time()
 
       # Calculate throughput
-      total_data_size = data_size * 10
-      throughput = total_data_size / (end_time - start_time)
-      print(f"Throughput: {throughput / 1000} KBytes per second")
+    total_data_size = data_size * 10
+    throughput = total_data_size / (end_time - start_time)
+    print(f"Throughput: {throughput / 1000} KBytes per second")
 
-      throughput = throughput / 1000
-      self.set_log_throughput(throughput)
-      print(f"Log Throughput set to \n {self.get_log_throughput()} in KB/second \n")
+    throughput = throughput / 1000
+    self.set_log_throughput(throughput)
+    print(f"Log Throughput set to \n {self.get_log_throughput()} in KB/second \n")
      
-    except asyncio.TimeoutError:
-            print(f"TimeoutError: Throughput-Berechnung fehlgeschlagen für Proxy {self.ip}:{self.port}.")
-            self.set_log_throughput(0)
+    
 
   def calc_score(self,input_evaluation_rounds):
     """

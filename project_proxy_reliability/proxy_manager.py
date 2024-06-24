@@ -110,19 +110,15 @@ class Proxy_Manager:
     while counter < input_evaluation_rounds: 
       counter += 1 
       
-      queue = asyncio.Queue()
-      """
-      What exactly needs to be added to the queue?
-      """
+    
       tasks = []
       print(f"Test Queue Evaluation Round Nr. {counter}")
       
 
       for i in range(len(self.proxy_list)):
         proxy = self.get_proxy(i)
-        tasks.append(proxy.evaluate_handshakes())
-        tasks.append(proxy.evaluate_throughput())
-        tasks.append(proxy.evaluate_transmission_time())
+        task = proxy.evaluate()
+        tasks.append(task)
         #task calculate score per proxy
         
 
