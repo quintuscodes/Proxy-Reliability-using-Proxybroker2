@@ -16,14 +16,19 @@ class Proxy:
     self.ip = _ip
     self.port =_port
     self.score = 0
-    self.avg_syn_ack_time = 0
-    self.avg_transmission_time = 0
-    self.avg_throughput = 0
     self.handshakes = _handshakes
     self.log_handshake = []
     self.log_syn_ack_time = []
+    self.avg_syn_ack_time = 0
     self.log_transmission_time = []
+    self.avg_transmission_time = 0
     self.log_throughput = []
+    self.avg_throughput = 0
+    
+    
+    
+    
+    
 
     """
     A Class for managing a single proxy fetched from the proxybroker2 python tool.
@@ -45,6 +50,10 @@ class Proxy:
   def get_score(self):
     return self.score
 
+  def get_last_log_handshake_item(self):
+     last_elem = self.log_handshake[-1]
+     return last_elem
+  
   def get_log_handshake(self):
     return self.log_handshake
   
@@ -127,7 +136,7 @@ class Proxy:
 
 
   def evaluate_handshakes(self):
-    
+      "Evaluate a successful TCP-Handshake Hit Ratio and the Time for establishing the handshake"
       print(f"START HANDSHAKE PROT: {self.protocol} IP:  {self.ip}  PORT:  {self.port}\n")
     
     
@@ -183,13 +192,13 @@ class Proxy:
           
           self.set_log_handshake(0)
           print(f"Log Handshake set to \n {self.get_log_handshake()}\n")
-          self.set_log_syn_ack_time(0)
+          self.set_log_syn_ack_time(1)
           print(f"Log SYN_ACK set to \n {self.get_log_syn_ack_time()}\n")
       
       
 
   def evaluate_transmission_time(self):
-   
+    "Evaluate the transmission time for sending (1000Bytes)data size packets and receiving a answer."
     print(f"START TTM PROT: {self.protocol} IP:  {self.ip}  PORT:  {self.port}\n")
     
     #Data Packet for Measuring Transmission Time of 1000 Bytes of data
@@ -209,21 +218,21 @@ class Proxy:
     else:
         print("No response received.")
   
-        self.set_log_transmission_time(0)
+        self.set_log_transmission_time(1)
         print(f"Log Transmission TIme set to \n {self.get_log_transmission_time()}\n")
 
    
       
   
   def evaluate_throughput(self):
-    
+    "Evaluate Time for sending 10 Packets a 1kB - TODO is this necessary?, because it actually tests the physical layer not the proxy reliability?"
     print(f"START Throughput PROT: {self.protocol} IP:  {self.ip}  PORT:  {self.port}\n")
     
     # Data Packet for Measuring Throughput
     data_size = 1000
     throughput_packet = IP(dst=self.ip)/TCP(dport=self.port)/Raw(RandString(size=data_size))
 
-    #Send 10 data packets through proxy and measure time for 10 * 1000Bytes
+    #Send 10 data packets to proxy and measure time for 10 * 1000Bytes
     start_time = time.time()
 
     
@@ -240,7 +249,11 @@ class Proxy:
     print(f"Throughput: {throughput / 1000} KBytes per second")
 
     throughput = throughput / 1000
-    self.set_log_throughput(throughput)
+    if self.get_last_log_handshake_item() == 0:
+       self.set_log_throughput(0)
+    else:
+       self.set_log_throughput(throughput)
+
     print(f"Log Throughput set to \n {self.get_log_throughput()} in KB/second \n")
      
     
@@ -253,3 +266,25 @@ class Proxy:
     handshake_rate = succ_handshakes / input_evaluation_rounds
     score = handshake_rate * 100
     self.score = score
+
+    #TODO Calculate SYN-ACK Score Add Bonus of 3 Best Avg_resp_time to score ; 15 , 10 , 5 points
+    sum_syn_ack = sum(self.log_syn_ack_time)
+    avg_syn_ack_time = sum_syn_ack / input_evaluation_rounds
+    self.avg_syn_ack_time = avg_syn_ack_time
+    if self.avg_syn_ack_time == 0.0:
+        self.avg_syn_ack_time = 99
+    #self.log_syn_ack_time.clear()
+
+    #TODO calc AVG transmission time for data size - 1000B default
+    sum_transmission_time = sum(self.log_transmission_time)
+    avg_transmission_time = sum_transmission_time / input_evaluation_rounds
+    self.avg_transmission_time = avg_transmission_time
+    if self.avg_transmission_time == 0.0:
+      self.avg_transmission_time = 99
+    #self.log_transmission_time.clear()
+
+    "calc AVG Throughput score"
+    sum_throughput = sum(self.log_throughput)
+    avg_throughput = sum_throughput / input_evaluation_rounds
+    self.avg_throughput = avg_throughput
+    
