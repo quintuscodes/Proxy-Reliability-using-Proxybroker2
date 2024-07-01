@@ -16,7 +16,6 @@ class Proxy:
     self.ip = _ip
     self.port =_port
     self.score = 0
-    self.credit = str
     self.handshakes = _handshakes
     self.log_handshake = []
     self.log_syn_ack_time = []

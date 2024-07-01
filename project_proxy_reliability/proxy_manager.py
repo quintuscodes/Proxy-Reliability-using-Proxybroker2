@@ -23,7 +23,7 @@ class Proxy_Manager:
     self.protocol = _protocol
     self.master_proxy_list = []
     self.proxy_list = []
-  
+    self.proxy_list_slave = []
   
 
   def get_proxy(self, index) -> Proxy:
@@ -62,7 +62,7 @@ class Proxy_Manager:
   async def fetch_proxys_write_to_class(self,input_proxy_number,input_evaluation_rounds,data_size):
     
     proxies = asyncio.Queue()
-
+    
    
     broker = Broker(proxies)
     print("test")
@@ -223,4 +223,81 @@ class Proxy_Manager:
     for proxy in proxy_list:
       async create task(proxy.master_evaluate)
     """
+  async def sort_proxy_list(self):
+    """A Function for sorting the List and remove proxys with a 70 score threshold
+    """
+    #TODO SORT first, so that proxy with score 100 is on top
+    
+    self.proxy_list.sort(key=lambda Proxy: Proxy.score, reverse=True)
 
+    
+    unbalanced = True
+    
+        
+    #DELETE Proxys with score < 60
+    while unbalanced and len(self.proxy_list) > 0:
+        for proxy in self.proxy_list:
+            if proxy.score <= 100:
+                self.proxy_list.remove(proxy)
+                print("\n Removed Proxys with score < 70 \n")
+                
+                await self.sort_proxy_list()
+            
+            else: unbalanced = False
+
+    async def refresh_proxy_list(self,Ready_for_connection: bool):
+        "A function to refill the proxy list with new evaluated Proxys"
+        """
+                TODO: 
+                - Copy proxys with score > 100 of proxy_list -> Master proxy_list
+                - clear() the self.proxy_list
+                - gather 5 new!!!(check if IPs are not doubled) proxys to empty self.proxy_list
+                - evaluate them and push with score > 120 in the self.master_list
+
+                - checker method every asyncio.sleep(5) seconds to listen if 10 reliable proxys are in the list, if not -> refresh list 
+                
+        """
+        if Ready_for_connection == False:
+            if  len(self.proxy_list) <= 2 or self.proxy_list[0].score < 130 or self.proxy_list[1].score < 120: # and proxy_list[2]["score"] < 100 or proxy_list[0] == None:
+                print("Refreshing the Proxy List \n")
+                #asyncio.sleep(5)
+                print("Refreshing the Proxy List \n")
+
+                Ready_for_connection = False
+                proxies = asyncio.Queue()
+                broker = Broker(proxies)
+                
+                
+                init_proxy_list(5, self.proxy_list_slave)
+
+                tasks = asyncio.gather(broker.find( types=[ 'SOCKS5'],lvl = 'HIGH', strict = True,limit=5),
+                            write_proxy_to_(5,proxies, proxy_list_slave,6),)
+    
+                loop = asyncio.get_event_loop()
+                loop.run_until_complete(tasks)
+
+                counter = 0
+                evaluate_call(proxy_list_slave, counter,6,1000)
+                sort_proxy_list(proxy_list_slave)
+                for elements in proxy_list_slave:
+                    if elements["score"] >= 100:
+                        proxy_list.append(elements)
+                        print("Proxy ATTACHED to MASTER List")
+                
+                sort_proxy_list(proxy_list)
+                print_proxy_list_dict(proxy_list)
+
+                if len(proxy_list) <= 2 and proxy_list[0]["score"] < 130 or proxy_list[1]["score"] < 120:
+                    refresh_proxy_list(Ready_for_connection,proxy_list,proxy_list_slave)
+                else:
+                    Ready_for_connection = True
+                    refresh_proxy_list(Ready_for_connection,proxy_list,proxy_list_slave)
+
+            else:
+                Ready_for_connection = True
+                sort_proxy_list(proxy_list)
+                print("Proxy List is ready for Connection")
+        else:
+                Ready_for_connection = True
+                sort_proxy_list(proxy_list)
+                print("Proxy List is ready for Connection")
