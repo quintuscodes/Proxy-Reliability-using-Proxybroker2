@@ -11,9 +11,9 @@ from proxy_manager import *
 
 async def main():
     
-    Ready_for_connection = False
-    data_size =1000
     
+    data_size =1000
+    master = "master"
     
     """
     HTTP, SOCKS4, SOCKS5, CONNECT:25 
@@ -52,26 +52,42 @@ async def main():
     evaluate_tasks = [socks5.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number),
                       http.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number),
                       ]   
-
+    """
+    refresh_tasks = [socks5.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size ),
+                     http.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size )
+                     ]
+    """
+    
     await asyncio.gather(*fetch_tasks)
     await asyncio.gather(*evaluate_tasks)
     end_time = time.perf_counter()
 
     
-    await socks5.print_proxy_list()
-    await http.print_proxy_list()
+    await socks5.print_proxy_list(0)
+    await http.print_proxy_list(0)
     
 
     evaluation_time = end_time - start_time
     num_proto = len(fetch_tasks)
     print(f"Die Evaluation von {input_proxy_number} Proxys bei {input_evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s ")
     
-    await socks5.sort_proxy_list()
-    await http.sort_proxy_list()
+    await socks5.sort_proxy_lists()
+    await http.sort_proxy_lists()
 
-    await socks5.print_proxy_list()
-    await http.print_proxy_list()
+    #await asyncio.gather(*refresh_tasks)
+    
 
+    await socks5.print_proxy_list(0)
+    await http.print_proxy_list(0)
+    await socks5.print_proxy_list(master)
+    await http.print_proxy_list(master)
+    
+    """
+    TODO: 
+    > Checker Methode:
+        - check every 10 seconds if 5 reliable proxys are in the proxy master class
+        - if not -> refresh proxy list
+    """
 """
     #http.perform_request()
     sort_proxy_list(proxy_list)
