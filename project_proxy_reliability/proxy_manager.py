@@ -258,7 +258,7 @@ class Proxy_Manager:
         for proxy in self.proxy_list:
             if proxy.score <= 100:
                 self.proxy_list.remove(proxy)
-                print("\n Removed Proxys with score < 70 \n")
+                print("\n Removed Proxys with score <= 100 \n")
                 
                 await self.sort_proxy_lists()
             

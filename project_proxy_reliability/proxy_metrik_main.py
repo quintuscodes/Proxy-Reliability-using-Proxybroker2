@@ -85,7 +85,7 @@ async def main():
     """
     TODO: 
     > Checker Methode:
-        - check every 10 seconds if 5 reliable proxys are in the proxy master class
+        - check every 10 seconds if 10 reliable proxys are in the proxy master class
         - if not -> refresh proxy list
     """
 """

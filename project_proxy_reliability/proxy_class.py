@@ -99,7 +99,7 @@ class Proxy:
       return None
 
   
-  
+  """
   async def master_evaluate(self,index,queue,proxy_list):
     #Worker Function to call async Task Group evaluate functions asynchronously 
     
@@ -120,7 +120,7 @@ class Proxy:
       finally:
          queue.task_done()
     
-     
+    """
 
       
       
