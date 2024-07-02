@@ -283,18 +283,19 @@ class Proxy_Manager:
                 await asyncio.gather(self.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number))
                 
 
-                self.sort_proxy_lists()
+                await self.sort_proxy_lists()
 
-                if len(self.master_proxy_list) <= 7:
-                    self.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size )
+                if len(self.master_proxy_list) <= 10:
+                    await self.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size )
                 else:
                     self.ready_for_connection = True
-                    self.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size )
+                    await self.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size )
 
             else:
                 self.ready_for_connection = True
-                self.sort_proxy_list()
+                await self.sort_proxy_list()
                 print(f"{self.protocol}  *** MASTER *** Proxy List is ready for Connection")
+                
         else:
           
           print(f"{self.protocol}  *** MASTER *** Proxy List is ready for Connection")

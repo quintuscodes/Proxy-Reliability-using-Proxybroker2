@@ -14,7 +14,8 @@ async def main():
     
     data_size =1000
     master = "master"
-    
+    global unbalanced
+    unbalanced = True
     """
     HTTP, SOCKS4, SOCKS5, CONNECT:25 
     """
@@ -53,9 +54,7 @@ async def main():
                       http.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number),
                       ]   
     
-    refresh_tasks = [socks5.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size ),
-                     http.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size )
-                     ]
+    
     
     
     await asyncio.gather(*fetch_tasks)
@@ -65,8 +64,9 @@ async def main():
     
     await socks5.print_proxy_list(0)
     await http.print_proxy_list(0)
+    await socks5.print_proxy_list(master)
+    await http.print_proxy_list(master)
     
-
     evaluation_time = end_time - start_time
     num_proto = len(fetch_tasks)
     print(f"Die Evaluation von {input_proxy_number} Proxys bei {input_evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s ")
@@ -74,30 +74,34 @@ async def main():
     await socks5.sort_proxy_lists()
     await http.sort_proxy_lists()
 
-    await asyncio.sleep(3)
-    await asyncio.gather(*refresh_tasks)
-    
-
-    await socks5.print_proxy_list(0)
-    await http.print_proxy_list(0)
-    await socks5.print_proxy_list(master)
-    await http.print_proxy_list(master)
     
     "Checker-Method"
-    while active:
+    while unbalanced:
 
         await asyncio.sleep(5)
         print("CHECKER METHOD active\n")
         await asyncio.sleep(5)
-        
+
         query = int(input("Enter 1 to continue and 0 to abort\n"))
         if query == 1:
           print(f"Query new reliable Proxys to MASTER List ")
+
+          refresh_tasks = [socks5.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size ),
+                     http.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size )
+                     ]
           await asyncio.gather(*refresh_tasks)
-        else:
-           active = False
-           print("Initiated Termination\n")
         
+          await socks5.print_proxy_list(0)
+          await http.print_proxy_list(0)
+          await socks5.print_proxy_list(master)
+          await http.print_proxy_list(master)
+          if len(socks5.master_proxy_list) and len(http.master_proxy_list) == 10:
+              unbalanced = False
+        else:
+           unbalanced = False
+           print("      ------- Initiated Termination -------\n     Here is the final Master Proxy List\n")
+           await socks5.print_proxy_list(master)
+           await http.print_proxy_list(master)
    
 
 
