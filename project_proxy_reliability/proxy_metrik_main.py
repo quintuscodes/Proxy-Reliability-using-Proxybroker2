@@ -62,10 +62,6 @@ async def main():
     end_time = time.perf_counter()
 
     
-    await socks5.print_proxy_list(0)
-    await http.print_proxy_list(0)
-    await socks5.print_proxy_list(master)
-    await http.print_proxy_list(master)
     
     evaluation_time = end_time - start_time
     num_proto = len(fetch_tasks)
@@ -74,12 +70,22 @@ async def main():
     await socks5.sort_proxy_lists()
     await http.sort_proxy_lists()
 
+    await socks5.print_proxy_list(0)
+    await http.print_proxy_list(0)
+    await socks5.print_proxy_list(master)
+    await http.print_proxy_list(master)
+    
+
     
     "Checker-Method"
     while unbalanced:
 
         await asyncio.sleep(5)
         print("CHECKER METHOD active\n")
+        await socks5.print_proxy_list(0)
+        await http.print_proxy_list(0)
+        await socks5.print_proxy_list(master)
+        await http.print_proxy_list(master)
         await asyncio.sleep(5)
 
         query = int(input("Enter 1 to continue and 0 to abort\n"))
@@ -91,15 +97,15 @@ async def main():
                      ]
           await asyncio.gather(*refresh_tasks)
         
-          await socks5.print_proxy_list(0)
-          await http.print_proxy_list(0)
-          await socks5.print_proxy_list(master)
-          await http.print_proxy_list(master)
+          
           if len(socks5.master_proxy_list) and len(http.master_proxy_list) == 10:
               unbalanced = False
+              print("\n\n      ------- Initiated Termination -------\n       Here is the final Master Proxy List\n")
+              await socks5.print_proxy_list(master)
+              await http.print_proxy_list(master)
         else:
            unbalanced = False
-           print("      ------- Initiated Termination -------\n     Here is the final Master Proxy List\n")
+           print("\n\n      ------- Initiated Termination -------\n       Here is the final Master Proxy List\n")
            await socks5.print_proxy_list(master)
            await http.print_proxy_list(master)
    

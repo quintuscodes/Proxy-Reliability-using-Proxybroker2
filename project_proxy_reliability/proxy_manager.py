@@ -248,13 +248,13 @@ class Proxy_Manager:
     #TODO SORT first, so that proxy with score 100 is on top
     
     self.proxy_list.sort(key=lambda Proxy: Proxy.score, reverse=True)
-
-    for proxy in self.proxy_list:
-      if proxy.score < 100:
-        self.proxy_list.remove(proxy)
-        print("\n Removed Proxys with score <= 100 \n")
-      elif proxy.score >= 100:
-        self.master_proxy_list.append(proxy)
+    if len(self.master_proxy_list) < 10:
+      for proxy in self.proxy_list:
+        if proxy.score < 100:
+          self.proxy_list.remove(proxy)
+          print("\n Removed Proxys with score <= 100 \n")
+        elif proxy.score >= 100 and len(self.master_proxy_list) < 10:
+          self.master_proxy_list.append(proxy)
       
 
     self.master_proxy_list.sort(key=lambda Proxy: Proxy.score, reverse=True)
@@ -274,7 +274,7 @@ class Proxy_Manager:
         """
 
         if self.ready_for_connection == False:
-            if  len(self.master_proxy_list) <= 10: 
+            if len(self.master_proxy_list) < 10: 
                 print("Refreshing the Proxy List \n")
                 #asyncio.sleep(5)
                 print("Refreshing the Proxy List \n")
@@ -285,15 +285,15 @@ class Proxy_Manager:
 
                 await self.sort_proxy_lists()
 
-                if len(self.master_proxy_list) <= 10:
+                if len(self.master_proxy_list) < 10:
                     await self.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size )
                 else:
                     self.ready_for_connection = True
-                    await self.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size )
+                    
 
             else:
                 self.ready_for_connection = True
-                await self.sort_proxy_list()
+                await self.sort_proxy_lists()
                 print(f"{self.protocol}  *** MASTER *** Proxy List is ready for Connection")
                 
         else:
