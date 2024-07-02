@@ -249,26 +249,14 @@ class Proxy_Manager:
     
     self.proxy_list.sort(key=lambda Proxy: Proxy.score, reverse=True)
 
-    
-    unbalanced = True
-    
-        
-    #DELETE Proxys with score < 60
-    while unbalanced and len(self.proxy_list) > 0:
-        for proxy in self.proxy_list:
-            if proxy.score <= 100:
-                self.proxy_list.remove(proxy)
-                print("\n Removed Proxys with score <= 100 \n")
-                
-                await self.sort_proxy_lists()
-            
-            else: unbalanced = False
-    "Looping the Proxy List and Copy proxys with score > 100 of proxy_list -> Master proxy_list"
-    
     for proxy in self.proxy_list:
-           
-      if proxy.score >= 100:
-              self.master_proxy_list.append(proxy)
+      if proxy.score < 100:
+        self.proxy_list.remove(proxy)
+        print("\n Removed Proxys with score <= 100 \n")
+      elif proxy.score >= 100:
+        self.master_proxy_list.append(proxy)
+      
+
     self.master_proxy_list.sort(key=lambda Proxy: Proxy.score, reverse=True)
     self.proxy_list.clear()
 
@@ -306,9 +294,9 @@ class Proxy_Manager:
             else:
                 self.ready_for_connection = True
                 self.sort_proxy_list()
-                print("*** MASTER *** Proxy List is ready for Connection")
+                print(f"{self.protocol}  *** MASTER *** Proxy List is ready for Connection")
         else:
           
-          print("*** MASTER *** Proxy List is ready for Connection")
+          print(f"{self.protocol}  *** MASTER *** Proxy List is ready for Connection")
                 
       

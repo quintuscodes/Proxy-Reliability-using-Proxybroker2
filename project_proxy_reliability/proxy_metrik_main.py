@@ -22,7 +22,7 @@ async def main():
     #socks4 = Proxy_Manager("SOCKS4")
     socks5 = Proxy_Manager("SOCKS5")
     #connect25 = Proxy_Manager("CONNECT:25")
-
+    active = True
     counter = 0
     input_proxy_number = 0
     input_evaluation_rounds = 0
@@ -52,11 +52,11 @@ async def main():
     evaluate_tasks = [socks5.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number),
                       http.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number),
                       ]   
-    """
+    
     refresh_tasks = [socks5.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size ),
                      http.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size )
                      ]
-    """
+    
     
     await asyncio.gather(*fetch_tasks)
     await asyncio.gather(*evaluate_tasks)
@@ -74,7 +74,8 @@ async def main():
     await socks5.sort_proxy_lists()
     await http.sort_proxy_lists()
 
-    #await asyncio.gather(*refresh_tasks)
+    await asyncio.sleep(3)
+    await asyncio.gather(*refresh_tasks)
     
 
     await socks5.print_proxy_list(0)
@@ -82,21 +83,24 @@ async def main():
     await socks5.print_proxy_list(master)
     await http.print_proxy_list(master)
     
-    """
-    TODO: 
-    > Checker Methode:
-        - check every 10 seconds if 10 reliable proxys are in the proxy master class
-        - if not -> refresh proxy list
-    """
-"""
-    #http.perform_request()
-    sort_proxy_list(proxy_list)
-    refresh_proxy_list(Ready_for_connection,proxy_list,proxy_list_slave)
+    "Checker-Method"
+    while active:
+
+        await asyncio.sleep(5)
+        print("CHECKER METHOD active\n")
+        await asyncio.sleep(5)
         
-    #requests methode für WEbanfrage mit Proxy
-    #request(proxy_list)
-"""
+        query = int(input("Enter 1 to continue and 0 to abort\n"))
+        if query == 1:
+          print(f"Query new reliable Proxys to MASTER List ")
+          await asyncio.gather(*refresh_tasks)
+        else:
+           active = False
+           print("Initiated Termination\n")
+        
+   
+
 
 if __name__ == '__main__':
-   loop = asyncio.get_event_loop()
-   loop.run_until_complete(main())
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
