@@ -236,7 +236,9 @@ class Proxy:
 
     proxy_requirements_urls = {
             "http" : f"http://{self.ip}:{self.port}",
-            "https" : f"https://{self.ip}:{self.port}"
+            "https" : f"https://{self.ip}:{self.port}",
+            "http" : f"socks5://{self.ip}:{self.port}",
+            "https" : f"socks5://{self.ip}:{self.port}"
      }
 
     try:
