@@ -1,2 +1,4 @@
 # Proxy-Reliability-using-Proxybroker2
-Python Scripts for developing a dynamic data structure to manage open source Proxy Servers using a python module proxybroker2 and evaluate them concurrently using asyncio and collect data like successful TCP-Handshake rate, average response time, -transmission time, -throughput and a request. Goal is to evaluate a dynamic Proxy List for reliable Proxy-Connections.
+Python Scripts are developed to create a dynamic data structure for managing open-source proxy servers using the Python module proxybroker2.
+These scripts evaluate the proxy servers concurrently using asyncio, collecting data such as successful TCP-Handshake rate, average response time, average transmission time,  average throughput and perform a request. 
+The goal is to evaluate a dynamic proxy list for reliable proxy connections.
