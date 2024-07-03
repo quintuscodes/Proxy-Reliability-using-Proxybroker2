@@ -5,11 +5,13 @@ from scapy.layers.inet import TCP
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 
-"""
-A Class for managing a single proxy fetched from the proxybroker2 python tool.
-"""
+
 
 class Proxy:
+
+  """
+  A Class for managing a single proxy fetched from the proxybroker2 python tool.
+  """
 
   def __init__(self,_proto,_ip,_port,_handshakes):
     self.protocol = _proto
@@ -24,19 +26,11 @@ class Proxy:
     self.avg_transmission_time = 0
     self.log_throughput = []
     self.avg_throughput = 0
-    
-    
-    
-    
-    
-
-    """
-    A Class for managing a single proxy fetched from the proxybroker2 python tool.
-    """
 
     print(f"Initiated Proxy: \nIP: {self.ip}   , Port:  {self.port},  Protokoll:  {self.protocol}, ")
 
-  #TODO Getter and Setter for Proxy
+  "Getter and Setter for Proxy"
+
   def get_object(self):
      
      return self
@@ -80,52 +74,16 @@ class Proxy:
 
   def set_log_throughput(self,throughput):
     self.log_throughput.append(throughput)
-    
-
-  def add_to_list(self,proxy_list):
-    proxy_list.append(self)
-    
-    attrs = vars(self)
-    print(f"\nAdded to List:\n" + ', \n'.join("%s: %s" % item for item in attrs.items()) + "\n")
-
-  async def send_paket(self,packet,timeout=2):
-    loop = asyncio.get_running_loop()
-    try:
-       future =  loop.run_in_executor(None, sr1, packet)
-       return await asyncio.wait_for(future,timeout)
-    
-    except asyncio.TimeoutError:
-      print(f"TimeoutError: Keine Antwort vom Proxy {self.ip}:{self.port} erhalten.")
-      return None
-
   
-  """
-  async def master_evaluate(self,index,queue,proxy_list):
-    #Worker Function to call async Task Group evaluate functions asynchronously 
-    
-    while True:
-     
-      print(f"------------------------------START MASTER EVALUATE fuer {index}. Proxy mit IP: {self.ip} und PORT: {self.port}----------------------------\n")
-      print(queue)
-      #TODO Schedule Tasks with Asyncio to perform evaluation concurrently
-    
-      task = await queue.get()
+ 
+  async def evaluate(self):
+    """
+    Method to evaluate proxys of the proxy list concurrently using a ThreadPoolExecutor and asyncio
 
-      try:
-        await task()
+            - synchronous methods will be wrapped in an asynchronous Executor
 
-      except Exception as e:
-                print(f"Error während der Ausführung des Tasks: {e}")
-      
-      finally:
-         queue.task_done()
-    
     """
 
-      
-      
-  async def evaluate(self):
-     #Asynchron Wrapping um Thread Pool Executor der synchronen Evaluierungsmethoden
     loop = asyncio._get_running_loop()
     with ThreadPoolExecutor() as pool:
        await loop.run_in_executor(pool, self.evaluate_handshakes)
@@ -136,11 +94,13 @@ class Proxy:
 
 
   def evaluate_handshakes(self):
-      "Evaluate a successful TCP-Handshake Hit Ratio and the Time for establishing the handshake"
+      
+      "Evaluate a successful TCP-Handshake Hit Ratio and the Time for establishing the handshake -> syn_ack_time"
+
       print(f"START HANDSHAKE PROT: {self.protocol} IP:  {self.ip}  PORT:  {self.port}\n")
     
     
-     # Create SYN-Paket to Proxy
+      # Create SYN-Paket to Proxy
       syn_packet = IP(dst=self.ip) / TCP(dport=self.port, flags="S")
       print("Erstelle SYN- Paket: \n")
 
@@ -148,9 +108,9 @@ class Proxy:
       # Transceive SYN-Paket and Receive Answer
       print("Sendet SYN- Paket\n")
       syn_ack_response = sr1(syn_packet,timeout=2,verbose=False)
-      #syn_ack_response = sr1(syn_packet, timeout=2, verbose=False)
       
-      #TODO dieses if statement erneut anschauen
+      
+      
       if syn_ack_response:
           syn_ack_time = syn_ack_response.time - syn_packet.sent_time
           print(f"Response time for SYN-ACK: {syn_ack_time} seconds")
@@ -198,14 +158,16 @@ class Proxy:
       
 
   def evaluate_transmission_time(self):
+
     "Evaluate the transmission time for sending (1000Bytes)data size packets and receiving a answer."
+
     print(f"START TTM PROT: {self.protocol} IP:  {self.ip}  PORT:  {self.port}\n")
     
     #Data Packet for Measuring Transmission Time of 1000 Bytes of data
     data_size = 1000
     data_packet = IP(dst=self.ip)/TCP(dport=self.port)/Raw(RandString(size=data_size))
     start_time = time.time()
-    #response = await self.send_paket(data_packet,timeout=2)
+    
     response = sr1(data_packet, timeout=5,verbose=False)
     end_time = time.time()
 
@@ -225,7 +187,9 @@ class Proxy:
       
   
   def evaluate_throughput(self):
+
     "Evaluate Time for sending 10 Packets a 1kB - TODO is this necessary?, because it actually tests the physical layer not the proxy reliability?"
+
     print(f"START Throughput PROT: {self.protocol} IP:  {self.ip}  PORT:  {self.port}\n")
     
     # Data Packet for Measuring Throughput
@@ -243,7 +207,7 @@ class Proxy:
 
     end_time = time.time()
 
-      # Calculate throughput
+    # Calculate throughput
     total_data_size = data_size * 10
     throughput = total_data_size / (end_time - start_time)
     print(f"Throughput: {throughput / 1000} KBytes per second")
@@ -260,14 +224,14 @@ class Proxy:
 
   def calc_score(self,input_evaluation_rounds):
     """
-    A function to calculate the score given the parameters TCP Handshake Hit Ratio, [Syn_ACK] Response Time, Transmission Time, Throughput
+    Method to calculate the score given the parameters TCP Handshake Hit Ratio, [Syn_ACK] Response Time, Transmission Time, Throughput
     """
     succ_handshakes = self.log_handshake.count(1)
     handshake_rate = succ_handshakes / input_evaluation_rounds
     score = handshake_rate * 100
     self.score = score
 
-    #TODO Calculate SYN-ACK Score Add Bonus of 3 Best Avg_resp_time to score ; 15 , 10 , 5 points
+    "Calculate avg_syn_ack"
     sum_syn_ack = sum(self.log_syn_ack_time)
     avg_syn_ack_time = sum_syn_ack / input_evaluation_rounds
     self.avg_syn_ack_time = avg_syn_ack_time
@@ -275,7 +239,7 @@ class Proxy:
         self.avg_syn_ack_time = 99
     #self.log_syn_ack_time.clear()
 
-    #TODO calc AVG transmission time for data size - 1000B default
+    "Calc avg_TransmissionTime"
     sum_transmission_time = sum(self.log_transmission_time)
     avg_transmission_time = sum_transmission_time / input_evaluation_rounds
     self.avg_transmission_time = avg_transmission_time
@@ -283,7 +247,7 @@ class Proxy:
       self.avg_transmission_time = 99
     #self.log_transmission_time.clear()
 
-    "calc AVG Throughput score"
+    "calc AVG Throughput"
     sum_throughput = sum(self.log_throughput)
     avg_throughput = sum_throughput / input_evaluation_rounds
     self.avg_throughput = avg_throughput

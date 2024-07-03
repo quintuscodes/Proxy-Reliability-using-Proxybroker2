@@ -17,9 +17,13 @@ from proxy_metrik_main import *
 #import requests
 
 class Proxy_Manager:
+
   """
-  A Class for Managing Proxy List and Evaluation
+  A Class for Managing Protocol Proxy List and Evaluation
   """
+
+
+  "Construcotr"
   def __init__(self,_protocol):
     self.ready_for_connection = False
     self.protocol = _protocol
@@ -27,11 +31,13 @@ class Proxy_Manager:
     self.proxy_list = []
     self.proxy_list_slave = []
   
+  "Helper Method to get proxy items from list"
 
   def get_proxy(self, index) -> Proxy:
      proxy = self.proxy_list[index]
      
      return proxy
+  
   """
   def perform_request(self):
     "Perform the Request with [1] in master list"
@@ -47,22 +53,11 @@ class Proxy_Manager:
     print(response.text)
   """
 
-  async def write_proxy_to_class(self,_type, input_number, proxies,input_evaluation_rounds):
-        proxycount = 0
-        while True:
-            proxy = await proxies.get()
-            if proxy is None:
-                break
-            
-            ip = proxy.host
-            port = proxy.port
-            type = _type
-            self.protocol = _type
-            p = Proxy(type,ip,port,input_evaluation_rounds)
-            p.add_to_list(self.proxy_list)
+  
 
   async def fetch_proxys_write_to_class(self,input_proxy_number,input_evaluation_rounds,data_size):
-    
+    "Fetching Proxys from open Source using proxybroker2 and writitng them to customized class"
+
     proxies = asyncio.Queue()
     
    
@@ -73,14 +68,32 @@ class Proxy_Manager:
       
     await self.print_proxy_list(0)
     
+  async def write_proxy_to_class(self,_type, input_number, proxies,input_evaluation_rounds):
+    "Method to write proxys to customized class and adding to proxy list  "
 
+    proxycount = 0
+    while True:
+      proxy = await proxies.get()
+      if proxy is None:
+          break
+            
+      ip = proxy.host
+      port = proxy.port
+      type = _type
+      self.protocol = _type
+      p = Proxy(type,ip,port,input_evaluation_rounds)
+      self.add_to_list(p)
 
-
-
+  "Method to add a Proxy item to the list "
+  def add_to_list(self,Proxy):
+    self.proxy_list.append(Proxy)
+    
+    attrs = vars(Proxy)
+    print(f"\nAdded to List:\n" + ', \n'.join("%s: %s" % item for item in attrs.items()) + "\n")
 
   async def print_proxy_list(self,arg):
     """
-    A function to print the actual proxy_list
+    Method to print the actual proxy_list
     """
     
     if arg == "master":
@@ -92,16 +105,20 @@ class Proxy_Manager:
       print("   **** MASTER **** Proxy - Liste")
       print("   __________________________________________________________________________________________________________________________________________________________________")
       print("  |\n")
+
       for elements in self.master_proxy_list:
           index = self.master_proxy_list.index(elements)
           index += 1
           attrs = vars(elements)
           print(f"      > {index}. Proxy \n \n      " + ', \n      '.join("%s: %s" % item for item in attrs.items()) + "\n")
-          #print(f', \n'.join("%s: %s" % item for item in attrs.items()) + "\n")
+         
+
       print("  |__________________________________________________________________________________________________________________________________________________________________\n \n \n")
       print("|_____________________________________________________________________________________________________________________________________________________________________")
       print("\n \n") 
+
     else:
+
       print("\n \n ")
       print(f"{self.protocol} Proxy - Manager")
       print(" ____________________________________________________________________________________________________________________________________________________________________")
@@ -109,16 +126,20 @@ class Proxy_Manager:
       print("   Proxy - Liste")
       print("   __________________________________________________________________________________________________________________________________________________________________")
       print("  |\n")
+
       for elements in self.proxy_list:
           index = self.proxy_list.index(elements)
           index += 1
           attrs = vars(elements)
           print(f"      > {index}. Proxy \n \n      " + ', \n      '.join("%s: %s" % item for item in attrs.items()) + "\n")
-          #print(f', \n'.join("%s: %s" % item for item in attrs.items()) + "\n")
+          
+
       print("  |__________________________________________________________________________________________________________________________________________________________________\n \n \n")
       print("|_____________________________________________________________________________________________________________________________________________________________________")
       print("\n \n") 
+
   async def evaluate_proxy_list(self,counter, input_evaluation_rounds,data_size, input_proxy_number):
+    
     """
     A Method to initialize the evaluation of the Proxys in Proxy-List
     
@@ -133,21 +154,22 @@ class Proxy_Manager:
       tasks = []
       print(f"Test Queue Evaluation Round Nr. {counter}")
       
-
+      
       for i in range(len(self.proxy_list)):
         proxy = self.get_proxy(i)
-        task = proxy.evaluate()
+        task = proxy.evaluate()             #Evaluate Thread Pool Executor -> Evaluation Methods {handshake,transmission_time,throughput,request}
         tasks.append(task)
-        #task calculate score per proxy
+        
         
 
       await asyncio.gather(*tasks)
     
     for i in range(len(self.proxy_list)):
         proxy = self.get_proxy(i)
-        proxy.calc_score(input_evaluation_rounds)
+        proxy.calc_score(input_evaluation_rounds) #loop through proxy_list and calculate score per proxy
 
-    "Reward the Best Proxys in evaltuation parameters - sort then give 15,10,5 Points credit score"
+    "Reward the Best Proxys in evaluation parameters - sort after score - then give 15,10,5 Points credit score"
+
     first = 15
     second = 10
     third = 5
@@ -194,58 +216,9 @@ class Proxy_Manager:
     self.proxy_list.sort(key=lambda Proxy: Proxy.score, reverse=True)
     
 
-    
-    """
-        queue.put_nowait(proxy.evaluate_handshakes)
 
-        print("Queue Evaluate Handshake added")
-
-        queue.put_nowait(proxy.evaluate_throughput)
-
-        print("Queue Evaluate Throughput added")
-
-        queue.put_nowait(proxy.evaluate_transmission_time)
-
-        print("Queue Evaluate TTM added\n")
-  
-      for i in range(len(self.proxy_list)):
-          index = i + 1
-
-          proxy = self.get_proxy(i)
-          
-          
-          
-          
-          print(queue.qsize())
-          await proxy.master_evaluate(index,queue,self.proxy_list)
-          #task = asyncio.create_task()
-          print(f"Master Evaluate Proxy Task created - evaluate async Proxy IP: {proxy.ip} ")
-          #tasks.append(task)
-          
-        
-      await queue.join() 
-
-      for task in tasks:
-        task.cancel()
-        # Wait until all worker tasks are cancelled.
-      
-      await asyncio.gather(*tasks, return_exceptions=True)
-      
-      """
-
-
-
-    #calc_score(proxy_list,input_evaluation_rounds)  
-    #print_proxy_list_dict(proxy_list) 
-
-    """
-    for proxy in proxy_list:
-      async create task(proxy.master_evaluate)
-    """
   async def sort_proxy_lists(self):
-    """A Function for sorting the List and remove proxys with a 70 score threshold
-    """
-    #TODO SORT first, so that proxy with score 100 is on top
+    "A Method to sort the List and remove proxys with a < 100 score threshold"
     
     self.proxy_list.sort(key=lambda Proxy: Proxy.score, reverse=True)
     if len(self.master_proxy_list) < 10:
@@ -261,22 +234,13 @@ class Proxy_Manager:
     self.proxy_list.clear()
 
   async def refresh_proxy_list(self,counter,input_proxy_number,input_evaluation_rounds,data_size ):
-        master = "master"
-        "A function to refill the proxy list with new evaluated Proxys"
-        """
-                TODO: 
-                
-                - gather 5 new!!!(check if IPs are not doubled) proxys to empty self.proxy_list
-                - evaluate them and push with score > 120 in the self.master_list
-
-                - checker method every asyncio.sleep(5) seconds to listen if 10 reliable proxys are in the list, if not -> refresh list 
-                
-        """
+        
+        "A method to refill the proxy list with new evaluated Proxys score > 100"
 
         if self.ready_for_connection == False:
             if len(self.master_proxy_list) < 10: 
                 print("Refreshing the Proxy List \n")
-                #asyncio.sleep(5)
+                await asyncio.sleep(3)
                 print("Refreshing the Proxy List \n")
                 
                 await asyncio.gather(self.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size))

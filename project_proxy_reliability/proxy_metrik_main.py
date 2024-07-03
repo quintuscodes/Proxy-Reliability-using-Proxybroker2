@@ -1,4 +1,4 @@
-"""Find and show 10 working SOCKS5 proxies and perform a TCP Handshake individually."""
+
 from scapy.all import *
 from scapy.layers.inet import IP
 from scapy.layers.inet import TCP
@@ -11,19 +11,25 @@ from proxy_manager import *
 
 async def main():
     
-    
-    data_size =1000
-    master = "master"
-    global unbalanced
-    unbalanced = True
     """
+
+    Asynchronous Main Funtion to instantiate Proxy-Manager Object for a specific Protocol, find, evaluate and store reliable Proxys given a score
+
+
     HTTP, SOCKS4, SOCKS5, CONNECT:25 
+    - Need to adapt main() with fetch_, print() &  evaluate_ tasks to gather other protocols if desired
+
     """
+
     http = Proxy_Manager("HTTP")
     #socks4 = Proxy_Manager("SOCKS4")
     socks5 = Proxy_Manager("SOCKS5")
     #connect25 = Proxy_Manager("CONNECT:25")
-    active = True
+
+    data_size =1000
+    master = "master"
+    global unbalanced
+    unbalanced = True
     counter = 0
     input_proxy_number = 0
     input_evaluation_rounds = 0
@@ -33,20 +39,10 @@ async def main():
     
     while input_evaluation_rounds < 1:
         input_evaluation_rounds = int(input('How many handshakes >= 6 should be established? At least 6 for a reliable list configuration.\n'))
-    """
-    start_time = time.perf_counter()
-    await socks.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size)
-    await http.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size)
     
-    await socks.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number)
-    await http.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number)
-    end_time = time.perf_counter()
-    await socks.print_proxy_list()
-    await http.print_proxy_list()
-    evaluation_time = end_time - start_time
-    
-    """
     start_time = time.perf_counter()
+
+    "Add here different protocols"
     fetch_tasks = [socks5.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size),
                    http.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size),
                    ] 
@@ -88,21 +84,25 @@ async def main():
         await http.print_proxy_list(master)
         await asyncio.sleep(5)
 
-        query = int(input("Enter 1 to continue and 0 to abort\n"))
-        if query == 1:
-          print(f"Query new reliable Proxys to MASTER List ")
+        
+        
+        print(f"Query new reliable Proxys to MASTER List ")
 
-          refresh_tasks = [socks5.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size ),
+        refresh_tasks = [socks5.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size ),
                      http.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size )
                      ]
-          await asyncio.gather(*refresh_tasks)
+        await asyncio.gather(*refresh_tasks)
         
           
-          if len(socks5.master_proxy_list) and len(http.master_proxy_list) == 10:
+        if len(socks5.master_proxy_list) and len(http.master_proxy_list) == 10:
               unbalanced = False
               print("\n\n      ------- Initiated Termination -------\n       Here is the final Master Proxy List\n")
               await socks5.print_proxy_list(master)
               await http.print_proxy_list(master)
+
+        query = int(input("Enter 1 to continue and 0 to abort\n"))
+        if query == 1:
+            print("\n\n Continue \n")
         else:
            unbalanced = False
            print("\n\n      ------- Initiated Termination -------\n       Here is the final Master Proxy List\n")
@@ -112,5 +112,6 @@ async def main():
 
 
 if __name__ == '__main__':
+    "Asyncio Event Loop to find and evaluate Proxys concurrently"
     loop = asyncio.get_event_loop()
     loop.run_until_complete(main())
