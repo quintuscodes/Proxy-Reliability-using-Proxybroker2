@@ -4,6 +4,7 @@ from scapy.layers.inet import IP
 from scapy.layers.inet import TCP
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+#import requests
 
 
 
@@ -26,6 +27,9 @@ class Proxy:
     self.avg_transmission_time = 0
     self.log_throughput = []
     self.avg_throughput = 0
+    self.log_request = []
+    self.log_request_response_time = []
+    self.avg_request_response_time = 0
 
     print(f"Initiated Proxy: \nIP: {self.ip}   , Port:  {self.port},  Protokoll:  {self.protocol}, ")
 
@@ -74,7 +78,12 @@ class Proxy:
 
   def set_log_throughput(self,throughput):
     self.log_throughput.append(throughput)
-  
+
+  def set_log_request_response_time(self,response_time):
+     self.log_request_response_time.append(response_time)
+     
+  def set_log_request(self,res):
+     self.log_request.append(res)
  
   async def evaluate(self):
     """
@@ -89,6 +98,7 @@ class Proxy:
        await loop.run_in_executor(pool, self.evaluate_handshakes)
        await loop.run_in_executor(pool,self.evaluate_throughput)
        await loop.run_in_executor(pool,self.evaluate_transmission_time)
+       #await loop.run_in_executor(pool,self.evaluate_request)
        
 
 
@@ -219,7 +229,36 @@ class Proxy:
        self.set_log_throughput(throughput)
 
     print(f"Log Throughput set to \n {self.get_log_throughput()} in KB/second \n")
-     
+
+  def evaluate_request(self):
+    
+    "Method to perform an HTTP request and evaluate the proxy based on response time and status code."
+
+    proxy_requirements_urls = {
+            "http" : f"http://{self.ip}:{self.port}",
+            "https" : f"https://{self.ip}:{self.port}"
+     }
+
+    try:
+
+      start_time = time.perf_counter()
+      response = requests.get("https://httpbin.org/get",proxies=proxy_requirements_urls,timeout=5)
+      end_time = time.perf_counter()
+      response_time = end_time - start_time
+
+      if response.status_code == 200:
+         print(f"HTTP request successful. Response time: {response_time} seconds")
+         self.set_log_request_response_time(response_time) 
+         self.set_log_request(200) # log success
+      else:
+         print(f"HTTP request failed with status code : {response.status_code}")
+         self.set_log_request_response_time(1) #high value to indicate fail
+         self.set_log_request(response.status_code) # fail 
+
+    except requests.RequestException as fail:
+       print(f"HTTP request failed: {fail} ")
+       self.set_log_request_response_time(1) #high value to indicate fail
+       self.set_log_request(response.status_code) #fail
     
 
   def calc_score(self,input_evaluation_rounds):
@@ -251,4 +290,11 @@ class Proxy:
     sum_throughput = sum(self.log_throughput)
     avg_throughput = sum_throughput / input_evaluation_rounds
     self.avg_throughput = avg_throughput
+
+    "calc avg_request"
+    sum_request_response_time = sum(self.log_request_response_time)
+    avg_requ_resp_time = sum_request_response_time / input_evaluation_rounds
+    self.avg_request_response_time = avg_requ_resp_time
     
+    "TODO: Check calculation again"
+    self.score += (100 - self.avg_request_response_time) * 10
