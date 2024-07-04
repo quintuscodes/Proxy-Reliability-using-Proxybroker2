@@ -44,10 +44,10 @@ async def main():
 
     "Add here different protocols"
     fetch_tasks = [socks5.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size),
-                   http.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size),
+                   http.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size)
                    ] 
     evaluate_tasks = [socks5.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number),
-                      http.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number),
+                      http.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number)
                       ]   
     
     
@@ -94,7 +94,7 @@ async def main():
         await asyncio.gather(*refresh_tasks)
         
           
-        if len(socks5.master_proxy_list) and len(http.master_proxy_list) == 10:
+        if len(http.master_proxy_list) == 10:
               unbalanced = False
               print("\n\n      ------- Initiated Termination -------\n       Here is the final Master Proxy List\n")
               await socks5.print_proxy_list(master)

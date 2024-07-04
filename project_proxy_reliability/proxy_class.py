@@ -4,7 +4,7 @@ from scapy.layers.inet import IP
 from scapy.layers.inet import TCP
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
-#import requests
+import requests
 
 
 
@@ -98,7 +98,7 @@ class Proxy:
        await loop.run_in_executor(pool, self.evaluate_handshakes)
        await loop.run_in_executor(pool,self.evaluate_throughput)
        await loop.run_in_executor(pool,self.evaluate_transmission_time)
-       #await loop.run_in_executor(pool,self.evaluate_request)
+       await loop.run_in_executor(pool,self.evaluate_request)
        
 
 
@@ -235,10 +235,7 @@ class Proxy:
     "Method to perform an HTTP request and evaluate the proxy based on response time and status code."
 
     proxy_requirements_urls = {
-            "http" : f"http://{self.ip}:{self.port}",
-            "https" : f"https://{self.ip}:{self.port}",
-            "http" : f"socks5://{self.ip}:{self.port}",
-            "https" : f"socks5://{self.ip}:{self.port}"
+            "http" : f"http://{self.ip}:{self.port}"
      }
 
     try:
@@ -299,4 +296,4 @@ class Proxy:
     self.avg_request_response_time = avg_requ_resp_time
     
     "TODO: Check calculation again"
-    self.score += (100 - self.avg_request_response_time) * 10
+    
