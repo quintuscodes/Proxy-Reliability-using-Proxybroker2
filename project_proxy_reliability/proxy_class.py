@@ -251,23 +251,23 @@ class Proxy:
          self.set_log_request(200) # log success
       else:
          print(f"HTTP request failed with status code : {response.status_code}")
-         self.set_log_request_response_time(1) #high value to indicate fail
+         self.set_log_request_response_time(2) #high value to indicate fail
          self.set_log_request(response.status_code) # fail 
 
     except requests.RequestException as fail:
        print(f"HTTP request failed: {fail} ")
-       self.set_log_request_response_time(1) #high value to indicate fail
+       self.set_log_request_response_time(2) #high value to indicate fail
        self.set_log_request(response.status_code) #fail
     
 
   def calc_score(self,input_evaluation_rounds):
     """
-    Method to calculate the score given the parameters TCP Handshake Hit Ratio, [Syn_ACK] Response Time, Transmission Time, Throughput
+    Method to calculate the score given the parameters TCP Handshake Hit Ratio, [Syn_ACK] Response Time, Transmission Time, Throughput and Requests Ratio
     """
     succ_handshakes = self.log_handshake.count(1)
     handshake_rate = succ_handshakes / input_evaluation_rounds
-    score = handshake_rate * 100
-    self.score = score
+    handshake_score = (handshake_rate * 100) / 2
+    self.score += handshake_score
 
     "Calculate avg_syn_ack"
     sum_syn_ack = sum(self.log_syn_ack_time)
@@ -295,5 +295,8 @@ class Proxy:
     avg_requ_resp_time = sum_request_response_time / input_evaluation_rounds
     self.avg_request_response_time = avg_requ_resp_time
     
-    "TODO: Check calculation again"
-    
+    "Request Score"
+    succ_requests = self.log_request.count(200)
+    requests_rate = succ_requests / input_evaluation_rounds
+    requ_score = (requests_rate * 100) / 2
+    self.score += requ_score
