@@ -20,7 +20,7 @@ async def main():
     
     Comment out/in desired Protocols
 
-    """
+        """
 
     http = Proxy_Manager("HTTP")
     socks4 = Proxy_Manager("SOCKS4")
@@ -108,7 +108,7 @@ async def main():
               print("\n\n      ------- Initiated Termination -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
 
 
-        query = int(input("Enter 1 to continue and 0 to abort\n")) # For Future Events 
+        query = int(input("Enter 1 to continue and 0 to cancel\n")) # For Future Events 
         if query == 1:
             print("\n\n Continue \n")
         else:
