@@ -210,16 +210,16 @@ class Proxy_Manager:
     
 
 
-  async def sort_proxy_lists(self):
+  async def sort_proxy_lists(self,input_proxy_number):
     "A Method to sort the List and remove proxys with a < 100 score threshold"
     
     self.proxy_list.sort(key=lambda Proxy: Proxy.score, reverse=True)
-    if len(self.master_proxy_list) < 10:
+    if len(self.master_proxy_list) < input_proxy_number:
       for proxy in self.proxy_list:
         if proxy.score < 100:
           self.proxy_list.remove(proxy)
           print("\n Removed Proxys with score <= 100 \n")
-        elif proxy.score >= 100 and len(self.master_proxy_list) < 10:
+        elif proxy.score >= 100 and len(self.master_proxy_list) < input_proxy_number:
           self.master_proxy_list.append(proxy)
       
 
@@ -231,7 +231,7 @@ class Proxy_Manager:
         "A method to refill the proxy list with new evaluated Proxys score > 100"
 
         if self.ready_for_connection == False:
-            if len(self.master_proxy_list) < 10: 
+            if len(self.master_proxy_list) < input_proxy_number: 
                 print("Refreshing the Proxy List \n")
                 await asyncio.sleep(3)
                 print("Refreshing the Proxy List \n")
@@ -240,9 +240,9 @@ class Proxy_Manager:
                 await asyncio.gather(self.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number))
                 
 
-                await self.sort_proxy_lists()
+                await self.sort_proxy_lists(input_proxy_number)
 
-                if len(self.master_proxy_list) < 10:
+                if len(self.master_proxy_list) < input_proxy_number:
                     await self.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size )
                 else:
                     self.ready_for_connection = True
@@ -250,7 +250,7 @@ class Proxy_Manager:
 
             else:
                 self.ready_for_connection = True
-                await self.sort_proxy_lists()
+                await self.sort_proxy_lists(input_proxy_number)
                 print(f"{self.protocol}  *** MASTER *** Proxy List is ready for Connection")
                 
         else:

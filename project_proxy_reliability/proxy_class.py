@@ -275,7 +275,7 @@ class Proxy:
     self.avg_syn_ack_time = avg_syn_ack_time
     if self.avg_syn_ack_time == 0.0:
         self.avg_syn_ack_time = 99
-    #self.log_syn_ack_time.clear()
+    self.log_syn_ack_time.clear() # Comment out/in if you want to print log to console
 
     "Calc avg_TransmissionTime"
     sum_transmission_time = sum(self.log_transmission_time)
@@ -283,7 +283,7 @@ class Proxy:
     self.avg_transmission_time = avg_transmission_time
     if self.avg_transmission_time == 0.0:
       self.avg_transmission_time = 99
-    #self.log_transmission_time.clear()
+    self.log_transmission_time.clear() # Comment out/in if you want to print log to console
 
     "calc AVG Throughput"
     sum_throughput = sum(self.log_throughput)
@@ -294,6 +294,7 @@ class Proxy:
     sum_request_response_time = sum(self.log_request_response_time)
     avg_requ_resp_time = sum_request_response_time / input_evaluation_rounds
     self.avg_request_response_time = avg_requ_resp_time
+    self.log_request_response_time.clear() # Comment out/in if you want to print log to console
     
     "Request Score"
     succ_requests = self.log_request.count(200)
