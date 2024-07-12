@@ -39,16 +39,16 @@ class Proxy_Manager:
      return proxy
   
   
-  async def fetch_proxys_write_to_class(self,input_proxy_number,input_evaluation_rounds,data_size):
+  async def fetch_proxys_write_to_class(self,proxy_number,input_evaluation_rounds,data_size):
     "Fetching Proxys from open Source using proxybroker2 and writitng them to customized class"
 
     proxies = asyncio.Queue()
     
    
     broker = Broker(proxies)
-    print("test")
-    await broker.find( types=[ f'{self.protocol}'],lvl = 'HIGH', strict = True,limit=input_proxy_number)
-    await self.write_proxy_to_class(f'{self.protocol}',input_proxy_number, proxies,input_evaluation_rounds)
+    print(f"Proxybroker - FIND - Initiated for Protocol {self.protocol} ")
+    await broker.find( types=[ f'{self.protocol}'],lvl = 'HIGH', strict = True,limit=proxy_number)
+    await self.write_proxy_to_class(f'{self.protocol}',proxy_number, proxies,input_evaluation_rounds)
       
     await self.print_proxy_list(0)
     
