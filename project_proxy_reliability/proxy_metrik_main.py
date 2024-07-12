@@ -8,25 +8,25 @@ from proxy_class import *
 from proxy_manager import *
 
 
+HTTP_PROTOS = {'HTTP', 'CONNECT:25', 'SOCKS4', 'SOCKS5'}
 
 @click.command()
 @click.argument("proxy_number",type=int)
 @click.argument("evaluation_rounds", type=int)
-
-#@click.option('--proxy', default=10, prompt='Enter the Number of reliable Proxy-Servers to be gathered for each protocol.', help='Number of reliable Proxy-Servers to be gathered for each protocol.')
-#@click.option('--evaluation_rounds', default=4,prompt='Enter the Number of Evaluation Rounds. ',
-#             help='Number of Rounds Handshake, Request, Transmission Time, Throughput should be evaluated. The greater the number of rounds, the more precise the proxy evaluation. ')
-def run(proxy_number: int, evaluation_rounds: int):
+@click.option('--protocols', default = 'HTTP',prompt='Enter the Protocols{HTTP,CONNECT:25, SOCKS4,SOCKS5} to be gathered',help='Enter the Protocols{"HTTP" "CONNECT:25", "SOCKS4", "SOCKS5"} to be gathered separated by a comma like HTTP,SOCKS4,CONNECT25')
+def run(proxy_number: int, evaluation_rounds: int, protocols: set):
     """
     CLI command to start the proxy evaluation with specified number of proxies and evaluation rounds wrapped in an Asyncio Event Loop to find and evaluate Proxys concurrently
+    
+    TODO: Code fuer CLI um protokolle per click.option anzugeben. fetch,evaluate, refresh tasks und abfrage aus main anpassen.
+    
     """
-    ""
     
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(proxy_number, evaluation_rounds))
+    loop.run_until_complete(main(proxy_number, evaluation_rounds, protocols))
     
 
-async def main(proxy_number: int,evaluation_rounds:int):
+async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     
     """
 
