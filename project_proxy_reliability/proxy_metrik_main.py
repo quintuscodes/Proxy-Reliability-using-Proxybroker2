@@ -89,7 +89,7 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     
     evaluation_time = end_time - start_time
     num_proto = len(fetch_tasks)
-    print(f"Die Evaluation von {proxy_number} Proxys bei {input_evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s ")
+    print(f"The Evaluation of {proxy_number} Proxys in {input_evaluation_rounds} Evaluation Rounds of {num_proto}  protocols took {evaluation_time} s ")
     
     await sort_proxy_managers(proxy_managers_list,proxy_number)
 
