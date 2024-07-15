@@ -110,7 +110,16 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
         await asyncio.gather(*refresh_tasks)
         
         "Remove/Add here desired protocols in if - statement"
-        if len(http.master_proxy_list) == proxy_number and len(socks5.master_proxy_list) == proxy_number and len(socks4.master_proxy_list) == proxy_number and len(connect25.master_proxy_list) == proxy_number:
+        checked = []
+        for items in proxy_managers_list:
+            
+            if len(items.master_proxy_list) == proxy_number:
+                checked.append(1)
+
+        if checked.count(1) == num_proto:
+              print("CHECK approved")
+              await asyncio.sleep(5)
+
               unbalanced = False
               end_time = time.perf_counter()
               evaluation_time = end_time - start_time
@@ -119,7 +128,10 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
               await print_proxy_managers(proxy_managers_list,master)
               print("\n\n      ------- Initiated Termination -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
               print(f"Die Evaluation von {proxy_number} Proxys bei {input_evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s \n")
-    
+        else:
+            print("Notdoneyet")
+            await asyncio.sleep(5)
+
     await wait_and_evaluate_loop()
 
 
