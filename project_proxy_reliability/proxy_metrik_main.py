@@ -42,37 +42,45 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     socks5 = Proxy_Manager("SOCKS5")
     connect25 = Proxy_Manager("CONNECT:25")
 
+    fetch_tasks = [] 
+    evaluate_tasks = []
+    refresh_tasks = []   
     proxy_managers_list = []
-    proxy_managers_list.append(http)
-    proxy_managers_list.append(socks4)
-    proxy_managers_list.append(socks5)
-    proxy_managers_list.append(connect25)
 
-    
     data_size =1000
     master = "master"
     global unbalanced
     unbalanced = True
     counter = 0
     input_evaluation_rounds = evaluation_rounds
-    
-    start_time = time.perf_counter()
 
-    "Remove/Add here desired protocols"
-    fetch_tasks = [socks5.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds,data_size),
-                   http.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds,data_size),
-                   socks4.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds,data_size),
-                   connect25.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds,data_size)
-                   ] 
-    evaluate_tasks = [socks5.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, proxy_number),
-                      http.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, proxy_number),
-                      socks4.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, proxy_number),
-                      connect25.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, proxy_number)
-                      ]   
+    
+    if "HTTP" in protocols:
+        proxy_managers_list.append(http)
+        fetch_tasks.append(http.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds,data_size))
+        evaluate_tasks.append(http.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, proxy_number))
+        refresh_tasks.append(http.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds,data_size ))
+    if "SOCKS4" in protocols:
+        proxy_managers_list.append(socks4)
+        fetch_tasks.append(socks4.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds,data_size))
+        evaluate_tasks.append(socks4.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, proxy_number))
+        refresh_tasks.append(socks4.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds,data_size ))
+    if "SOCKS5" in protocols:
+        proxy_managers_list.append(socks5)
+        fetch_tasks.append(socks5.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds,data_size))
+        evaluate_tasks.append(socks5.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, proxy_number))
+        refresh_tasks.append(socks5.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds,data_size ))
+    if "CONNECT:25" in protocols:   
+        proxy_managers_list.append(connect25)
+        fetch_tasks.append(connect25.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds,data_size))
+        evaluate_tasks.append(connect25.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, proxy_number))
+        refresh_tasks.append(connect25.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds,data_size ))
+
     
     
     
     "Using Asyncio to concurrently find Proxy Objects using Proxybroker2 and evaluate them using the proxy_class methods "
+    start_time = time.perf_counter()
     await asyncio.gather(*fetch_tasks)
     await asyncio.gather(*evaluate_tasks)
     end_time = time.perf_counter()
@@ -97,16 +105,10 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
         await print_proxy_managers(proxy_managers_list,master)
         await asyncio.sleep(5)
 
-        
-        
         print(f"Query new reliable Proxys to MASTER List ")
 
         "Remove/Add here desired protocols"
-        refresh_tasks = [socks5.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds,data_size ),
-                     http.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds,data_size ),
-                     socks4.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds,data_size ),
-                     connect25.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds,data_size )
-                     ]
+        
         await asyncio.gather(*refresh_tasks)
         
         "Remove/Add here desired protocols in if - statement"
