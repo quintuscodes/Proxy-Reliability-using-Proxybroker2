@@ -3,18 +3,12 @@ A Class for managing Proxy Evaluation and performing Request. This is the target
 
 """
 from scapy.all import *
-import queue
-import threading
-from scapy.layers.inet import IP
-from scapy.layers.inet import TCP
 import asyncio
-import aiohttp
 from proxybroker import Broker, Proxy # type: ignore
 from proxy_class import *
 from proxy_manager import *
 from proxy_metrik_main import *
 
-import requests
 
 class Proxy_Manager:
 

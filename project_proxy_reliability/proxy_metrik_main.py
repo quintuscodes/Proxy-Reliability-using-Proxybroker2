@@ -1,7 +1,5 @@
 
 from scapy.all import *
-from scapy.layers.inet import IP
-from scapy.layers.inet import TCP
 import asyncio
 import click
 from proxy_class import *
@@ -74,7 +72,7 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     
     
     
-    
+    "Using Asyncio to concurrently find Proxy Objects using Proxybroker2 and evaluate them using the proxy_class methods "
     await asyncio.gather(*fetch_tasks)
     await asyncio.gather(*evaluate_tasks)
     end_time = time.perf_counter()
@@ -120,17 +118,10 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
 
               await print_proxy_managers(proxy_managers_list,master)
               print("\n\n      ------- Initiated Termination -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
-              print(f"Die Evaluation von {proxy_number} Proxys bei {input_evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s ")
+              print(f"Die Evaluation von {proxy_number} Proxys bei {input_evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s \n")
     
+    await wait_and_evaluate_loop()
 
-        query = int(input("Enter 1 to continue and 0 to cancel\n")) # For Future Events 
-        if query == 1:
-            print("\n\n Continue \n")
-        else:
-           unbalanced = False
-
-           await print_proxy_managers(proxy_managers_list,master)
-           print("\n\n      ------- Initiated Termination -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
 
 async def print_proxy_managers(list,arg):
     for proxy_manager_item in list:
@@ -140,6 +131,12 @@ async def sort_proxy_managers(list,proxy_number):
     for proxy_manager_item in list:
         await proxy_manager_item.sort_proxy_lists(proxy_number)
 
+async def wait_and_evaluate_loop():
+    print("Wait 30s until Master List re-evaluate.\n")
+    for _ in range(15):  # 40 Sekunden / 2 Sekunden = 20
+        await asyncio.sleep(2)
+        print('.', end='',flush=True)
+    print('\nEvaluate Master List again!')
 
 
 if __name__ == '__main__':
