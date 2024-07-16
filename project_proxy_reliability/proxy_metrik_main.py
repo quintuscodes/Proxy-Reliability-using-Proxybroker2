@@ -134,7 +134,7 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
             print("Notdoneyet")
             await asyncio.sleep(5)
 
-    await wait_and_evaluate_loop()
+    await rec_wait_and_evaluate_again()
 
 
 async def print_proxy_managers(list,arg):
@@ -145,7 +145,7 @@ async def sort_proxy_managers(list,proxy_number):
     for proxy_manager_item in list:
         await proxy_manager_item.sort_proxy_lists(proxy_number)
 
-async def wait_and_evaluate_loop():
+async def rec_wait_and_evaluate_again():
     print("Wait 30s until Master List re-evaluate.\n")
     for _ in range(15):  # 40 Sekunden / 2 Sekunden = 20
         await asyncio.sleep(2)
@@ -159,7 +159,7 @@ async def wait_and_evaluate_loop():
     > start asyncio.gather(*evaluate_tasks) 
     """
 
-    await wait_and_evaluate_loop()
+    await rec_wait_and_evaluate_again()
 
 
 if __name__ == '__main__':
