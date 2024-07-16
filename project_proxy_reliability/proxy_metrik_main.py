@@ -150,7 +150,16 @@ async def wait_and_evaluate_loop():
     for _ in range(15):  # 40 Sekunden / 2 Sekunden = 20
         await asyncio.sleep(2)
         print('.', end='',flush=True)
-    print('\nEvaluate Master List again!')
+    print('\nEvaluate Master List again!\n')
+
+    """The Recursive Loop to Re-Evaluate
+    Here goes the Code to 
+    > reset proxy.ip and proxy.port in the proxy managers master lists -> TODO: Write a Method to iterate through the Proxy_Manager_lists 
+    > evaluate_tasks neu befüllen ->Function 
+    > start asyncio.gather(*evaluate_tasks) 
+    """
+
+    await wait_and_evaluate_loop()
 
 
 if __name__ == '__main__':
