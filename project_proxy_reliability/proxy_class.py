@@ -84,6 +84,20 @@ class Proxy:
      
   def set_log_request(self,res):
      self.log_request.append(res)
+
+  def reset_attributes(self):
+    self.score = 0
+    self.log_handshake = []
+    self.log_syn_ack_time = []
+    self.avg_syn_ack_time = 0
+    self.log_transmission_time = []
+    self.avg_transmission_time = 0
+    self.log_throughput = []
+    self.avg_throughput = 0
+    self.log_request = []
+    self.log_request_response_time = []
+    self.avg_request_response_time = 0
+    
  
   async def evaluate(self):
     """
