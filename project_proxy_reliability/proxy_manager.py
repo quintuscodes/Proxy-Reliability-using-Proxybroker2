@@ -23,7 +23,7 @@ class Proxy_Manager:
     self.protocol = _protocol
     self.master_proxy_list = []
     self.proxy_list = []
-    self.proxy_list_slave = []
+    self.log_evaluation_time = []
   
   "Helper Method to get proxy items from list"
 

@@ -5,6 +5,8 @@ from scapy.layers.inet import TCP
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import requests
+import time
+import os
 
 
 
@@ -19,6 +21,7 @@ class Proxy:
     self.ip = _ip
     self.port =_port
     self.score = 0
+    self.log_score = []
     self.handshakes = _handshakes
     self.log_handshake = []
     self.log_syn_ack_time = []
@@ -86,6 +89,7 @@ class Proxy:
      self.log_request.append(res)
 
   def reset_attributes(self):
+    self.log_score.append(self.score) #store the score before reset
     self.score = 0
     self.log_handshake = []
     self.log_syn_ack_time = []

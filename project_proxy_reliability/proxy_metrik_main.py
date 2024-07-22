@@ -80,8 +80,9 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     
     
     "Using Asyncio to concurrently find Proxy Objects using Proxybroker2 and evaluate them using the proxy_class methods "
-    start_time = time.perf_counter()
+    
     await asyncio.gather(*fetch_tasks)
+    start_time = time.perf_counter()
     await asyncio.gather(*evaluate_tasks)
     end_time = time.perf_counter()
 
@@ -163,6 +164,7 @@ async def rec_wait_and_evaluate_again(proxy_managers_list):
     > start asyncio.gather(*evaluate_tasks) 
     """
     await reset_proxy_objects(proxy_managers_list)
+    
     #await rec_wait_and_evaluate_again(proxy_managers_list)
     
 
