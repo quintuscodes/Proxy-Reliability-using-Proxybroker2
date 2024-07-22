@@ -152,7 +152,7 @@ class Proxy_Manager:
     second = 10
     third = 5
 
-    for i in range(4):
+    for i in range(3):
       if i == 0:
         self.proxy_list.sort(key=lambda Proxy: Proxy.avg_syn_ack_time, reverse=False) 
 
@@ -162,8 +162,7 @@ class Proxy_Manager:
       elif i == 2:
          self.proxy_list.sort(key=lambda Proxy: Proxy.avg_throughput, reverse=True)
 
-      elif i == 3:
-         self.proxy_list.sort(key=lambda Proxy: Proxy.avg_request_response_time, reverse=False)
+      
       
       if len(self.proxy_list) >= 1:
         self.proxy_list[0].score += first
@@ -173,8 +172,7 @@ class Proxy_Manager:
           print(f"{first}  Points Credit to IP: {self.proxy_list[0].ip} in avg_transmission_time PROT: {self.protocol}  ")
         if i == 2:
           print(f"{first}  Points Credit to IP: {self.proxy_list[0].ip} in avg_throughput PROT: {self.protocol}  ")
-        if i == 3:
-          print(f"{first}  Points Credit to IP: {self.proxy_list[0].ip} in avg_request_response_time PROT: {self.protocol}  ")
+        
       
       if len(self.proxy_list) >= 2:
         self.proxy_list[1].score += second
@@ -184,8 +182,7 @@ class Proxy_Manager:
           print(f"{second} Points Credit to IP: {self.proxy_list[1].ip} in avg_transmission_time PROT: {self.protocol} ")
         if i == 2:
           print(f"{second} Points Credit to IP: {self.proxy_list[1].ip} in avg_throughput PROT: {self.protocol} ")
-        if i == 3:
-          print(f"{second}  Points Credit to IP: {self.proxy_list[0].ip} in avg_request_response_time PROT: {self.protocol}  ")
+        
         
       
       if len(self.proxy_list) >= 3:
@@ -196,8 +193,7 @@ class Proxy_Manager:
           print(f"{third} Points Credit to IP: {self.proxy_list[2].ip} in avg_transmission_time PROT: {self.protocol} ")
         if i == 2:
           print(f"{third} Points Credit to IP: {self.proxy_list[2].ip} in avg_throughput PROT: {self.protocol} ")
-        if i == 3:
-          print(f"{third}  Points Credit to IP: {self.proxy_list[0].ip} in avg_request_response_time PROT: {self.protocol}  ")
+        
         
     
     self.proxy_list.sort(key=lambda Proxy: Proxy.score, reverse=True)

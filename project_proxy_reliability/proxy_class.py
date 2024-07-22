@@ -31,8 +31,7 @@ class Proxy:
     self.log_throughput = []
     self.avg_throughput = 0
     self.log_request = []
-    self.log_request_response_time = []
-    self.avg_request_response_time = 0
+    
 
     print(f"Initiated Proxy: \nIP: {self.ip}   , Port:  {self.port},  Protokoll:  {self.protocol}, ")
 
@@ -115,7 +114,6 @@ class Proxy:
     with ThreadPoolExecutor() as pool:
        await loop.run_in_executor(pool, self.evaluate_handshakes)
        await loop.run_in_executor(pool,self.evaluate_throughput)
-       await loop.run_in_executor(pool,self.evaluate_transmission_time)
        await loop.run_in_executor(pool,self.evaluate_request)
        
 
@@ -123,7 +121,7 @@ class Proxy:
 
   def evaluate_handshakes(self):
       
-      "Evaluate a successful TCP-Handshake Hit Ratio and the Time for establishing the handshake -> syn_ack_time"
+      "Evaluate a (successful) TCP-Handshake Hit Ratio and the Time for establishing the handshake -> syn_ack_time"
 
       print(f"START HANDSHAKE PROT: {self.protocol} IP:  {self.ip}  PORT:  {self.port}\n")
     
@@ -135,17 +133,17 @@ class Proxy:
       
       # Transceive SYN-Paket and Receive Answer
       print("Sendet SYN- Paket\n")
+      start_time = time.time()
       syn_ack_response = sr1(syn_packet,timeout=2,verbose=False)
-      
+      end_time = time.time()
       
       
       if syn_ack_response:
-          syn_ack_time = syn_ack_response.time - syn_packet.sent_time
-          print(f"Response time for SYN-ACK: {syn_ack_time} seconds")
           
-
           if syn_ack_response.haslayer(TCP) and syn_ack_response[TCP].flags & 0x12:
               print("SYN-ACK empfangen. Handshake erfolgreich.\n")
+              syn_ack_time = syn_ack_response.time - syn_packet.sent_time
+              print(f"Response time for successful Handshake  SYN-ACK-Time : {syn_ack_time} seconds\n")
 
           # Create ACK-Paket to Proxy
 
@@ -171,7 +169,7 @@ class Proxy:
               print("SYN-ACK nicht empfangen. Handshake fehlgeschlagen.\n")
               self.set_log_handshake(0)
               print(f"Log Handshake set to \n {self.get_log_handshake()}\n")
-              self.set_log_syn_ack_time(syn_ack_time)
+              self.set_log_syn_ack_time(float('inf'))
               print(f"Log SYN_ACK set to \n {self.get_log_syn_ack_time()}\n")
               
               
@@ -180,73 +178,57 @@ class Proxy:
           
           self.set_log_handshake(0)
           print(f"Log Handshake set to \n {self.get_log_handshake()}\n")
-          self.set_log_syn_ack_time(1)
+          self.set_log_syn_ack_time(float('inf'))
           print(f"Log SYN_ACK set to \n {self.get_log_syn_ack_time()}\n")
       
-      
-
-  def evaluate_transmission_time(self):
-
-    "Evaluate the transmission time for sending (1000Bytes)data size packets and receiving a answer."
-
-    print(f"START TTM PROT: {self.protocol} IP:  {self.ip}  PORT:  {self.port}\n")
     
-    #Data Packet for Measuring Transmission Time of 1000 Bytes of data
-    data_size = 1000
-    data_packet = IP(dst=self.ip)/TCP(dport=self.port)/Raw(RandString(size=data_size))
-    start_time = time.time()
-    
-    response = sr1(data_packet, timeout=5,verbose=False)
-    end_time = time.time()
 
-    if response:
-        transmission_time = end_time - start_time
-        print(f"Transmission time for {data_size} bytes of data: {transmission_time} seconds")
-        self.set_log_transmission_time(transmission_time)
-        print(f"Log Transmission TIme set to \n {self.get_log_transmission_time()}\n")
-        
-    else:
-        print("No response received.")
-  
-        self.set_log_transmission_time(1)
-        print(f"Log Transmission TIme set to \n {self.get_log_transmission_time()}\n")
 
-   
-      
-  
   def evaluate_throughput(self):
 
-    "Evaluate Time for sending 10 Packets a 1kB - TODO is this necessary?, because it actually tests the physical layer not the proxy reliability?"
+    "Evaluate Throughput using the Proxy performing a http-Request and sending 1MB of random Data through the Proxy. "
 
     print(f"START Throughput PROT: {self.protocol} IP:  {self.ip}  PORT:  {self.port}\n")
     
-    # Data Packet for Measuring Throughput
-    data_size = 1000
-    throughput_packet = IP(dst=self.ip)/TCP(dport=self.port)/Raw(RandString(size=data_size))
+    
+    url = "https://httpbin.org/post"
 
-    #Send 10 data packets to proxy and measure time for 10 * 1000Bytes
-    start_time = time.time()
+    proxy_requ = {
+                "http": f"http://{self.ip}:{self.port}"
+    }
+    data_block = os.urandom(1024 * 1024) # 1 MB of random data
+    
+
+    "Sending the Data Block through the proxy using the http post method"
+    try:
+       
+      start_time = time.time()
+      response = requests.post(url, data=data_block, proxies=proxy_requ, timeout=30)
+      end_time = time.time()
+
+      if response.status_code == 200:
+         data_sent = len(data_block)
+         data_received = len(response.content)
+         total_data_size = data_sent + data_received
+
+         throughput = total_data_size / (end_time - start_time)
+         self.set_log_throughput(throughput / 1024) #KB/s
+         print(f"Throughput: {throughput / 1024} KB/s")
+      else:
+         print(f"Throughput HTTP request failed with status code: {response.status_code}")
+         self.set_log_throughput(0) # Low Value for Fail Indication in Scoring
+
+    except requests.ReadTimeout:
+        print("HTTP request timed out.")
+        self.set_log_throughput(0)  # high value to indicate fail
+        
+
+    except requests.RequestException as e:
+      print(f"HTTP request through proxy failed: {e}")
+      self.set_log_throughput(0) # Low Value for Fail Indication in Scoring
 
     
-    for packet in range(10):
-          send(throughput_packet,verbose=False)
-    
-      #await asyncio.gather(*[send_paket(throughput_packet) for send in range(10)])
-
-    end_time = time.time()
-
-    # Calculate throughput
-    total_data_size = data_size * 10
-    throughput = total_data_size / (end_time - start_time)
-    print(f"Throughput: {throughput / 1000} KBytes per second")
-
-    throughput = throughput / 1000
-    if self.get_last_log_handshake_item() == 0:
-       self.set_log_throughput(0)
-    else:
-       self.set_log_throughput(throughput)
-
-    print(f"Log Throughput set to \n {self.get_log_throughput()} in KB/second \n")
+    print(f"Log Throughput set to \n {self.get_log_throughput()} in KB/s \n")
 
   def evaluate_request(self):
     
@@ -255,27 +237,36 @@ class Proxy:
     proxy_requirements_urls = {
             "http" : f"http://{self.ip}:{self.port}"
      }
-
+    
+    
+    
+    data_block = os.urandom(1024 * 1024) # 1 MB of random data
+    
     try:
 
       start_time = time.perf_counter()
-      response = requests.get("https://httpbin.org/get",proxies=proxy_requirements_urls,timeout=5)
+      response = requests.get("https://httpbin.org/get",data=data_block,proxies=proxy_requirements_urls,timeout=30)
       end_time = time.perf_counter()
-      response_time = end_time - start_time
+      transmission_time = end_time - start_time
 
       if response.status_code == 200:
-         print(f"HTTP request successful. Response time: {response_time} seconds")
-         self.set_log_request_response_time(response_time) 
+         print(f"HTTP request successful. Response time: {transmission_time} seconds")
+         self.set_log_transmission_time(transmission_time) 
          self.set_log_request(200) # log success
       else:
          print(f"HTTP request failed with status code : {response.status_code}")
-         self.set_log_request_response_time(2) #high value to indicate fail
+         self.set_log_transmission_time(float('inf')) #high value to indicate fail
          self.set_log_request(response.status_code) # fail 
+
+    except requests.ReadTimeout:
+        print("HTTP request timed out.")
+        self.set_log_transmission_time(float('inf'))  # high value to indicate fail
+        self.set_log_request(408)  # HTTP 408 Request Timeout
 
     except requests.RequestException as fail:
        print(f"HTTP request failed: {fail} ")
-       self.set_log_request_response_time(2) #high value to indicate fail
-       self.set_log_request(response.status_code) #fail
+       self.set_log_transmission_time(float('inf')) #high value to indicate fail
+       self.set_log_request(500) #fail
     
 
   def calc_score(self,input_evaluation_rounds):
@@ -292,28 +283,28 @@ class Proxy:
     avg_syn_ack_time = sum_syn_ack / input_evaluation_rounds
     self.avg_syn_ack_time = avg_syn_ack_time
     if self.avg_syn_ack_time == 0.0:
-        self.avg_syn_ack_time = 99
-    self.log_syn_ack_time.clear() # Comment out/in if you want to print log to console
+        self.avg_syn_ack_time = float('inf')
+    #self.log_syn_ack_time.clear() # Comment out/in if you want to print log to console
 
     "Calc avg_TransmissionTime"
     sum_transmission_time = sum(self.log_transmission_time)
     avg_transmission_time = sum_transmission_time / input_evaluation_rounds
     self.avg_transmission_time = avg_transmission_time
     if self.avg_transmission_time == 0.0:
-      self.avg_transmission_time = 99
-    self.log_transmission_time.clear() # Comment out/in if you want to print log to console
+      self.avg_transmission_time = float('inf')
+    #self.log_transmission_time.clear() # Comment out/in if you want to print log to console
 
     "calc AVG Throughput"
     sum_throughput = sum(self.log_throughput)
     avg_throughput = sum_throughput / input_evaluation_rounds
     self.avg_throughput = avg_throughput
 
-    "calc avg_request"
+    """calc avg_request"
     sum_request_response_time = sum(self.log_request_response_time)
     avg_requ_resp_time = sum_request_response_time / input_evaluation_rounds
     self.avg_request_response_time = avg_requ_resp_time
     self.log_request_response_time.clear() # Comment out/in if you want to print log to console
-    
+    """
     "Request Score"
     succ_requests = self.log_request.count(200)
     requests_rate = succ_requests / input_evaluation_rounds
