@@ -80,9 +80,6 @@ class Proxy:
 
   def set_log_throughput(self,throughput):
     self.log_throughput.append(throughput)
-
-  def set_log_request_response_time(self,response_time):
-     self.log_request_response_time.append(response_time)
      
   def set_log_request(self,res):
      self.log_request.append(res)
@@ -98,8 +95,7 @@ class Proxy:
     self.log_throughput = []
     self.avg_throughput = 0
     self.log_request = []
-    self.log_request_response_time = []
-    self.avg_request_response_time = 0
+    
     
  
   async def evaluate(self):

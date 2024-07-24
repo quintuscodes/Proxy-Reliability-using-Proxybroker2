@@ -32,7 +32,13 @@ class Proxy_Manager:
      
      return proxy
   
+  def get_master_list(self):
+     return self.master_proxy_list
   
+  def get_proxy_list(self):
+     return self.proxy_list
+  
+
   async def fetch_proxys_write_to_class(self,proxy_number,input_evaluation_rounds,data_size):
     "Fetching Proxys from open Source using proxybroker2 and writitng them to customized class"
 
@@ -247,6 +253,8 @@ class Proxy_Manager:
           
           print(f"{self.protocol}  *** MASTER *** Proxy List is ready for Connection")
                 
-  async def reset_proxys(self):
+  def reset_proxys(self):
      for proxy_object in self.master_proxy_list:
         proxy_object.reset_attributes()
+        self.proxy_list.append(proxy_object)
+        self.master_proxy_list.remove(proxy_object)
