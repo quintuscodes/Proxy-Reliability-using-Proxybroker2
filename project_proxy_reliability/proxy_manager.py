@@ -151,7 +151,7 @@ class Proxy_Manager:
     for i in range(len(self.proxy_list)):
         proxy = self.get_proxy(i)
         proxy.calc_score(input_evaluation_rounds) #loop through proxy_list and calculate score per proxy
-
+    
     "Reward the Best Proxys in evaluation parameters - sort after score - then give 15,10,5 Points credit score"
 
     first = 15
@@ -199,6 +199,9 @@ class Proxy_Manager:
           print(f"{third} Points Credit to IP: {self.proxy_list[2].ip} in avg_transmission_time PROT: {self.protocol} ")
         if i == 2:
           print(f"{third} Points Credit to IP: {self.proxy_list[2].ip} in avg_throughput PROT: {self.protocol} ")
+
+    for i in range(len(self.proxy_list)):
+        proxy = self.get_proxy(i)
         
         
     
@@ -216,6 +219,7 @@ class Proxy_Manager:
           self.proxy_list.remove(proxy)
           print("\n Removed Proxys with score <= 100 \n")
         elif proxy.score >= 100 and len(self.master_proxy_list) < input_proxy_number:
+          
           self.master_proxy_list.append(proxy)
       
 
@@ -258,3 +262,7 @@ class Proxy_Manager:
         proxy_object.reset_attributes()
         self.proxy_list.append(proxy_object)
         self.master_proxy_list.remove(proxy_object)
+
+  def log_scores(self):
+     for proxy_object in self.master_proxy_list:
+        proxy_object.set_log_score()# Store score before reset

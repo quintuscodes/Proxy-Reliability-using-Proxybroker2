@@ -69,6 +69,9 @@ class Proxy:
   def set_score(self, _score):
     self.score = _score
 
+  def set_log_score(self):
+     self.log_score.append(self.score)
+
   def set_log_handshake(self,n):
     self.log_handshake.append(n)
 
@@ -85,7 +88,6 @@ class Proxy:
      self.log_request.append(res)
 
   def reset_attributes(self):
-    self.log_score.append(self.score) #store the score before reset
     self.score = 0
     self.log_handshake = []
     self.log_syn_ack_time = []
@@ -309,3 +311,5 @@ class Proxy:
     requests_rate = succ_requests / input_evaluation_rounds
     requ_score = (requests_rate * 100) / 2
     self.score += requ_score
+
+    
