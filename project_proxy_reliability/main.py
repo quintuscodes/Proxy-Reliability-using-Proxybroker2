@@ -25,25 +25,12 @@ def run(proxy_number: int, evaluation_rounds: int, protocols: set):
     loop = asyncio.get_event_loop()
     stop_event = asyncio.Event()
 
-    def signal_handler():
-        stop_event.set()
-        print("\nEvaluation interrupted by user. Presenting the final list...")
-
-    signal.signal(signal.SIGINT,lambda s, f: signal_handler())
-
-    try:
-        loop.run_until_complete(main(proxy_number, evaluation_rounds, protocols, stop_event))
     
-    except(asyncio.CancelledError,KeyboardInterrupt):
-        loop.stop()
-        loop.close()
-        print_proxy_managers(proxy_managers_list)
-    finally:
-        loop.stop()
-        loop.close()
-        print_proxy_managers(proxy_managers_list)
+    loop.run_until_complete(main(proxy_number, evaluation_rounds, protocols, stop_event))
+    
+    
 
-async def main(proxy_number: int,evaluation_rounds:int, protocols: set, stop_event: asyncio.Event):
+async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     
     """
 
@@ -99,88 +86,77 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set, stop_eve
     
     
     "Using Asyncio to concurrently find Proxy Objects using Proxybroker2 and evaluate them using the proxy_class methods "
-    try:
-        await asyncio.gather(*fetch_tasks)
-        start_time = time.perf_counter()
-        await asyncio.gather(*evaluate_tasks)
-        end_time = time.perf_counter()
+    
+    await asyncio.gather(*fetch_tasks)
+    start_time = time.perf_counter()
+    await asyncio.gather(*evaluate_tasks)
+    end_time = time.perf_counter()
 
     
     
-        evaluation_time = end_time - start_time
-        num_proto = len(fetch_tasks)
-        print(f"The Evaluation of {proxy_number} Proxys in {input_evaluation_rounds} Evaluation Rounds of {num_proto}  protocols took {evaluation_time} s ")
+    evaluation_time = end_time - start_time
+    num_proto = len(fetch_tasks)
+    print(f"The Evaluation of {proxy_number} Proxys in {input_evaluation_rounds} Evaluation Rounds of {num_proto}  protocols took {evaluation_time} s ")
     
-        await sort_proxy_managers(proxy_managers_list,proxy_number)
+    await sort_proxy_managers(proxy_managers_list,proxy_number)
 
     
-        "Checker-Method"
-        while unbalanced and not stop_event.is_set():
+    "Checker-Method"
+    while unbalanced:
 
-            await asyncio.sleep(5)
-            print("CHECKER METHOD active\n")
+        await asyncio.sleep(5)
+        print("CHECKER METHOD active\n")
         
-            await print_proxy_managers(proxy_managers_list,0)
+        await print_proxy_managers(proxy_managers_list,0)
         
-            await print_proxy_managers(proxy_managers_list,master)
-            await asyncio.sleep(5)
+        await print_proxy_managers(proxy_managers_list,master)
+        await asyncio.sleep(5)
 
-            print(f"Query new reliable Proxys to MASTER List ")
+        print(f"Query new reliable Proxys to MASTER List ")
 
-            "Remove/Add here desired protocols"
+        "Remove/Add here desired protocols"
         
-            await asyncio.gather(*refresh_tasks)
+        await asyncio.gather(*refresh_tasks)
         
-            "Remove/Add here desired protocols in if - statement"
-            checked = []
-            for items in proxy_managers_list:
+        "Remove/Add here desired protocols in if - statement"
+        checked = []
+        for items in proxy_managers_list:
             
-                if len(items.master_proxy_list) == proxy_number:
+            if len(items.master_proxy_list) == proxy_number:
                     checked.append(1)
 
-            if checked.count(1) == num_proto:
-                print("CHECK approved")
-                await asyncio.sleep(5)
+        if checked.count(1) == num_proto:
+            print("CHECK approved")
+            await asyncio.sleep(5)
 
-                unbalanced = False
-                """
-                end_time = time.perf_counter()
-                evaluation_time = end_time - start_time
-                num_proto = len(fetch_tasks)
+            unbalanced = False
+            """
+            end_time = time.perf_counter()
+            evaluation_time = end_time - start_time
+            num_proto = len(fetch_tasks)
               
-                log_scores(proxy_managers_list) #Log Score here before reset TODO: Not correct
-                await print_proxy_managers(proxy_managers_list,master)
-                print("\n\n      ------- Initiated Termination -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
-                print(f"Die Evaluation von {proxy_number} Proxys bei {input_evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s \n")
-                """
-            else:
-                print("Notdoneyet")
-                await asyncio.sleep(5)
+            log_scores(proxy_managers_list) #Log Score here before reset TODO: Not correct
+            await print_proxy_managers(proxy_managers_list,master)
+            print("\n\n      ------- Initiated Termination -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
+            print(f"Die Evaluation von {proxy_number} Proxys bei {input_evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s \n")
+            """
+        else:
+            print("Notdoneyet")
+            await asyncio.sleep(5)
 
-        end_time = time.perf_counter()
-        evaluation_time = end_time - start_time
-        num_proto = len(fetch_tasks)
+    end_time = time.perf_counter()
+    evaluation_time = end_time - start_time
+    num_proto = len(fetch_tasks)
               
-        log_scores(proxy_managers_list) #Log Score here before reset TODO: Not correct
-        await print_proxy_managers(proxy_managers_list,master)
-        print("\n\n      ------- Initiated Termination -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
-        print(f"Die Evaluation von {proxy_number} Proxys bei {input_evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s \n")
+    log_scores(proxy_managers_list) #Log Score here before reset TODO: Not correct
+    await print_proxy_managers(proxy_managers_list,master)
+    print("\n\n      ------- Initiated Termination -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
+    print(f"Die Evaluation von {proxy_number} Proxys bei {input_evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s \n")
 
 
-        "Recursive Re-Evaluate List: Dynamic Approach"
-        if not stop_event.is_set():
-
-            await rec_wait_and_evaluate_again(proxy_managers_list,counter,input_evaluation_rounds,data_size,proxy_number,stop_event)
-    except asyncio.CancelledError:
-        log_scores(proxy_managers_list)
-        await print_proxy_managers(proxy_managers_list,"master")
-        print("\n\n      ------- Evaluation Aborted -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
-    except KeyboardInterrupt:
-        log_scores(proxy_managers_list)
-        await print_proxy_managers(proxy_managers_list,"master")
-        print("\n\n      ------- Evaluation Aborted -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
-    finally:
-        return proxy_managers_list
+    "Recursive Re-Evaluate List: Dynamic Approach"
+    await rec_wait_and_evaluate_again(proxy_managers_list,counter,input_evaluation_rounds,data_size,proxy_number)
+    
         
 
 async def print_proxy_managers(list,arg):
@@ -201,19 +177,16 @@ def log_scores(list):
         
         
 
-async def rec_wait_and_evaluate_again(proxy_managers_list, counter, input_evaluation_rounds,data_size,proxy_number,stop_event):
+async def rec_wait_and_evaluate_again(proxy_managers_list, counter, input_evaluation_rounds,data_size,proxy_number):
     print("Wait 40s until Master List re-evaluate. Press ctrl + c to break and present the final List.\n")
-    try:
-        for _ in range(20):  # 40 Seconds / 2 Seconds = 20
-            if stop_event.is_set():
-                break
-            await asyncio.sleep(2)
+    
+    for _ in range(20):  # 40 Seconds / 2 Seconds = 20
+        
+        await asyncio.sleep(2)
             
-            print('.', end='',flush=True)
-    except KeyboardInterrupt:
-        print('\n Evalutaion interrupted by user.\n')
-        raise
-    if not stop_event.is_set():
+        print('.', end='',flush=True)
+    
+    
         print('\nEvaluate Master List again!\n')
 
         log_scores(proxy_managers_list)
@@ -225,7 +198,7 @@ async def rec_wait_and_evaluate_again(proxy_managers_list, counter, input_evalua
         await sort_proxy_managers(proxy_managers_list,proxy_number)
         await print_proxy_managers(proxy_managers_list,"master")
         await print_proxy_managers(proxy_managers_list,"slave")
-        await rec_wait_and_evaluate_again(proxy_managers_list,counter,input_evaluation_rounds,data_size,proxy_number,stop_event)
+        await rec_wait_and_evaluate_again(proxy_managers_list,counter,input_evaluation_rounds,data_size,proxy_number)
     
     
 async def generate_evaluate_tasks(proxy_managers_list, counter, input_evaluation_rounds, data_size, proxy_number):
