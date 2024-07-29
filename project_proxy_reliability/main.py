@@ -1,15 +1,13 @@
-
 from scapy.all import *
 import asyncio
 import click
-import signal
 from proxy_class import *
 from proxy_manager import *
-
+from functions import *
 
 HTTP_PROTOS = {'HTTP', 'CONNECT:25', 'SOCKS4', 'SOCKS5'}
 global proxy_managers_list
-
+global unbalanced
 @click.command()
 @click.argument("proxy_number",type=int)
 @click.argument("evaluation_rounds", type=int)
@@ -53,34 +51,34 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     refresh_tasks = []   
     proxy_managers_list = []
 
-    data_size =1000
+    
     master = "master"
-    global unbalanced
-    unbalanced = True
+    
+    
     counter = 0
     input_evaluation_rounds = evaluation_rounds
 
-    
+    "Filter by selected protocol and init the tasks"
     if "HTTP" in protocols:
         proxy_managers_list.append(http)
-        fetch_tasks.append(http.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds,data_size))
-        evaluate_tasks.append(http.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, proxy_number))
-        refresh_tasks.append(http.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds,data_size ))
+        fetch_tasks.append(http.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds))
+        evaluate_tasks.append(http.evaluate_proxy_list(counter, input_evaluation_rounds, proxy_number))
+        refresh_tasks.append(http.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds ))
     if "SOCKS4" in protocols:
         proxy_managers_list.append(socks4)
-        fetch_tasks.append(socks4.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds,data_size))
-        evaluate_tasks.append(socks4.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, proxy_number))
-        refresh_tasks.append(socks4.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds,data_size ))
+        fetch_tasks.append(socks4.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds))
+        evaluate_tasks.append(socks4.evaluate_proxy_list(counter, input_evaluation_rounds, proxy_number))
+        refresh_tasks.append(socks4.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds ))
     if "SOCKS5" in protocols:
         proxy_managers_list.append(socks5)
-        fetch_tasks.append(socks5.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds,data_size))
-        evaluate_tasks.append(socks5.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, proxy_number))
-        refresh_tasks.append(socks5.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds,data_size ))
+        fetch_tasks.append(socks5.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds))
+        evaluate_tasks.append(socks5.evaluate_proxy_list(counter, input_evaluation_rounds, proxy_number))
+        refresh_tasks.append(socks5.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds ))
     if "CONNECT:25" in protocols:   
         proxy_managers_list.append(connect25)
-        fetch_tasks.append(connect25.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds,data_size))
-        evaluate_tasks.append(connect25.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, proxy_number))
-        refresh_tasks.append(connect25.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds,data_size ))
+        fetch_tasks.append(connect25.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds))
+        evaluate_tasks.append(connect25.evaluate_proxy_list(counter, input_evaluation_rounds, proxy_number))
+        refresh_tasks.append(connect25.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds ))
 
     
     
@@ -98,51 +96,12 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     num_proto = len(fetch_tasks)
     print(f"The Evaluation of {proxy_number} Proxys in {input_evaluation_rounds} Evaluation Rounds of {num_proto}  protocols took {evaluation_time} s ")
     
-    await sort_proxy_managers(proxy_managers_list,proxy_number)
+    
+    await sort_proxy_managers(proxy_managers_list,proxy_number) # Sort,remove and add reliable proxys to master list
 
     
     "Checker-Method"
-    while unbalanced:
-
-        await asyncio.sleep(5)
-        print("CHECKER METHOD active\n")
-        
-        await print_proxy_managers(proxy_managers_list,0)
-        
-        await print_proxy_managers(proxy_managers_list,master)
-        await asyncio.sleep(5)
-
-        print(f"Query new reliable Proxys to MASTER List ")
-
-        "Remove/Add here desired protocols"
-        
-        await asyncio.gather(*refresh_tasks)
-        
-        "Remove/Add here desired protocols in if - statement"
-        checked = []
-        for items in proxy_managers_list:
-            
-            if len(items.master_proxy_list) == proxy_number:
-                    checked.append(1)
-
-        if checked.count(1) == num_proto:
-            print("CHECK approved")
-            await asyncio.sleep(5)
-
-            unbalanced = False
-            """
-            end_time = time.perf_counter()
-            evaluation_time = end_time - start_time
-            num_proto = len(fetch_tasks)
-              
-            log_scores(proxy_managers_list) #Log Score here before reset TODO: Not correct
-            await print_proxy_managers(proxy_managers_list,master)
-            print("\n\n      ------- Initiated Termination -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
-            print(f"Die Evaluation von {proxy_number} Proxys bei {input_evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s \n")
-            """
-        else:
-            print("Notdoneyet")
-            await asyncio.sleep(5)
+    await Checker(proxy_managers_list,refresh_tasks,proxy_number,num_proto)
 
     end_time = time.perf_counter()
     evaluation_time = end_time - start_time
@@ -152,62 +111,14 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     print(f"Die Evaluation von {proxy_number} Proxys bei {input_evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s \n")
 
     "Recursive Re-Evaluate List: Dynamic Approach"
-    await rec_wait_and_evaluate_again(proxy_managers_list,counter,input_evaluation_rounds,data_size,proxy_number)
+    await rec_wait_and_evaluate_again(proxy_managers_list,counter,input_evaluation_rounds,proxy_number)
     
-        
 
-async def print_proxy_managers(list,arg):
-    for proxy_manager_item in list:
-        await proxy_manager_item.print_proxy_list(arg)
 
-async def sort_proxy_managers(list,proxy_number):
-    for proxy_manager_item in list:
-        await proxy_manager_item.sort_proxy_lists(proxy_number)
-
-def reset_proxy_objects(list):
-    for proxy_manager_item in list:
-        proxy_manager_item.reset_proxys() #resets the proxy attributes, logs the score, copys master -> proxy_list, clears master list
-
-def log_scores(list):
-    for proxy_manager_item in list:
-        proxy_manager_item.log_scores() #Store Scores before Reset
         
         
 
-async def rec_wait_and_evaluate_again(proxy_managers_list, counter, input_evaluation_rounds,data_size,proxy_number):
-    log_scores(proxy_managers_list) #Log Score here before reset TODO: Not correct
-    await print_proxy_managers(proxy_managers_list,"master")
-    print("\n\n      ------- Initiated Termination -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
 
-    print("Wait 40s until Master List re-evaluate. Press ctrl + z to break and show the final List.\n")
-    
-    for _ in range(20):  # 40 Seconds / 2 Seconds = 20
-        
-        await asyncio.sleep(2)
-            
-        print('.', end='',flush=True)
-    
-    
-    print('\nEvaluate Master List again!\n')
-
-    
-    reset_proxy_objects(proxy_managers_list) # reset proxy Objects and init Master/Proxy List for new evaluation Update
-
-    re_evaluate_tasks = await generate_evaluate_tasks(proxy_managers_list, counter, input_evaluation_rounds,data_size,proxy_number)
-    
-    await asyncio.gather(*re_evaluate_tasks)
-    await sort_proxy_managers(proxy_managers_list,proxy_number)
-    await print_proxy_managers(proxy_managers_list,"master")
-    await print_proxy_managers(proxy_managers_list,"slave")
-    
-    await rec_wait_and_evaluate_again(proxy_managers_list,counter,input_evaluation_rounds,data_size,proxy_number)
-    
-    
-async def generate_evaluate_tasks(proxy_managers_list, counter, input_evaluation_rounds, data_size, proxy_number):
-    re_evaluate_tasks = []
-    for manager in proxy_managers_list:
-        re_evaluate_tasks.append(manager.evaluate_proxy_list(counter, input_evaluation_rounds, data_size, proxy_number))
-    return re_evaluate_tasks
 
 
 if __name__ == '__main__':

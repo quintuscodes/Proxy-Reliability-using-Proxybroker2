@@ -20,6 +20,7 @@ class Proxy:
     self.protocol = _proto
     self.ip = _ip
     self.port =_port
+    self.avg_score = 0
     self.score = 0
     self.log_score = []
     self.country = country_code + " - " + country_name
@@ -69,6 +70,14 @@ class Proxy:
   
   def set_score(self, _score):
     self.score = _score
+
+  def set_avg_score(self):
+    sum_score = sum(self.log_score)
+    denom = len(self.log_score)
+    if denom == 0:
+       self.avg_score = self.score
+    else:
+      self.avg_score = sum_score / denom
 
   def set_log_score(self):
      self.log_score.append(self.score)
@@ -300,17 +309,20 @@ class Proxy:
     sum_throughput = sum(self.log_throughput)
     avg_throughput = sum_throughput / input_evaluation_rounds
     self.avg_throughput = avg_throughput
-
-    """calc avg_request"
-    sum_request_response_time = sum(self.log_request_response_time)
-    avg_requ_resp_time = sum_request_response_time / input_evaluation_rounds
-    self.avg_request_response_time = avg_requ_resp_time
-    self.log_request_response_time.clear() # Comment out/in if you want to print log to console
-    """
+    #self.log_throughput.clear() # Comment out/in if you want to print log to console
+    
     "Request Score"
     succ_requests = self.log_request.count(200)
     requests_rate = succ_requests / input_evaluation_rounds
     requ_score = (requests_rate * 100) / 2
     self.score += requ_score
 
+    "Failed Requests - Punish failed requests "
+
+    failed_requ = input_evaluation_rounds - succ_requests
+    penalty = failed_requ * 5
+    self.score -= penalty
+    print(f"Penalty of {penalty} Points deducted. ")
+
+    
     

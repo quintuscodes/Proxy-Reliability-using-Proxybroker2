@@ -39,7 +39,7 @@ class Proxy_Manager:
      return self.proxy_list
   
 
-  async def fetch_proxys_write_to_class(self,proxy_number,input_evaluation_rounds,data_size):
+  async def fetch_proxys_write_to_class(self,proxy_number,input_evaluation_rounds):
     "Fetching Proxys from open Source using proxybroker2 and writitng them to customized class"
 
     proxies = asyncio.Queue()
@@ -83,7 +83,7 @@ class Proxy_Manager:
     """
     
     if arg == "master":
-       
+      self.master_proxy_list.sort(key=lambda Proxy: Proxy.avg_score, reverse=True)
       print("\n \n ")
       print(f"{self.protocol} Proxy - Manager")
       print(" ____________________________________________________________________________________________________________________________________________________________________")
@@ -124,7 +124,7 @@ class Proxy_Manager:
       print("|_____________________________________________________________________________________________________________________________________________________________________")
       print("\n \n") 
 
-  async def evaluate_proxy_list(self,counter, input_evaluation_rounds,data_size, input_proxy_number):
+  async def evaluate_proxy_list(self,counter, input_evaluation_rounds, input_proxy_number):
     
     """
     A Method to initialize the evaluation of the Proxys in Proxy-List
@@ -228,7 +228,7 @@ class Proxy_Manager:
     self.master_proxy_list.sort(key=lambda Proxy: Proxy.score, reverse=True)
     self.proxy_list.clear()
 
-  async def refresh_proxy_list(self,counter,input_proxy_number,input_evaluation_rounds,data_size ):
+  async def refresh_proxy_list(self,counter,input_proxy_number,input_evaluation_rounds ):
         
         "A method to refill the proxy list with new evaluated Proxys score > 100"
 
@@ -238,14 +238,14 @@ class Proxy_Manager:
                 await asyncio.sleep(3)
                 print("Refreshing the Proxy List \n")
                 
-                await asyncio.gather(self.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds,data_size))
-                await asyncio.gather(self.evaluate_proxy_list(counter, input_evaluation_rounds,data_size, input_proxy_number))
+                await asyncio.gather(self.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds))
+                await asyncio.gather(self.evaluate_proxy_list(counter, input_evaluation_rounds, input_proxy_number))
                 
 
                 await self.sort_proxy_lists(input_proxy_number)
 
                 if len(self.master_proxy_list) < input_proxy_number:
-                    await self.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds,data_size )
+                    await self.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds )
                 else:
                     self.ready_for_connection = True
                     
@@ -268,3 +268,4 @@ class Proxy_Manager:
   def log_scores(self):
      for proxy_object in self.master_proxy_list:
         proxy_object.set_log_score()# Store score before reset
+        proxy_object.set_avg_score() #Average Score for up to date reliability attribute criteria
