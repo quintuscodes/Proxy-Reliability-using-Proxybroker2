@@ -63,9 +63,11 @@ class Proxy_Manager:
             
       ip = proxy.host
       port = proxy.port
+      country_code = proxy.geo[0]
+      country_name = proxy.geo[1]
       type = _type
       self.protocol = _type
-      p = Proxy(type,ip,port,input_evaluation_rounds)
+      p = Proxy(type,ip,port,country_code,country_name,input_evaluation_rounds)
       self.add_to_list(p)
 
   "Method to add a Proxy item to the list "

@@ -26,7 +26,7 @@ def run(proxy_number: int, evaluation_rounds: int, protocols: set):
     stop_event = asyncio.Event()
 
     
-    loop.run_until_complete(main(proxy_number, evaluation_rounds, protocols, stop_event))
+    loop.run_until_complete(main(proxy_number, evaluation_rounds, protocols))
     
     
 
@@ -148,11 +148,8 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     evaluation_time = end_time - start_time
     num_proto = len(fetch_tasks)
               
-    log_scores(proxy_managers_list) #Log Score here before reset TODO: Not correct
-    await print_proxy_managers(proxy_managers_list,master)
-    print("\n\n      ------- Initiated Termination -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
+    
     print(f"Die Evaluation von {proxy_number} Proxys bei {input_evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s \n")
-
 
     "Recursive Re-Evaluate List: Dynamic Approach"
     await rec_wait_and_evaluate_again(proxy_managers_list,counter,input_evaluation_rounds,data_size,proxy_number)
@@ -178,6 +175,10 @@ def log_scores(list):
         
 
 async def rec_wait_and_evaluate_again(proxy_managers_list, counter, input_evaluation_rounds,data_size,proxy_number):
+    log_scores(proxy_managers_list) #Log Score here before reset TODO: Not correct
+    await print_proxy_managers(proxy_managers_list,"master")
+    print("\n\n      ------- Initiated Termination -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
+
     print("Wait 40s until Master List re-evaluate. Press ctrl + z to break and show the final List.\n")
     
     for _ in range(20):  # 40 Seconds / 2 Seconds = 20
@@ -187,18 +188,19 @@ async def rec_wait_and_evaluate_again(proxy_managers_list, counter, input_evalua
         print('.', end='',flush=True)
     
     
-        print('\nEvaluate Master List again!\n')
+    print('\nEvaluate Master List again!\n')
 
-        log_scores(proxy_managers_list)
-        reset_proxy_objects(proxy_managers_list) # reset proxy Objects and init Master/Proxy List for new evaluation Update
-
-        re_evaluate_tasks = await generate_evaluate_tasks(proxy_managers_list, counter, input_evaluation_rounds,data_size,proxy_number)
     
-        await asyncio.gather(*re_evaluate_tasks)
-        await sort_proxy_managers(proxy_managers_list,proxy_number)
-        await print_proxy_managers(proxy_managers_list,"master")
-        await print_proxy_managers(proxy_managers_list,"slave")
-        await rec_wait_and_evaluate_again(proxy_managers_list,counter,input_evaluation_rounds,data_size,proxy_number)
+    reset_proxy_objects(proxy_managers_list) # reset proxy Objects and init Master/Proxy List for new evaluation Update
+
+    re_evaluate_tasks = await generate_evaluate_tasks(proxy_managers_list, counter, input_evaluation_rounds,data_size,proxy_number)
+    
+    await asyncio.gather(*re_evaluate_tasks)
+    await sort_proxy_managers(proxy_managers_list,proxy_number)
+    await print_proxy_managers(proxy_managers_list,"master")
+    await print_proxy_managers(proxy_managers_list,"slave")
+    
+    await rec_wait_and_evaluate_again(proxy_managers_list,counter,input_evaluation_rounds,data_size,proxy_number)
     
     
 async def generate_evaluate_tasks(proxy_managers_list, counter, input_evaluation_rounds, data_size, proxy_number):

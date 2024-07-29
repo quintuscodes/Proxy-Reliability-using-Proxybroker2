@@ -16,12 +16,13 @@ class Proxy:
   A Class for managing a single proxy fetched from the proxybroker2 python tool.
   """
 
-  def __init__(self,_proto,_ip,_port,_handshakes):
+  def __init__(self,_proto,_ip,_port,country_code,country_name,_handshakes):
     self.protocol = _proto
     self.ip = _ip
     self.port =_port
     self.score = 0
     self.log_score = []
+    self.country = country_code + " - " + country_name
     self.handshakes = _handshakes
     self.log_handshake = []
     self.log_syn_ack_time = []
