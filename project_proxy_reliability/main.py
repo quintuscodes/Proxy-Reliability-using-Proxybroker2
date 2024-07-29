@@ -178,7 +178,7 @@ def log_scores(list):
         
 
 async def rec_wait_and_evaluate_again(proxy_managers_list, counter, input_evaluation_rounds,data_size,proxy_number):
-    print("Wait 40s until Master List re-evaluate. Press ctrl + c to break and present the final List.\n")
+    print("Wait 40s until Master List re-evaluate. Press ctrl + z to break and show the final List.\n")
     
     for _ in range(20):  # 40 Seconds / 2 Seconds = 20
         

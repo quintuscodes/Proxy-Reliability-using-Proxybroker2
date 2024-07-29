@@ -7,7 +7,7 @@ import asyncio
 from proxybroker import Broker, Proxy # type: ignore
 from proxy_class import *
 from proxy_manager import *
-from proxy_metrik_main import *
+from main import *
 
 
 class Proxy_Manager:
