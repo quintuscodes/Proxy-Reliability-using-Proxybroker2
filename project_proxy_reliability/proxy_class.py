@@ -16,7 +16,7 @@ class Proxy:
   A Class for managing a single proxy fetched from the proxybroker2 python tool.
   """
 
-  def __init__(self,_proto,_ip,_port,country_code,country_name,_handshakes):
+  def __init__(self,_proto: str,_ip: int,_port:int,country_code:str,country_name:str,_handshakes:int):
     self.protocol = _proto
     self.ip = _ip
     self.port =_port
