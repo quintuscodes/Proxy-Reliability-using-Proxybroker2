@@ -56,29 +56,29 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     
     
     counter = 0
-    input_evaluation_rounds = evaluation_rounds
+    
 
     "Filter by selected protocol and init the tasks"
     if "HTTP" in protocols:
         proxy_managers_list.append(http)
-        fetch_tasks.append(http.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds))
-        evaluate_tasks.append(http.evaluate_proxy_list(counter, input_evaluation_rounds, proxy_number))
-        refresh_tasks.append(http.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds ))
+        fetch_tasks.append(http.fetch_proxys_write_to_class(proxy_number,evaluation_rounds))
+        evaluate_tasks.append(http.evaluate_proxy_list(counter, evaluation_rounds, proxy_number))
+        refresh_tasks.append(http.refresh_proxy_list(counter,proxy_number,evaluation_rounds ))
     if "SOCKS4" in protocols:
         proxy_managers_list.append(socks4)
-        fetch_tasks.append(socks4.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds))
-        evaluate_tasks.append(socks4.evaluate_proxy_list(counter, input_evaluation_rounds, proxy_number))
-        refresh_tasks.append(socks4.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds ))
+        fetch_tasks.append(socks4.fetch_proxys_write_to_class(proxy_number,evaluation_rounds))
+        evaluate_tasks.append(socks4.evaluate_proxy_list(counter, evaluation_rounds, proxy_number))
+        refresh_tasks.append(socks4.refresh_proxy_list(counter,proxy_number,evaluation_rounds ))
     if "SOCKS5" in protocols:
         proxy_managers_list.append(socks5)
-        fetch_tasks.append(socks5.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds))
-        evaluate_tasks.append(socks5.evaluate_proxy_list(counter, input_evaluation_rounds, proxy_number))
-        refresh_tasks.append(socks5.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds ))
+        fetch_tasks.append(socks5.fetch_proxys_write_to_class(proxy_number,evaluation_rounds))
+        evaluate_tasks.append(socks5.evaluate_proxy_list(counter, evaluation_rounds, proxy_number))
+        refresh_tasks.append(socks5.refresh_proxy_list(counter,proxy_number,evaluation_rounds ))
     if "CONNECT:25" in protocols:   
         proxy_managers_list.append(connect25)
-        fetch_tasks.append(connect25.fetch_proxys_write_to_class(proxy_number,input_evaluation_rounds))
-        evaluate_tasks.append(connect25.evaluate_proxy_list(counter, input_evaluation_rounds, proxy_number))
-        refresh_tasks.append(connect25.refresh_proxy_list(counter,proxy_number,input_evaluation_rounds ))
+        fetch_tasks.append(connect25.fetch_proxys_write_to_class(proxy_number,evaluation_rounds))
+        evaluate_tasks.append(connect25.evaluate_proxy_list(counter, evaluation_rounds, proxy_number))
+        refresh_tasks.append(connect25.refresh_proxy_list(counter,proxy_number,evaluation_rounds ))
 
     
     
@@ -94,7 +94,7 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     
     evaluation_time = end_time - start_time
     num_proto = len(fetch_tasks)
-    print(f"The Evaluation of {proxy_number} Proxys in {input_evaluation_rounds} Evaluation Rounds of {num_proto}  protocols took {evaluation_time} s ")
+    print(f"The Evaluation of {proxy_number} Proxys in {evaluation_rounds} Evaluation Rounds of {num_proto}  protocols took {evaluation_time} s ")
     
     
     await sort_proxy_managers(proxy_managers_list,proxy_number) # Sort,remove and add reliable proxys to master list
@@ -108,10 +108,10 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     num_proto = len(fetch_tasks)
               
     
-    print(f"Die Evaluation von {proxy_number} Proxys bei {input_evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s \n")
+    print(f"Die Evaluation von {proxy_number} Proxys bei {evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s \n")
 
     "Recursive Re-Evaluate List: Dynamic Approach"
-    await rec_wait_and_evaluate_again(proxy_managers_list,counter,input_evaluation_rounds,proxy_number)
+    await rec_wait_and_evaluate_again(proxy_managers_list,counter,evaluation_rounds,proxy_number)
     
 
 

@@ -35,7 +35,7 @@ class Proxy_Manager:
      return self.proxy_list
   
 
-  async def fetch_proxys_write_to_class(self,proxy_number,input_evaluation_rounds):
+  async def fetch_proxys_write_to_class(self,proxy_number,evaluation_rounds):
     "Fetching Proxys from open Source using proxybroker2 and writitng them to customized class"
 
     proxies = asyncio.Queue()
@@ -44,11 +44,11 @@ class Proxy_Manager:
     broker = Broker(proxies)
     print(f"Proxybroker - FIND - Initiated for Protocol {self.protocol} ")
     await broker.find( types=[ f'{self.protocol}'],lvl = 'HIGH', strict = True,limit=proxy_number)
-    await self.write_proxy_to_class(f'{self.protocol}',proxy_number, proxies,input_evaluation_rounds)
+    await self.write_proxy_to_class(f'{self.protocol}',proxies,evaluation_rounds)
       
     await self.print_proxy_list(0)
     
-  async def write_proxy_to_class(self,_type, input_number, proxies,input_evaluation_rounds):
+  async def write_proxy_to_class(self,_type, proxies,evaluation_rounds):
     "Method to write proxys to customized class and adding to proxy list  "
 
     proxycount = 0
@@ -64,7 +64,7 @@ class Proxy_Manager:
       country = country_code + " - " + country_name
       type = _type
       self.protocol = _type
-      p = Proxy(type,ip,port,country_code,country,input_evaluation_rounds)
+      p = Proxy(type,ip,port,country,evaluation_rounds)
       self.add_to_list(p)
 
   "Method to add a Proxy item to the list "
@@ -121,7 +121,7 @@ class Proxy_Manager:
       print("|_____________________________________________________________________________________________________________________________________________________________________")
       print("\n \n") 
 
-  async def evaluate_proxy_list(self,counter, input_evaluation_rounds, input_proxy_number):
+  async def evaluate_proxy_list(self,counter, evaluation_rounds, input_proxy_number):
     
     """
     A Method to initialize the evaluation of the Proxys in Proxy-List
@@ -130,7 +130,7 @@ class Proxy_Manager:
     
     
     
-    while counter < input_evaluation_rounds: 
+    while counter < evaluation_rounds: 
       counter += 1 
       
     
@@ -149,7 +149,7 @@ class Proxy_Manager:
     
     for i in range(len(self.proxy_list)):
         proxy = self.get_proxy(i)
-        proxy.calc_score(input_evaluation_rounds) #loop through proxy_list and calculate score per proxy
+        proxy.calc_score(evaluation_rounds) #loop through proxy_list and calculate score per proxy
     
     "Reward the Best Proxys in evaluation parameters - sort after score - then give 15,10,5 Points credit score"
 
@@ -225,7 +225,7 @@ class Proxy_Manager:
     self.master_proxy_list.sort(key=lambda Proxy: Proxy.score, reverse=True)
     self.proxy_list.clear()
 
-  async def refresh_proxy_list(self,counter,input_proxy_number,input_evaluation_rounds ):
+  async def refresh_proxy_list(self,counter,input_proxy_number,evaluation_rounds ):
         
         "A method to refill the proxy list with new evaluated Proxys score > 100"
 
@@ -235,14 +235,14 @@ class Proxy_Manager:
                 await asyncio.sleep(3)
                 print("Refreshing the Proxy List \n")
                 
-                await asyncio.gather(self.fetch_proxys_write_to_class(input_proxy_number,input_evaluation_rounds))
-                await asyncio.gather(self.evaluate_proxy_list(counter, input_evaluation_rounds, input_proxy_number))
+                await asyncio.gather(self.fetch_proxys_write_to_class(input_proxy_number,evaluation_rounds))
+                await asyncio.gather(self.evaluate_proxy_list(counter, evaluation_rounds, input_proxy_number))
                 
 
                 await self.sort_proxy_lists(input_proxy_number)
 
                 if len(self.master_proxy_list) < input_proxy_number:
-                    await self.refresh_proxy_list(counter,input_proxy_number,input_evaluation_rounds )
+                    await self.refresh_proxy_list(counter,input_proxy_number,evaluation_rounds )
                 else:
                     self.ready_for_connection = True
                     

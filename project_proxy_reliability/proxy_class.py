@@ -16,7 +16,7 @@ class Proxy:
   A Class for managing a single proxy fetched from the proxybroker2 python tool.
   """
 
-  def __init__(self,_proto: str,_ip: int,_port:int,_country:str,country_name:str,_handshakes:int):
+  def __init__(self,_proto: str,_ip: int,_port:int,_country:str,_handshakes:int):
     self.protocol = _proto
     self.ip = _ip
     self.port =_port
@@ -280,18 +280,18 @@ class Proxy:
        self.set_log_request(500) #fail
     
 
-  def calc_score(self,input_evaluation_rounds):
+  def calc_score(self,evaluation_rounds):
     """
     Method to calculate the score given the parameters TCP Handshake Hit Ratio, [Syn_ACK] Response Time, Transmission Time, Throughput and Requests Ratio
     """
     succ_handshakes = self.log_handshake.count(1)
-    handshake_rate = succ_handshakes / input_evaluation_rounds
+    handshake_rate = succ_handshakes / evaluation_rounds
     handshake_score = (handshake_rate * 100) / 2
     self.score += handshake_score
 
     "Calculate avg_syn_ack"
     sum_syn_ack = sum(self.log_syn_ack_time)
-    avg_syn_ack_time = sum_syn_ack / input_evaluation_rounds
+    avg_syn_ack_time = sum_syn_ack / evaluation_rounds
     self.avg_syn_ack_time = avg_syn_ack_time
     if self.avg_syn_ack_time == 0.0:
         self.avg_syn_ack_time = float('inf')
@@ -299,7 +299,7 @@ class Proxy:
 
     "Calc avg_TransmissionTime"
     sum_transmission_time = sum(self.log_transmission_time)
-    avg_transmission_time = sum_transmission_time / input_evaluation_rounds
+    avg_transmission_time = sum_transmission_time / evaluation_rounds
     self.avg_transmission_time = avg_transmission_time
     if self.avg_transmission_time == 0.0:
       self.avg_transmission_time = float('inf')
@@ -307,19 +307,19 @@ class Proxy:
 
     "calc AVG Throughput"
     sum_throughput = sum(self.log_throughput)
-    avg_throughput = sum_throughput / input_evaluation_rounds
+    avg_throughput = sum_throughput / evaluation_rounds
     self.avg_throughput = avg_throughput
     #self.log_throughput.clear() # Comment out/in if you want to print log to console
     
     "Request Score"
     succ_requests = self.log_request.count(200)
-    requests_rate = succ_requests / input_evaluation_rounds
+    requests_rate = succ_requests / evaluation_rounds
     requ_score = (requests_rate * 100) / 2
     self.score += requ_score
 
     "Failed Requests - Punish failed requests "
 
-    failed_requ = input_evaluation_rounds - succ_requests
+    failed_requ = evaluation_rounds - succ_requests
     penalty = failed_requ * 5
     self.score -= penalty
     print(f"Penalty of {penalty} Points deducted. ")

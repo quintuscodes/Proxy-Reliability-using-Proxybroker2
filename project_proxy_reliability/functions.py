@@ -18,7 +18,7 @@ def log_scores(list):
     for proxy_manager_item in list:
         proxy_manager_item.log_scores() #Store Scores before Reset
 
-async def rec_wait_and_evaluate_again(proxy_managers_list, counter, input_evaluation_rounds,proxy_number):
+async def rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_rounds,proxy_number):
     log_scores(proxy_managers_list) #Log Score here before reset TODO: Not correct
     await print_proxy_managers(proxy_managers_list,"master")
     print("\n\n      ------- Initiated Termination -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
@@ -37,20 +37,20 @@ async def rec_wait_and_evaluate_again(proxy_managers_list, counter, input_evalua
     
     reset_proxy_objects(proxy_managers_list) # reset proxy Objects and init Master/Proxy List for new evaluation Update
 
-    re_evaluate_tasks = await generate_evaluate_tasks(proxy_managers_list, counter, input_evaluation_rounds,proxy_number)
+    re_evaluate_tasks = await generate_evaluate_tasks(proxy_managers_list, counter, evaluation_rounds,proxy_number)
     
     await asyncio.gather(*re_evaluate_tasks)
     await sort_proxy_managers(proxy_managers_list,proxy_number)
     await print_proxy_managers(proxy_managers_list,"master")
     await print_proxy_managers(proxy_managers_list,"slave")
     
-    await rec_wait_and_evaluate_again(proxy_managers_list,counter,input_evaluation_rounds,proxy_number)
+    await rec_wait_and_evaluate_again(proxy_managers_list,counter,evaluation_rounds,proxy_number)
     
     
-async def generate_evaluate_tasks(proxy_managers_list, counter, input_evaluation_rounds, proxy_number):
+async def generate_evaluate_tasks(proxy_managers_list, counter, evaluation_rounds, proxy_number):
     re_evaluate_tasks = []
     for manager in proxy_managers_list:
-        re_evaluate_tasks.append(manager.evaluate_proxy_list(counter, input_evaluation_rounds, proxy_number))
+        re_evaluate_tasks.append(manager.evaluate_proxy_list(counter, evaluation_rounds, proxy_number))
     return re_evaluate_tasks
 
 async def Checker(proxy_managers_list,refresh_tasks,proxy_number,num_proto):
