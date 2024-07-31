@@ -1,7 +1,3 @@
-"""
-A Class for managing Proxy Evaluation and performing Request. This is the target data structure.
-
-"""
 from scapy.all import *
 import asyncio
 from proxybroker import Broker, Proxy # type: ignore
