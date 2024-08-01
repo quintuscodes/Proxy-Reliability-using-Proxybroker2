@@ -11,7 +11,7 @@ The portrayed Class Diagram for the Proxy Manager. <br>
 <br>
 <br>
 
-::: mermaid 
+'''mermaid 
 classDiagram
   direction LR
   class Proxy_Manager {
@@ -76,6 +76,6 @@ classDiagram
   }
 
   Proxy_Manager --> Proxy : manages
-:::
+'''
 
 # Sequence Diagram
