@@ -12,6 +12,7 @@ The portrayed Class Diagram for the Proxy Manager. <br>
 <br>
 
 ```mermaid 
+%%{init: {'theme':'dark'}}%%
 classDiagram
   direction LR
   class Proxy_Manager {
