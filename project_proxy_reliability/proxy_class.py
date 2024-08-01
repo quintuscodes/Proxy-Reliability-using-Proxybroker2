@@ -16,7 +16,7 @@ class Proxy:
   A Class for managing a single proxy fetched from the proxybroker2 python tool.
   """
 
-  def __init__(self,_proto: str,_ip: int,_port:int,_country:str,_handshakes:int):
+  def __init__(self,_proto: str,_ip,_port:int,_country:str,_handshakes:int):
     self.protocol = _proto
     self.ip = _ip
     self.port =_port
@@ -295,7 +295,7 @@ class Proxy:
     self.avg_syn_ack_time = avg_syn_ack_time
     if self.avg_syn_ack_time == 0.0:
         self.avg_syn_ack_time = float('inf')
-    #self.log_syn_ack_time.clear() # Comment out/in if you want to print log to console
+    self.log_syn_ack_time.clear() # Comment out/in if you want to print log to console
 
     "Calc avg_TransmissionTime"
     sum_transmission_time = sum(self.log_transmission_time)
@@ -303,13 +303,13 @@ class Proxy:
     self.avg_transmission_time = avg_transmission_time
     if self.avg_transmission_time == 0.0:
       self.avg_transmission_time = float('inf')
-    #self.log_transmission_time.clear() # Comment out/in if you want to print log to console
+    self.log_transmission_time.clear() # Comment out/in if you want to print log to console
 
     "calc AVG Throughput"
     sum_throughput = sum(self.log_throughput)
     avg_throughput = sum_throughput / evaluation_rounds
     self.avg_throughput = avg_throughput
-    #self.log_throughput.clear() # Comment out/in if you want to print log to console
+    self.log_throughput.clear() # Comment out/in if you want to print log to console
     
     "Request Score"
     succ_requests = self.log_request.count(200)
@@ -322,7 +322,7 @@ class Proxy:
     failed_requ = evaluation_rounds - succ_requests
     penalty = failed_requ * 5
     self.score -= penalty
-    print(f"Penalty of {penalty} Points deducted. ")
+    #print(f"Penalty of {penalty} Points to {self.ip} deducted. ")
 
     
     

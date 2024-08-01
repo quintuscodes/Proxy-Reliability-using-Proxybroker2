@@ -62,22 +62,22 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     if "HTTP" in protocols:
         proxy_managers_list.append(http)
         fetch_tasks.append(http.fetch_proxys_write_to_class(proxy_number,evaluation_rounds))
-        evaluate_tasks.append(http.evaluate_proxy_list(counter, evaluation_rounds, proxy_number))
+        evaluate_tasks.append(http.evaluate_proxy_list(counter, evaluation_rounds))
         refresh_tasks.append(http.refresh_proxy_list(counter,proxy_number,evaluation_rounds ))
     if "SOCKS4" in protocols:
         proxy_managers_list.append(socks4)
         fetch_tasks.append(socks4.fetch_proxys_write_to_class(proxy_number,evaluation_rounds))
-        evaluate_tasks.append(socks4.evaluate_proxy_list(counter, evaluation_rounds, proxy_number))
+        evaluate_tasks.append(socks4.evaluate_proxy_list(counter, evaluation_rounds))
         refresh_tasks.append(socks4.refresh_proxy_list(counter,proxy_number,evaluation_rounds ))
     if "SOCKS5" in protocols:
         proxy_managers_list.append(socks5)
         fetch_tasks.append(socks5.fetch_proxys_write_to_class(proxy_number,evaluation_rounds))
-        evaluate_tasks.append(socks5.evaluate_proxy_list(counter, evaluation_rounds, proxy_number))
+        evaluate_tasks.append(socks5.evaluate_proxy_list(counter, evaluation_rounds))
         refresh_tasks.append(socks5.refresh_proxy_list(counter,proxy_number,evaluation_rounds ))
     if "CONNECT:25" in protocols:   
         proxy_managers_list.append(connect25)
         fetch_tasks.append(connect25.fetch_proxys_write_to_class(proxy_number,evaluation_rounds))
-        evaluate_tasks.append(connect25.evaluate_proxy_list(counter, evaluation_rounds, proxy_number))
+        evaluate_tasks.append(connect25.evaluate_proxy_list(counter, evaluation_rounds))
         refresh_tasks.append(connect25.refresh_proxy_list(counter,proxy_number,evaluation_rounds ))
 
     
@@ -112,6 +112,7 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
 
     "Recursive Re-Evaluate List: Dynamic Approach"
     await rec_wait_and_evaluate_again(proxy_managers_list,counter,evaluation_rounds,proxy_number)
+    
     
 
 

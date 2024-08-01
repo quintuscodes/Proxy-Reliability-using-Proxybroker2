@@ -5,6 +5,7 @@ import asyncio
 async def print_proxy_managers(list,arg):
     for proxy_manager_item in list:
         await proxy_manager_item.print_proxy_list(arg)
+        
 
 async def sort_proxy_managers(list,proxy_number):
     for proxy_manager_item in list:

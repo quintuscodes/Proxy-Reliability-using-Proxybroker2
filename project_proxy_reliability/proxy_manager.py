@@ -22,7 +22,7 @@ class Proxy_Manager:
     self.log_evaluation_time = []
   
   "Helper Method to get proxy items from list"
-
+  
   def get_proxy(self, index) -> Proxy:
      proxy = self.proxy_list[index]
      
@@ -121,7 +121,7 @@ class Proxy_Manager:
       print("|_____________________________________________________________________________________________________________________________________________________________________")
       print("\n \n") 
 
-  async def evaluate_proxy_list(self,counter, evaluation_rounds, input_proxy_number):
+  async def evaluate_proxy_list(self,counter, evaluation_rounds):
     
     """
     A Method to initialize the evaluation of the Proxys in Proxy-List
@@ -208,16 +208,16 @@ class Proxy_Manager:
     
 
 
-  async def sort_proxy_lists(self,input_proxy_number):
+  async def sort_proxy_lists(self,proxy_number):
     "A Method to sort the List and remove proxys with a < 100 score threshold"
     
     self.proxy_list.sort(key=lambda Proxy: Proxy.score, reverse=True)
-    if len(self.master_proxy_list) < input_proxy_number:
+    if len(self.master_proxy_list) < proxy_number:
       for proxy in self.proxy_list:
         if proxy.score < 100:
           self.proxy_list.remove(proxy)
           print("\n Removed Proxys with score <= 100 \n")
-        elif proxy.score >= 100 and len(self.master_proxy_list) < input_proxy_number:
+        elif proxy.score >= 100 and len(self.master_proxy_list) < proxy_number:
           
           self.master_proxy_list.append(proxy)
       
@@ -225,31 +225,31 @@ class Proxy_Manager:
     self.master_proxy_list.sort(key=lambda Proxy: Proxy.score, reverse=True)
     self.proxy_list.clear()
 
-  async def refresh_proxy_list(self,counter,input_proxy_number,evaluation_rounds ):
+  async def refresh_proxy_list(self,counter,proxy_number,evaluation_rounds ):
         
         "A method to refill the proxy list with new evaluated Proxys score > 100"
 
         if self.ready_for_connection == False:
-            if len(self.master_proxy_list) < input_proxy_number: 
+            if len(self.master_proxy_list) < proxy_number: 
                 print("Refreshing the Proxy List \n")
                 await asyncio.sleep(3)
                 print("Refreshing the Proxy List \n")
                 
-                await asyncio.gather(self.fetch_proxys_write_to_class(input_proxy_number,evaluation_rounds))
-                await asyncio.gather(self.evaluate_proxy_list(counter, evaluation_rounds, input_proxy_number))
+                await asyncio.gather(self.fetch_proxys_write_to_class(proxy_number,evaluation_rounds))
+                await asyncio.gather(self.evaluate_proxy_list(counter, evaluation_rounds))
                 
 
-                await self.sort_proxy_lists(input_proxy_number)
+                await self.sort_proxy_lists(proxy_number)
 
-                if len(self.master_proxy_list) < input_proxy_number:
-                    await self.refresh_proxy_list(counter,input_proxy_number,evaluation_rounds )
+                if len(self.master_proxy_list) < proxy_number:
+                    await self.refresh_proxy_list(counter,proxy_number,evaluation_rounds )
                 else:
                     self.ready_for_connection = True
                     
 
             else:
                 self.ready_for_connection = True
-                await self.sort_proxy_lists(input_proxy_number)
+                await self.sort_proxy_lists(proxy_number)
                 print(f"{self.protocol}  *** MASTER *** Proxy List is ready for Connection")
                 
         else:
