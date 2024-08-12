@@ -121,7 +121,7 @@ class Proxy_Manager:
       print("|_____________________________________________________________________________________________________________________________________________________________________")
       print("\n \n") 
 
-  async def evaluate_proxy_list(self,counter, evaluation_rounds):
+  async def evaluate_proxy_list(self,counter, evaluation_rounds,proxy_number):
     
     """
     A Method to initialize the evaluation of the Proxys in Proxy-List
@@ -150,6 +150,7 @@ class Proxy_Manager:
     for i in range(len(self.proxy_list)):
         proxy = self.get_proxy(i)
         proxy.calc_score(evaluation_rounds) #loop through proxy_list and calculate score per proxy
+    
     
     "Reward the Best Proxys in evaluation parameters - sort after score - then give 15,10,5 Points credit score"
 
@@ -212,7 +213,9 @@ class Proxy_Manager:
     "A Method to sort the List and remove proxys with a < 100 score threshold"
     
     self.proxy_list.sort(key=lambda Proxy: Proxy.score, reverse=True)
+    
     if len(self.master_proxy_list) < proxy_number:
+      
       for proxy in self.proxy_list:
         if proxy.score < 100:
           self.proxy_list.remove(proxy)
@@ -220,15 +223,15 @@ class Proxy_Manager:
         elif proxy.score >= 100 and len(self.master_proxy_list) < proxy_number:
           
           self.master_proxy_list.append(proxy)
-      
-
+    
+    
     self.master_proxy_list.sort(key=lambda Proxy: Proxy.score, reverse=True)
     self.proxy_list.clear()
 
   async def refresh_proxy_list(self,counter,proxy_number,evaluation_rounds ):
         
         "A method to refill the proxy list with new evaluated Proxys score > 100"
-
+        self.proxy_list.clear() #TODO is this necessary?
         if self.ready_for_connection == False:
             if len(self.master_proxy_list) < proxy_number: 
                 print("Refreshing the Proxy List \n")
@@ -236,7 +239,7 @@ class Proxy_Manager:
                 print("Refreshing the Proxy List \n")
                 
                 await asyncio.gather(self.fetch_proxys_write_to_class(proxy_number,evaluation_rounds))
-                await asyncio.gather(self.evaluate_proxy_list(counter, evaluation_rounds))
+                await asyncio.gather(self.evaluate_proxy_list(counter, evaluation_rounds,proxy_number))
                 
 
                 await self.sort_proxy_lists(proxy_number)
@@ -266,3 +269,7 @@ class Proxy_Manager:
      for proxy_object in self.master_proxy_list:
         proxy_object.set_log_score()# Store score before reset
         proxy_object.set_avg_score() #Average Score for up to date reliability attribute criteria
+
+        if len(proxy_object.log_score) > 1:
+           if proxy_object.get_avg_score() <= 100:
+              self.master_proxy_list.remove(proxy_object)

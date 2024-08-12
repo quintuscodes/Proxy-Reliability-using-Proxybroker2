@@ -19,8 +19,10 @@ def log_scores(list):
     for proxy_manager_item in list:
         proxy_manager_item.log_scores() #Store Scores before Reset
 
+
+
 async def rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_rounds,proxy_number):
-    log_scores(proxy_managers_list) #Log Score here before reset TODO: Not correct
+    log_scores(proxy_managers_list) #Log Score here before reset AND remove avg_score <= 100
     await print_proxy_managers(proxy_managers_list,"master")
     print("\n\n      ------- Initiated Termination -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
 
@@ -35,7 +37,13 @@ async def rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_r
     
     print('\nEvaluate Master List again!\n')
 
-    
+    #TODO refresh the list with reliable proxys
+    for manager in proxy_managers_list:
+        if len(manager.master_proxy_list) <= 5:
+            print("Need to Refill \n")
+            await asyncio.sleep(5)
+            await manager.refresh_proxy_list(counter,proxy_number,evaluation_rounds)
+
     reset_proxy_objects(proxy_managers_list) # reset proxy Objects and init Master/Proxy List for new evaluation Update
 
     re_evaluate_tasks = await generate_evaluate_tasks(proxy_managers_list, counter, evaluation_rounds,proxy_number)
@@ -48,11 +56,14 @@ async def rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_r
     await rec_wait_and_evaluate_again(proxy_managers_list,counter,evaluation_rounds,proxy_number)
     
     
-async def generate_evaluate_tasks(proxy_managers_list, counter, evaluation_rounds, proxy_number):
+async def generate_evaluate_tasks(proxy_managers_list, counter, evaluation_rounds,proxy_number):
     re_evaluate_tasks = []
     for manager in proxy_managers_list:
-        re_evaluate_tasks.append(manager.evaluate_proxy_list(counter, evaluation_rounds, proxy_number))
+        re_evaluate_tasks.append(manager.evaluate_proxy_list(counter, evaluation_rounds,proxy_number))
+        
     return re_evaluate_tasks
+
+
 
 async def Checker(proxy_managers_list,refresh_tasks,proxy_number,num_proto):
     unbalanced = True

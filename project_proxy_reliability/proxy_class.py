@@ -51,7 +51,10 @@ class Proxy:
   
   def get_score(self):
     return self.score
-
+  
+  def get_avg_score(self):
+     return self.avg_score
+  
   def get_last_log_handshake_item(self):
      last_elem = self.log_handshake[-1]
      return last_elem
