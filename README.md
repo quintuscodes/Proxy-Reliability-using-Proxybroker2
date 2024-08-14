@@ -82,6 +82,63 @@ classDiagram
 # Sequence Diagram
 
 ```mermaid 
+
+sequenceDiagram
+    participant CLI
+    participant Main
+    participant Proxy_Manager
+    participant Proxy
+    participant Functions
+
+    CLI->>Main: run(proxy_number, evaluation_rounds, protocols)
+    activate Main
+    Main->>Main: main(proxy_number, evaluation_rounds,protocols)
+    
+    Main->>Proxy_Manager: __init__("HTTP")
+    Main->>Proxy_Manager: __init__("SOCKS4")
+    Main->>Proxy_Manager: __init__("SOCKS5")
+    Main->>Proxy_Manager: __init__("CONNECT:25")
+    Main->>Proxy_Manager:fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
+    activate Proxy_Manager
+    Proxy_Manager->>Proxy: __init__(_proto, _ip, _port, _country, _handshakes)
+    Proxy_Manager->>Proxy_Manager: add_to_list(Proxy)
+    Proxy_Manager-->>Main: return
+    deactivate Proxy_Manager
+
+    Main->>Proxy_Manager: evaluate_proxy_list(counter, evaluation_rounds,proxy_number)
+    activate Proxy_Manager
+    Proxy_Manager->>Proxy: evaluate()
+    activate Proxy
+    Proxy->>Proxy: evaluate_handshakes()
+    Proxy->>Proxy: evaluate_throughput()
+    Proxy->>Proxy: evaluate_request()
+    deactivate Proxy
+    Proxy_Manager->>Proxy: calc_score(evaluation_rounds)
+    Proxy_Manager-->>Main: return
+    deactivate Proxy_Manager
+
+    Main->>Functions: sort_proxy_managers(proxy_managers_list, proxy_number)
+    activate Functions
+    Functions->>Proxy_Manager: sort_proxy_lists(proxy_number)
+    deactivate Functions
+
+    Main->>Functions: Checker(proxy_managers_list, refresh_tasks, proxy_number, num_proto)
+    activate Functions
+    Functions->>Proxy_Manager: refresh_proxy_list(counter, proxy_number, evaluation_rounds)
+    deactivate Functions
+
+    Main->>Functions: rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_rounds, proxy_number)
+    activate Functions
+    Functions->>Functions: log_scores(proxy_managers_list)
+    Functions->>Proxy_Manager: reset_proxys()
+    Functions->>Functions: generate_evaluate_tasks(proxy_managers_list, counter, evaluation_rounds, proxy_number)
+    deactivate Functions
+    Main->>Functions: print_proxy_managers(proxy_managers_list, "master")
+    Main->>Functions: print_proxy_managers(proxy_managers_list, "slave")
+    deactivate Main
+```
+
+```mermaid
 sequenceDiagram
     participant User
     participant Main
