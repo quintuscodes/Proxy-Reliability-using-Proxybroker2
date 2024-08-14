@@ -15,7 +15,7 @@ The portrayed Class Diagram for the Proxy Manager. <br>
 %%{init: {'theme':'neutral'}}%%
 classDiagram
   direction LR
-  class Proxy_Manager {
+  class http {
     - ready_for_connection: bool
     - protocol: str
     - master_proxy_list: list
@@ -76,7 +76,7 @@ classDiagram
     + set_score(_score)
   }
 
-  Proxy_Manager --> Proxy : manages
+  http --> Proxy : manages
 ```
 
 # Sequence Diagram
@@ -84,112 +84,65 @@ classDiagram
 ```mermaid 
 
 sequenceDiagram
-    participant CLI
-    participant Main
-    participant Proxy_Manager
+    actor CLI as "User:CLI"
+    participant main
+    participant http as "HTTP:Proxy_Manager"
+    participant broker as "Broker:proxybroker"
     participant Proxy
     participant Functions
 
-    CLI->>Main: run(proxy_number, evaluation_rounds, protocols)
-    activate Main
-    Main->>Main: main(proxy_number, evaluation_rounds,protocols)
+    activate CLI
+    CLI->>CLI: run(proxy_number: int, evaluation_rounds: int, protocols: set)
+    CLI->>CLI: asyncio.get_event_loop()
+    CLI->>main: loop.run_until_complete(main(proxy_number, evaluation_rounds, protocols))
+    activate main
+    main->>main: main(proxy_number, evaluation_rounds,protocols)
     
-    Main->>Proxy_Manager: __init__("HTTP")
-    Main->>Proxy_Manager: __init__("SOCKS4")
-    Main->>Proxy_Manager: __init__("SOCKS5")
-    Main->>Proxy_Manager: __init__("CONNECT:25")
-    Main->>Proxy_Manager:fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
-    activate Proxy_Manager
-    Proxy_Manager->>Proxy: __init__(_proto, _ip, _port, _country, _handshakes)
-    Proxy_Manager->>Proxy_Manager: add_to_list(Proxy)
-    Proxy_Manager-->>Main: return
-    deactivate Proxy_Manager
-
-    Main->>Proxy_Manager: evaluate_proxy_list(counter, evaluation_rounds,proxy_number)
-    activate Proxy_Manager
-    Proxy_Manager->>Proxy: evaluate()
+    main->>http: __init__("HTTP")
+    main->>http: __init__("SOCKS4")
+    main->>http: __init__("SOCKS5")
+    main->>http: __init__("CONNECT:25")
+    main->>http:fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
+    activate http
+    http->>Proxy: __init__(_proto, _ip, _port, _country, _handshakes)
     activate Proxy
+    http->>http: add_to_list(Proxy)
+    http-->>main: return
+    
+
+    main->>http: asyncio.evaluate_proxy_list(counter, evaluation_rounds,proxy_number)
+    activate http
+    http->>Proxy: asyncio.evaluate()
     Proxy->>Proxy: evaluate_handshakes()
     Proxy->>Proxy: evaluate_throughput()
     Proxy->>Proxy: evaluate_request()
+    http->>Proxy: calc_score(evaluation_rounds)
+    http-->>main: return
+    deactivate http
+
+    main->>Functions: sort_https(https_list, proxy_number)
+    activate Functions
+    Functions->>http: sort_proxy_lists(proxy_number)
+    deactivate Functions
+
+    main->>Functions: Checker(https_list, refresh_tasks, proxy_number, num_proto)
+    activate Functions
+    Functions->>http: refresh_proxy_list(counter, proxy_number, evaluation_rounds)
+    deactivate Functions
+
+    main->>Functions: rec_wait_and_evaluate_again(https_list, counter, evaluation_rounds, proxy_number)
+    activate Functions
+    Functions->>Functions: log_scores(https_list)
+    Functions->>http: reset_proxy_objects()
+    http ->> Proxy: reset_proxys()
+    Proxy--> http: return
+    Functions->>Functions: generate_evaluate_tasks(https_list, counter, evaluation_rounds, proxy_number)
+    deactivate Functions
+    deactivate http
     deactivate Proxy
-    Proxy_Manager->>Proxy: calc_score(evaluation_rounds)
-    Proxy_Manager-->>Main: return
-    deactivate Proxy_Manager
-
-    Main->>Functions: sort_proxy_managers(proxy_managers_list, proxy_number)
-    activate Functions
-    Functions->>Proxy_Manager: sort_proxy_lists(proxy_number)
-    deactivate Functions
-
-    Main->>Functions: Checker(proxy_managers_list, refresh_tasks, proxy_number, num_proto)
-    activate Functions
-    Functions->>Proxy_Manager: refresh_proxy_list(counter, proxy_number, evaluation_rounds)
-    deactivate Functions
-
-    Main->>Functions: rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_rounds, proxy_number)
-    activate Functions
-    Functions->>Functions: log_scores(proxy_managers_list)
-    Functions->>Proxy_Manager: reset_proxys()
-    Functions->>Functions: generate_evaluate_tasks(proxy_managers_list, counter, evaluation_rounds, proxy_number)
-    deactivate Functions
-    Main->>Functions: print_proxy_managers(proxy_managers_list, "master")
-    Main->>Functions: print_proxy_managers(proxy_managers_list, "slave")
-    deactivate Main
+    main->>Functions: print_https(https_list, "master")
+    main->>Functions: print_https(https_list, "slave")
+    deactivate main
+    deactivate CLI
 ```
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant Main
-    participant Proxy_Manager
-    participant Proxy
-    participant Functions
-
-    User->>Main: run(proxy_number, evaluation_rounds, protocols)
-    activate Main
-    Main->>Main: main(proxy_number, evaluation_rounds, protocols)
-    
-    Main->>Proxy_Manager: __init__("HTTP")
-    Main->>Proxy_Manager: __init__("SOCKS4")
-    Main->>Proxy_Manager: __init__("SOCKS5")
-    Main->>Proxy_Manager: __init__("CONNECT:25")
-    Main->>Proxy_Manager: fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
-    activate Proxy_Manager
-    Proxy_Manager->>Proxy: __init__(_proto, _ip, _port, _country, _handshakes)
-    Proxy_Manager->>Proxy_Manager: add_to_list(Proxy)
-    Proxy_Manager-->>Main: return
-    deactivate Proxy_Manager
-
-    Main->>Proxy_Manager: evaluate_proxy_list(counter, evaluation_rounds)
-    activate Proxy_Manager
-    Proxy_Manager->>Proxy: evaluate()
-    activate Proxy
-    Proxy->>Proxy: evaluate_handshakes()
-    Proxy->>Proxy: evaluate_throughput()
-    Proxy->>Proxy: evaluate_request()
-    deactivate Proxy
-    Proxy_Manager->>Proxy: calc_score(evaluation_rounds)
-    Proxy_Manager-->>Main: return
-    deactivate Proxy_Manager
-
-    Main->>Functions: sort_proxy_managers(proxy_managers_list, proxy_number)
-    activate Functions
-    Functions->>Proxy_Manager: sort_proxy_lists(proxy_number)
-    deactivate Functions
-
-    Main->>Functions: Checker(proxy_managers_list, refresh_tasks, proxy_number, num_proto)
-    activate Functions
-    Functions->>Proxy_Manager: refresh_proxy_list(counter, proxy_number, evaluation_rounds)
-    deactivate Functions
-
-    Main->>Functions: rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_rounds, proxy_number)
-    activate Functions
-    Functions->>Functions: log_scores(proxy_managers_list)
-    Functions->>Proxy_Manager: reset_proxys()
-    Functions->>Functions: generate_evaluate_tasks(proxy_managers_list, counter, evaluation_rounds, proxy_number)
-    deactivate Functions
-    Main->>Functions: print_proxy_managers(proxy_managers_list, "master")
-    Main->>Functions: print_proxy_managers(proxy_managers_list, "slave")
-    deactivate Main
-```

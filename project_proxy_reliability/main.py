@@ -21,7 +21,6 @@ def run(proxy_number: int, evaluation_rounds: int, protocols: set):
     """
     
     loop = asyncio.get_event_loop()
-    stop_event = asyncio.Event()
 
     
     loop.run_until_complete(main(proxy_number, evaluation_rounds, protocols))

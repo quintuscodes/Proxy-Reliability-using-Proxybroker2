@@ -46,7 +46,7 @@ class Proxy_Manager:
     await broker.find( types=[ f'{self.protocol}'],lvl = 'HIGH', strict = True,limit=proxy_number)
     await self.write_proxy_to_class(f'{self.protocol}',proxies,evaluation_rounds)
       
-    await self.print_proxy_list(0)
+    #await self.print_proxy_list(0)
     
   async def write_proxy_to_class(self,_type, proxies,evaluation_rounds):
     "Method to write proxys to customized class and adding to proxy list  "
