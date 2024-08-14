@@ -37,10 +37,11 @@ async def rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_r
     
     print('\nEvaluate Master List again!\n')
 
-    #TODO refresh the list with reliable proxys
+    #TODO refresh the list with reliable proxys still not refilling enough proxys.
     for manager in proxy_managers_list:
-        if len(manager.master_proxy_list) <= 5:
+        if len(manager.master_proxy_list) < proxy_number:
             print("Need to Refill \n")
+            manager.ready_for_connection = False
             await asyncio.sleep(5)
             await manager.refresh_proxy_list(counter,proxy_number,evaluation_rounds)
 

@@ -258,7 +258,8 @@ class Proxy_Manager:
         else:
           
           print(f"{self.protocol}  *** MASTER *** Proxy List is ready for Connection")
-                
+
+    
   def reset_proxys(self):
      for proxy_object in self.master_proxy_list:
         proxy_object.reset_attributes()
