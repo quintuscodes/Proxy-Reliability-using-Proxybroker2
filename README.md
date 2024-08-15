@@ -164,7 +164,7 @@ sequenceDiagram
       
       
       main->>Functions: print_https(https_list, "master")
-      
+      deactivate Proxy
       deactivate http
       deactivate socks5
       deactivate main
