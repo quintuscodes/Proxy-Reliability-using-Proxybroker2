@@ -115,11 +115,11 @@ sequenceDiagram
       main
       par fetch http
           
-        main-)http: fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
+        main->>http: fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
         
       and fetch socks5
-        main-)socks5: fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
-        
+        main->>socks5: fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
+
       end
 
       main->>http: asyncio.evaluate_proxy_list(counter, evaluation_rounds,proxy_number)
