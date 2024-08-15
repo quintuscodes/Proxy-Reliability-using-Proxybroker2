@@ -130,7 +130,7 @@ sequenceDiagram
       Proxy->>Proxy: evaluate_request()
       http->>Proxy: calc_score(evaluation_rounds)
       http-->>main: return
-      deactivate http
+      
 
       main->>Functions: sort_https(https_list, proxy_number)
       activate Functions
