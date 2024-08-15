@@ -99,11 +99,11 @@ sequenceDiagram
       CLI->>+main: loop.run_until_complete(main(proxy_number, evaluation_rounds, protocols))
       
       
-      main->>http: new Proxy_Manager("HTTP")
+      main->>+http: new   Proxy_Manager("HTTP")
       http-->> main: http
-      
+
       main->>http:fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
-      activate http
+      
       http->>Proxy: __init__(_proto, _ip, _port, _country, _handshakes)
       activate Proxy
       http->>http: add_to_list(Proxy)
