@@ -93,8 +93,8 @@ sequenceDiagram
 
     
     CLI->>CLI: run(proxy_number: int, evaluation_rounds: int, protocols: set)
+    CLI->>CLI: asyncio.get_event_loop()
     loop
-      CLI->>CLI: asyncio.get_event_loop()
       activate CLI
       CLI->>main: loop.run_until_complete(main(proxy_number, evaluation_rounds, protocols))
       activate main
