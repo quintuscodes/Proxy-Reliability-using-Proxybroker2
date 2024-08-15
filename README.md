@@ -123,7 +123,7 @@ sequenceDiagram
       
 
       main->>http: asyncio.evaluate_proxy_list(counter, evaluation_rounds,proxy_number)
-      activate http
+      
       http->>Proxy: asyncio.evaluate()
       Proxy->>Proxy: evaluate_handshakes()
       Proxy->>Proxy: evaluate_throughput()
@@ -150,10 +150,12 @@ sequenceDiagram
       Proxy--> http: return
       Functions->>Functions: generate_evaluate_tasks(https_list, counter, evaluation_rounds, proxy_number)
       deactivate Functions
-      deactivate http
+      
       deactivate Proxy
       main->>Functions: print_https(https_list, "master")
-      main->>Functions: print_https(https_list, "slave")
+      
+      deactivate http
+      deactivate socks5
       deactivate main
       deactivate CLI
     end
