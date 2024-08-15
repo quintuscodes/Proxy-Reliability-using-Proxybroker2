@@ -84,7 +84,7 @@ classDiagram
 ```mermaid 
 
 sequenceDiagram
-    actor main as "User/CLI - main"
+    actor main as "CLI - main"
     
     participant socks5 as "SOCKS5   :Proxy_Manager"
     participant http as "HTTP   :Proxy_Manager"
@@ -113,13 +113,24 @@ sequenceDiagram
       main->>main: evaluate_tasks.append(socks5.evaluate_proxy_list(count,proxy_num,eval_rounds))
       main->>main: refresh_tasks.append(socks5.refresh_proxy_list(count,proxy_num,eval_rounds))
       
+      main->>main: await asyncio.gather(*fetch_tasks)
       par fetch http
           
         main-)http: fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
-        
+        http-)+broker: new   Broker()
+        broker-)broker: find(protocol,lvl = 'HIGH',limit=proxy_number)
+        http-)http: write_proxy_to_class(protocol,proxies,eval_rounds)
+        http-)+Proxy: new   Proxy(type,ip,port,country,evaluation_rounds)
+        Proxy->>http: add_to_list(<Proxy>)
+        deactivate broker
       and fetch socks5
         main-)socks5: fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
-
+        socks5-)+broker: new   Broker()
+        broker-)broker: find(protocol,lvl = 'HIGH',limit=proxy_number)
+        socks5-)socks5: write_proxy_to_class(protocol,proxies,eval_rounds)
+        socks5-)+Proxy: new   Proxy(type,ip,port,country,evaluation_rounds)
+        Proxy->>socks5: add_to_list(<Proxy>)
+        deactivate broker
       end
 
       main->>http: asyncio.evaluate_proxy_list(counter, evaluation_rounds,proxy_number)
