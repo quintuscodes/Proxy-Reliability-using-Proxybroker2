@@ -133,7 +133,7 @@ sequenceDiagram
         deactivate broker
       end
 
-      main->>http: asyncio.evaluate_proxy_list(counter, evaluation_rounds,proxy_number)
+      main->>main: asyncio.evaluate_proxy_list(counter, evaluation_rounds,proxy_number)
       
       http->>Proxy: asyncio.evaluate()
       Proxy->>Proxy: evaluate_handshakes()
