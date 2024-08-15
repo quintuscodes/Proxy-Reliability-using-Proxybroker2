@@ -104,9 +104,10 @@ sequenceDiagram
       main->>+http: new   Proxy_Manager("HTTP")
       http-->> main: http
 
-      main->>+socks5: new   Proxy_Manager("SOCKS5")
+      main->>socks5: new   Proxy_Manager("SOCKS5")
+      activate socks5
       socks5-->>main: socks5
-      
+
       main->>http:fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
       
       http->>Proxy: __init__(_proto, _ip, _port, _country, _handshakes)
