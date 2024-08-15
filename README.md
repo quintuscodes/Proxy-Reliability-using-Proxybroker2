@@ -84,8 +84,7 @@ classDiagram
 ```mermaid 
 
 sequenceDiagram
-    actor CLI as "User :CLI"
-    participant main
+    actor main as "User/CLI - main"
     
     participant socks5 as "SOCKS5   :Proxy_Manager"
     participant http as "HTTP   :Proxy_Manager"
@@ -94,11 +93,11 @@ sequenceDiagram
     participant Functions
 
     
-    CLI->>CLI: run(proxy_number: int, evaluation_rounds: int, protocols: set)
-    CLI->>CLI: asyncio.get_event_loop()
+    main->>main: run(proxy_number: int, evaluation_rounds: int, protocols: set)
+    main->>main: asyncio.get_event_loop()
     loop
-      activate CLI
-      CLI->>+main: loop.run_until_complete(main(proxy_number, evaluation_rounds, protocols))
+      activate main
+      main->>main: loop.run_until_complete(main(proxy_number, evaluation_rounds, protocols))
       
       
       main->>+http: new   Proxy_Manager("HTTP")
@@ -113,7 +112,9 @@ sequenceDiagram
       main->>main: fetch_tasks.append(socks5.fetch_proxy_write_to_class(proxy_num,eval_rounds))
       main->>main: evaluate_tasks.append(socks5.evaluate_proxy_list(count,proxy_num,eval_rounds))
       main->>main: refresh_tasks.append(socks5.refresh_proxy_list(count,proxy_num,eval_rounds))
-
+      main
+      par fetch http and extract fields to proxy class
+        
       main->>http:fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
       
       http->>Proxy: __init__(_proto, _ip, _port, _country, _handshakes)
@@ -157,7 +158,6 @@ sequenceDiagram
       deactivate http
       deactivate socks5
       deactivate main
-      deactivate CLI
     end
 ```
 
