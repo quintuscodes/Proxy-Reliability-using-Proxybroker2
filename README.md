@@ -86,8 +86,10 @@ classDiagram
 sequenceDiagram
     actor CLI as "User :CLI"
     participant main
-    participant http as "HTTP :Proxy_Manager"
-    participant broker as "Broker :proxybroker"
+    
+    participant socks5 as "SOCKS5   :Proxy_Manager"
+    participant http as "HTTP   :Proxy_Manager"
+    participant broker as "Broker   :proxybroker"
     participant Proxy
     participant Functions
 
@@ -102,6 +104,9 @@ sequenceDiagram
       main->>+http: new   Proxy_Manager("HTTP")
       http-->> main: http
 
+      main->>+socks5: new   Proxy_Manager("SOCKS5")
+      socks5-->>main: socks5
+      
       main->>http:fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
       
       http->>Proxy: __init__(_proto, _ip, _port, _country, _handshakes)
