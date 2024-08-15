@@ -96,14 +96,12 @@ sequenceDiagram
     CLI->>CLI: asyncio.get_event_loop()
     loop
       activate CLI
-      CLI->>main: loop.run_until_complete(main(proxy_number, evaluation_rounds, protocols))
-      activate main
-      main->>main: main(proxy_number, evaluation_rounds,protocols)
+      CLI->>+main: loop.run_until_complete(main(proxy_number, evaluation_rounds, protocols))
       
-      main->>http: __init__("HTTP")
-      main->>http: __init__("SOCKS4")
-      main->>http: __init__("SOCKS5")
-      main->>http: __init__("CONNECT:25")
+      
+      main->>http: new Proxy_Manager("HTTP")
+      http-->> main: http
+      
       main->>http:fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
       activate http
       http->>Proxy: __init__(_proto, _ip, _port, _country, _handshakes)
