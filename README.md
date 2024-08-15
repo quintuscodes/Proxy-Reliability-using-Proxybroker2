@@ -112,7 +112,7 @@ sequenceDiagram
       main->>main: fetch_tasks.append(socks5.fetch_proxy_write_to_class(proxy_num,eval_rounds))
       main->>main: evaluate_tasks.append(socks5.evaluate_proxy_list(count,proxy_num,eval_rounds))
       main->>main: refresh_tasks.append(socks5.refresh_proxy_list(count,proxy_num,eval_rounds))
-      main
+      
       par fetch http
           
         main-)http: fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
