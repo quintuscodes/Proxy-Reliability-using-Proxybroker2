@@ -114,14 +114,14 @@ sequenceDiagram
       main->>main: refresh_tasks.append(socks5.refresh_proxy_list(count,proxy_num,eval_rounds))
       main
       par fetch http and extract fields to proxy class
+          
+        main->>http:fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
         
-      main->>http:fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
-      
-      http->>Proxy: __init__(_proto, _ip, _port, _country, _handshakes)
-      activate Proxy
-      http->>http: add_to_list(Proxy)
-      http-->>main: return
-      
+        http->>Proxy: __init__(_proto, _ip, _port, _country, _handshakes)
+        activate Proxy
+        http->>http: add_to_list(Proxy)
+        http-->>main: return
+      end
 
       main->>http: asyncio.evaluate_proxy_list(counter, evaluation_rounds,proxy_number)
       
