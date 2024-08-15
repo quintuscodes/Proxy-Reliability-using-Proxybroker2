@@ -103,10 +103,16 @@ sequenceDiagram
       
       main->>+http: new   Proxy_Manager("HTTP")
       http-->> main: http
+      main->>main: fetch_tasks.append(http.fetch_proxy_write_to_class(proxy_num,eval_rounds))
+      main->>main: evaluate_tasks.append(http.evaluate_proxy_list(count,proxy_num,eval_rounds))
+      main->>main: refresh_tasks.append(http.refresh_proxy_list(count,proxy_num,eval_rounds))
 
-      main->>socks5: new   Proxy_Manager("SOCKS5")
-      activate socks5
+      main->>+socks5: new   Proxy_Manager("SOCKS5")
       socks5-->>main: socks5
+
+      main->>main: fetch_tasks.append(socks5.fetch_proxy_write_to_class(proxy_num,eval_rounds))
+      main->>main: evaluate_tasks.append(socks5.evaluate_proxy_list(count,proxy_num,eval_rounds))
+      main->>main: refresh_tasks.append(socks5.refresh_proxy_list(count,proxy_num,eval_rounds))
 
       main->>http:fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
       
