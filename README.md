@@ -128,7 +128,7 @@ sequenceDiagram
         socks5-)+broker: new   Broker()
         broker-)broker: find(protocol,lvl = 'HIGH',limit=proxy_number)
         socks5-)socks5: write_proxy_to_class(protocol,proxies,eval_rounds)
-        socks5-)+Proxy: new   Proxy(type,ip,port,country,evaluation_rounds)
+        socks5-)Proxy: new   Proxy(type,ip,port,country,evaluation_rounds)
         Proxy->>socks5: add_to_list(<Proxy>)
         deactivate broker
       end
