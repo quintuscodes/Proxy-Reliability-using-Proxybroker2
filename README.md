@@ -84,10 +84,10 @@ classDiagram
 ```mermaid 
 
 sequenceDiagram
-    actor CLI as "User:CLI"
+    actor CLI as "User :CLI"
     participant main
-    participant http as "HTTP:Proxy_Manager"
-    participant broker as "Broker:proxybroker"
+    participant http as "HTTP :Proxy_Manager"
+    participant broker as "Broker :proxybroker"
     participant Proxy
     participant Functions
 
