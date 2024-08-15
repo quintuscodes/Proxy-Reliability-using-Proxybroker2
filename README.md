@@ -151,7 +151,7 @@ sequenceDiagram
       Functions->>Functions: generate_evaluate_tasks(https_list, counter, evaluation_rounds, proxy_number)
       deactivate Functions
       
-      deactivate Proxy
+      
       main->>Functions: print_https(https_list, "master")
       
       deactivate http
