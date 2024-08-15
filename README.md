@@ -93,57 +93,59 @@ sequenceDiagram
 
     
     CLI->>CLI: run(proxy_number: int, evaluation_rounds: int, protocols: set)
-    CLI->>CLI: asyncio.get_event_loop()
-    activate CLI: loop
-    CLI->>main: loop.run_until_complete(main(proxy_number, evaluation_rounds, protocols))
-    activate main
-    main->>main: main(proxy_number, evaluation_rounds,protocols)
-    
-    main->>http: __init__("HTTP")
-    main->>http: __init__("SOCKS4")
-    main->>http: __init__("SOCKS5")
-    main->>http: __init__("CONNECT:25")
-    main->>http:fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
-    activate http
-    http->>Proxy: __init__(_proto, _ip, _port, _country, _handshakes)
-    activate Proxy
-    http->>http: add_to_list(Proxy)
-    http-->>main: return
-    
+    loop
+      CLI->>CLI: asyncio.get_event_loop()
+      activate CLI
+      CLI->>main: loop.run_until_complete(main(proxy_number, evaluation_rounds, protocols))
+      activate main
+      main->>main: main(proxy_number, evaluation_rounds,protocols)
+      
+      main->>http: __init__("HTTP")
+      main->>http: __init__("SOCKS4")
+      main->>http: __init__("SOCKS5")
+      main->>http: __init__("CONNECT:25")
+      main->>http:fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
+      activate http
+      http->>Proxy: __init__(_proto, _ip, _port, _country, _handshakes)
+      activate Proxy
+      http->>http: add_to_list(Proxy)
+      http-->>main: return
+      
 
-    main->>http: asyncio.evaluate_proxy_list(counter, evaluation_rounds,proxy_number)
-    activate http
-    http->>Proxy: asyncio.evaluate()
-    Proxy->>Proxy: evaluate_handshakes()
-    Proxy->>Proxy: evaluate_throughput()
-    Proxy->>Proxy: evaluate_request()
-    http->>Proxy: calc_score(evaluation_rounds)
-    http-->>main: return
-    deactivate http
+      main->>http: asyncio.evaluate_proxy_list(counter, evaluation_rounds,proxy_number)
+      activate http
+      http->>Proxy: asyncio.evaluate()
+      Proxy->>Proxy: evaluate_handshakes()
+      Proxy->>Proxy: evaluate_throughput()
+      Proxy->>Proxy: evaluate_request()
+      http->>Proxy: calc_score(evaluation_rounds)
+      http-->>main: return
+      deactivate http
 
-    main->>Functions: sort_https(https_list, proxy_number)
-    activate Functions
-    Functions->>http: sort_proxy_lists(proxy_number)
-    deactivate Functions
+      main->>Functions: sort_https(https_list, proxy_number)
+      activate Functions
+      Functions->>http: sort_proxy_lists(proxy_number)
+      deactivate Functions
 
-    main->>Functions: Checker(https_list, refresh_tasks, proxy_number, num_proto)
-    activate Functions
-    Functions->>http: refresh_proxy_list(counter, proxy_number, evaluation_rounds)
-    deactivate Functions
+      main->>Functions: Checker(https_list, refresh_tasks, proxy_number, num_proto)
+      activate Functions
+      Functions->>http: refresh_proxy_list(counter, proxy_number, evaluation_rounds)
+      deactivate Functions
 
-    main->>Functions: rec_wait_and_evaluate_again(https_list, counter, evaluation_rounds, proxy_number)
-    activate Functions
-    Functions->>Functions: log_scores(https_list)
-    Functions->>http: reset_proxy_objects()
-    http ->> Proxy: reset_proxys()
-    Proxy--> http: return
-    Functions->>Functions: generate_evaluate_tasks(https_list, counter, evaluation_rounds, proxy_number)
-    deactivate Functions
-    deactivate http
-    deactivate Proxy
-    main->>Functions: print_https(https_list, "master")
-    main->>Functions: print_https(https_list, "slave")
-    deactivate main
-    deactivate CLI
+      main->>Functions: rec_wait_and_evaluate_again(https_list, counter, evaluation_rounds, proxy_number)
+      activate Functions
+      Functions->>Functions: log_scores(https_list)
+      Functions->>http: reset_proxy_objects()
+      http ->> Proxy: reset_proxys()
+      Proxy--> http: return
+      Functions->>Functions: generate_evaluate_tasks(https_list, counter, evaluation_rounds, proxy_number)
+      deactivate Functions
+      deactivate http
+      deactivate Proxy
+      main->>Functions: print_https(https_list, "master")
+      main->>Functions: print_https(https_list, "slave")
+      deactivate main
+      deactivate CLI
+    end
 ```
 
