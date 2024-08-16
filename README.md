@@ -185,7 +185,6 @@ sequenceDiagram
           main-)main: await asyncio.gather(*refresh_tasks)
           main-)http: http.refresh_proxy_list()
           main-)socks5: socks5.refresh_proxy_list()
-          
       end
       main->>Functions: print_https(https_list, "master")
       deactivate proxy
