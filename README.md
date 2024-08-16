@@ -190,7 +190,8 @@ sequenceDiagram
       deactivate proxy
       deactivate http
       deactivate socks5
-      deactivate main
+      
     end
+    deactivate main
 ```
 
