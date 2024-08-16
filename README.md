@@ -169,8 +169,11 @@ sequenceDiagram
       end
       
 
-      main->>Functions: sort_https(https_list, proxy_number)
-      activate Functions
+      main->>main: sort_proxy_managers(list)
+      loop
+        main->>http:sort_proxy_lists()
+        main->>socks5: sort_proxy_lists()
+      end 
       Functions->>http: sort_proxy_lists(proxy_number)
       deactivate Functions
 
