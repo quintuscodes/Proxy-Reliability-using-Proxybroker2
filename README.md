@@ -102,32 +102,32 @@ sequenceDiagram
       
       main->>+http: new   Proxy_Manager("HTTP")
       http-->> main: http
-      main->>main: fetch_tasks.append(http.fetch_proxy_write_to_class(proxy_num,eval_rounds))
-      main->>main: evaluate_tasks.append(http.evaluate_proxy_list(count,proxy_num,eval_rounds))
-      main->>main: refresh_tasks.append(http.refresh_proxy_list(count,proxy_num,eval_rounds))
+      main->>main: fetch_tasks.append(http.fetch_proxy_write_to_class())
+      main->>main: evaluate_tasks.append(http.evaluate_proxy_list())
+      main->>main: refresh_tasks.append(http.refresh_proxy_list())
 
       main->>+socks5: new   Proxy_Manager("SOCKS5")
       socks5-->>main: socks5
 
-      main->>main: fetch_tasks.append(socks5.fetch_proxy_write_to_class(proxy_num,eval_rounds))
-      main->>main: evaluate_tasks.append(socks5.evaluate_proxy_list(count,proxy_num,eval_rounds))
-      main->>main: refresh_tasks.append(socks5.refresh_proxy_list(count,proxy_num,eval_rounds))
+      main->>main: fetch_tasks.append(socks5.fetch_proxy_write_to_class())
+      main->>main: evaluate_tasks.append(socks5.evaluate_proxy_list())
+      main->>main: refresh_tasks.append(socks5.refresh_proxy_list())
       
       main->>main: await asyncio.gather(*fetch_tasks)
       par fetch http
           
-        main-)http: fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
+        main-)http: fetch_proxys_write_to_class()
         http-)+broker: new   Broker()
         broker-)broker: find(protocol,lvl = 'HIGH',limit=proxy_num)
-        http-)http: write_proxy_to_class(protocol,proxies,eval_rounds)
+        http-)http: write_proxy_to_class()
         http-)+proxy: new   proxy(type,ip,port,country,evaluation_rounds)
         proxy->>http: add_to_list(<proxy>)
         deactivate broker
       and fetch socks5
-        main-)socks5: fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
+        main-)socks5: fetch_proxys_write_to_class()
         socks5-)+broker: new   Broker()
         broker-)broker: find(protocol,lvl = 'HIGH',limit=proxy_num)
-        socks5-)socks5: write_proxy_to_class(protocol,proxies,eval_rounds)
+        socks5-)socks5: write_proxy_to_class()
         socks5-)proxy: new   proxy(type,ip,port,country,evaluation_rounds)
         proxy->>socks5: add_to_list(<proxy>)
         deactivate broker
@@ -136,7 +136,7 @@ sequenceDiagram
       main->>main: await asyncio.gather(*evaluate_tasks)
       par evaluate http
           
-        main-)http: http.evaluate_proxy_list(count, eval_rounds,proxy_num)
+        main-)http: http.evaluate_proxy_list()
         loop evaluation_rounds
           par evaluate proxys concurrently with asyncio
             http-)proxy: proxy.evaluate()
@@ -152,7 +152,7 @@ sequenceDiagram
         end
         
       and evaluate socks5
-        main-)socks5: socks5.evaluate_proxy_list(count, eval_rounds,proxy_num)
+        main-)socks5: socks5.evaluate_proxy_list()
         loop evaluation_rounds
           par evaluate proxys concurrently with asyncio
             socks5-)proxy: proxy.evaluate()
@@ -177,8 +177,16 @@ sequenceDiagram
         main->>socks5: sort_proxy_lists()
       end 
       
-      
-      
+      main->>main: Checker()
+      loop
+        alt CHECK APPROVED
+
+        else CHECK Reject - Refill
+          main-)main: await asyncio.gather(*refresh_tasks)
+          main-)http: http.refresh_proxy_list()
+          main-)socks5: socks5.refresh_proxy_list()
+          
+      end
       main->>Functions: print_https(https_list, "master")
       deactivate proxy
       deactivate http

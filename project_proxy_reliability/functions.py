@@ -92,7 +92,7 @@ async def Checker(proxy_managers_list,refresh_tasks:list,proxy_number,num_proto,
             unbalanced = False
             
         else:
-            print("Notdoneyet")
+            print("CHECK rejected - Need to refill")
             refresh_tasks = await generate_refresh_tasks(proxy_managers_list, counter, evaluation_rounds,proxy_number)
             await asyncio.gather(*refresh_tasks)
             await asyncio.sleep(3)
