@@ -15,7 +15,7 @@ The portrayed Class Diagram for the proxy Manager. <br>
 %%{init: {'theme':'neutral'}}%%
 classDiagram
   direction LR
-  class http {
+  class Proxy_Manager {
     - ready_for_connection: bool
     - protocol: str
     - master_proxy_list: list
@@ -33,7 +33,7 @@ classDiagram
     + log_scores()
   }
 
-  class proxy {
+  class Proxy {
     - protocol: str
     - country: str
     - ip: str
@@ -76,7 +76,7 @@ classDiagram
     + set_score(_score)
   }
 
-  http --> proxy : manages
+  Proxy_Manager --> Proxy : manages
 ```
 
 # Sequence Diagram
