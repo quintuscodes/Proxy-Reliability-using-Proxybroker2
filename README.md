@@ -174,22 +174,7 @@ sequenceDiagram
         main->>http:sort_proxy_lists()
         main->>socks5: sort_proxy_lists()
       end 
-      Functions->>http: sort_proxy_lists(proxy_number)
-      deactivate Functions
-
-      main->>Functions: Checker(https_list, refresh_tasks, proxy_number, num_proto)
-      activate Functions
-      Functions->>http: refresh_proxy_list(counter, proxy_number, evaluation_rounds)
-      deactivate Functions
-
-      main->>Functions: rec_wait_and_evaluate_again(https_list, counter, evaluation_rounds, proxy_number)
-      activate Functions
-      Functions->>Functions: log_scores(https_list)
-      Functions->>http: reset_proxy_objects()
-      http ->> proxy: reset_proxys()
-      proxy--> http: return
-      Functions->>Functions: generate_evaluate_tasks(https_list, counter, evaluation_rounds, proxy_number)
-      deactivate Functions
+      
       
       
       main->>Functions: print_https(https_list, "master")
