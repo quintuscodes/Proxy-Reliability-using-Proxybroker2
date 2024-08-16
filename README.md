@@ -118,7 +118,7 @@ sequenceDiagram
           
         main-)http: fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
         http-)+broker: new   Broker()
-        broker-)broker: find(protocol,lvl = 'HIGH',limit=proxy_number)
+        broker-)broker: find(protocol,lvl = 'HIGH',limit=proxy_num)
         http-)http: write_proxy_to_class(protocol,proxies,eval_rounds)
         http-)+Proxy: new   Proxy(type,ip,port,country,evaluation_rounds)
         Proxy->>http: add_to_list(<Proxy>)
@@ -126,14 +126,25 @@ sequenceDiagram
       and fetch socks5
         main-)socks5: fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
         socks5-)+broker: new   Broker()
-        broker-)broker: find(protocol,lvl = 'HIGH',limit=proxy_number)
+        broker-)broker: find(protocol,lvl = 'HIGH',limit=proxy_num)
         socks5-)socks5: write_proxy_to_class(protocol,proxies,eval_rounds)
         socks5-)Proxy: new   Proxy(type,ip,port,country,evaluation_rounds)
         Proxy->>socks5: add_to_list(<Proxy>)
         deactivate broker
       end
 
-      main->>main: asyncio.evaluate_proxy_list(counter, evaluation_rounds,proxy_number)
+      main->>main: await asyncio.gather(*evaluate_tasks)
+      par evaluate http
+          
+        main-)http: http.evaluate_proxy_list(count, eval_rounds,proxy_num)
+        while evaluation_rounds
+
+        d
+      and evaluate socks5
+        main-)socks5: socks5.evaluate_proxy_list(counter, evaluation_rounds,proxy_number)
+        while evaluation_rounds
+      end
+
       
       http->>Proxy: asyncio.evaluate()
       Proxy->>Proxy: evaluate_handshakes()
