@@ -165,15 +165,8 @@ sequenceDiagram
             proxy-->>http: return
             socks5->>socks5: reward_best_proxys()
           end
+        end
       end
-
-      
-      http->>proxy: asyncio.evaluate()
-      proxy->>proxy: evaluate_handshakes()
-      proxy->>proxy: evaluate_throughput()
-      proxy->>proxy: evaluate_request()
-      http->>proxy: calc_score(evaluation_rounds)
-      http-->>main: return
       
 
       main->>Functions: sort_https(https_list, proxy_number)
