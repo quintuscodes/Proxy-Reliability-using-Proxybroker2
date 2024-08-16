@@ -137,7 +137,7 @@ sequenceDiagram
       par evaluate http
           
         main-)http: http.evaluate_proxy_list(count, eval_rounds,proxy_num)
-        loop evaluation_rounds
+        while evaluation_rounds
           loop every proxy 
             par evaluate proxys concurrently asyncio
               http-)Proxy: proxy.evaluate()
