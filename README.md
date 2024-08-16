@@ -169,9 +169,9 @@ sequenceDiagram
       end
       
 
-      main->>main: sort_proxy_managers(list)
+      main->>main: sort_proxy_managers()
       loop
-        %%Note over main,http: Remove Proxys with score <100
+        
         Note right of main: Remove Proxys with score <100
         main->>http:sort_proxy_lists()
         main->>socks5: sort_proxy_lists()
@@ -185,12 +185,13 @@ sequenceDiagram
           main-)main: await asyncio.gather(*refresh_tasks)
           main-)http: http.refresh_proxy_list()
           main-)socks5: socks5.refresh_proxy_list()
+          end
       end
       main->>Functions: print_https(https_list, "master")
       deactivate proxy
       deactivate http
       deactivate socks5
-      
+      deactivate main
     end
     
 ```
