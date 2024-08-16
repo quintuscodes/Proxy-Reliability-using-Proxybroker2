@@ -1,4 +1,4 @@
-# Proxy Validation
+# proxy Validation
 <br>
 Python Scripts are developed to create a dynamic data structure for managing open-source proxy servers using the Python module proxybroker2.
 These scripts evaluate the proxy servers concurrently using asyncio, collecting data such as successful TCP-Handshake rate, average response time, average transmission time,  average throughput and perform a request. 
@@ -7,7 +7,7 @@ The goal is to evaluate a dynamic proxy list for reliable proxy connections.  <b
 <br>
 
 # Class Diagram
-The portrayed Class Diagram for the Proxy Manager. <br>
+The portrayed Class Diagram for the proxy Manager. <br>
 <br>
 <br>
 
@@ -24,7 +24,7 @@ classDiagram
     + __init__(_protocol)
     + fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
     + write_proxy_to_class(_type, proxies, evaluation_rounds)
-    + add_to_list(Proxy)
+    + add_to_list(proxy)
     + print_proxy_list(arg)
     + evaluate_proxy_list(counter, evaluation_rounds)
     + sort_proxy_lists(proxy_number)
@@ -33,7 +33,7 @@ classDiagram
     + log_scores()
   }
 
-  class Proxy {
+  class proxy {
     - protocol: str
     - country: str
     - ip: str
@@ -76,7 +76,7 @@ classDiagram
     + set_score(_score)
   }
 
-  http --> Proxy : manages
+  http --> proxy : manages
 ```
 
 # Sequence Diagram
@@ -89,7 +89,7 @@ sequenceDiagram
     participant socks5 as "SOCKS5   :Proxy_Manager"
     participant http as "HTTP   :Proxy_Manager"
     participant broker as "Broker   :proxybroker"
-    participant Proxy
+    participant proxy
     participant Functions
 
     
@@ -120,16 +120,16 @@ sequenceDiagram
         http-)+broker: new   Broker()
         broker-)broker: find(protocol,lvl = 'HIGH',limit=proxy_num)
         http-)http: write_proxy_to_class(protocol,proxies,eval_rounds)
-        http-)+Proxy: new   Proxy(type,ip,port,country,evaluation_rounds)
-        Proxy->>http: add_to_list(<Proxy>)
+        http-)+proxy: new   proxy(type,ip,port,country,evaluation_rounds)
+        proxy->>http: add_to_list(<proxy>)
         deactivate broker
       and fetch socks5
         main-)socks5: fetch_proxys_write_to_class(proxy_number, evaluation_rounds)
         socks5-)+broker: new   Broker()
         broker-)broker: find(protocol,lvl = 'HIGH',limit=proxy_num)
         socks5-)socks5: write_proxy_to_class(protocol,proxies,eval_rounds)
-        socks5-)Proxy: new   Proxy(type,ip,port,country,evaluation_rounds)
-        Proxy->>socks5: add_to_list(<Proxy>)
+        socks5-)proxy: new   proxy(type,ip,port,country,evaluation_rounds)
+        proxy->>socks5: add_to_list(<proxy>)
         deactivate broker
       end
 
@@ -139,9 +139,12 @@ sequenceDiagram
         main-)http: http.evaluate_proxy_list(count, eval_rounds,proxy_num)
         loop evaluation_rounds
           par evaluate proxys concurrently asyncio
-            http-)Proxy: proxy.evaluate()
-            Proxy->>Proxy: proxy.calc_score()
-            Proxy-->>http: return
+            http-)proxy: proxy.evaluate()
+            par
+              proxy
+            end
+            proxy->>proxy: proxy.calc_score()
+            proxy-->>http: return
             http->>http: reward_best_proxys()
           end
         end
@@ -152,11 +155,11 @@ sequenceDiagram
       end
 
       
-      http->>Proxy: asyncio.evaluate()
-      Proxy->>Proxy: evaluate_handshakes()
-      Proxy->>Proxy: evaluate_throughput()
-      Proxy->>Proxy: evaluate_request()
-      http->>Proxy: calc_score(evaluation_rounds)
+      http->>proxy: asyncio.evaluate()
+      proxy->>proxy: evaluate_handshakes()
+      proxy->>proxy: evaluate_throughput()
+      proxy->>proxy: evaluate_request()
+      http->>proxy: calc_score(evaluation_rounds)
       http-->>main: return
       
 
@@ -174,14 +177,14 @@ sequenceDiagram
       activate Functions
       Functions->>Functions: log_scores(https_list)
       Functions->>http: reset_proxy_objects()
-      http ->> Proxy: reset_proxys()
-      Proxy--> http: return
+      http ->> proxy: reset_proxys()
+      proxy--> http: return
       Functions->>Functions: generate_evaluate_tasks(https_list, counter, evaluation_rounds, proxy_number)
       deactivate Functions
       
       
       main->>Functions: print_https(https_list, "master")
-      deactivate Proxy
+      deactivate proxy
       deactivate http
       deactivate socks5
       deactivate main
