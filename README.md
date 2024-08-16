@@ -138,13 +138,15 @@ sequenceDiagram
           
         main-)http: http.evaluate_proxy_list(count, eval_rounds,proxy_num)
         loop evaluation_rounds
-          loop 
+          while 
             par
               http-)Proxy: proxy.evaluate()
               Proxy->>Proxy: proxy.calc_score()
-              Proxy-->http:
+              Proxy-->>http:
               http->>http: reward_best_proxys()
             end
+          end
+        end
         
       and evaluate socks5
         main-)socks5: socks5.evaluate_proxy_list(counter, evaluation_rounds,proxy_number)
