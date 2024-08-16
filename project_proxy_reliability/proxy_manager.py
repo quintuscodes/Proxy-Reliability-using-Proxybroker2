@@ -51,7 +51,7 @@ class Proxy_Manager:
   async def write_proxy_to_class(self,_type, proxies,evaluation_rounds):
     "Method to write proxys to customized class and adding to proxy list  "
 
-    proxycount = 0
+    
     while True:
       proxy = await proxies.get()
       if proxy is None:

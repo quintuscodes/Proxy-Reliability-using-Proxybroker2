@@ -92,7 +92,7 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
 
     
     "Checker-Method"
-    await Checker(proxy_managers_list,refresh_tasks,proxy_number,num_proto)
+    await Checker(proxy_managers_list,refresh_tasks,proxy_number,num_proto,counter,evaluation_rounds)
 
     end_time = time.perf_counter()
     evaluation_time = end_time - start_time
@@ -102,7 +102,7 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     print(f"Die Evaluation von {proxy_number} Proxys bei {evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s \n")
 
     "Recursive Re-Evaluate List: Dynamic Approach"
-    await rec_wait_and_evaluate_again(proxy_managers_list,counter,evaluation_rounds,proxy_number)
+    await rec_wait_and_evaluate_again(proxy_managers_list,counter,evaluation_rounds,proxy_number,num_proto)
     
     
 

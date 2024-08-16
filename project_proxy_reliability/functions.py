@@ -21,16 +21,16 @@ def log_scores(list):
 
 
 
-async def rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_rounds,proxy_number):
+async def rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_rounds,proxy_number,num_proto):
     log_scores(proxy_managers_list) #Log Score here before reset AND remove avg_score <= 100
     await print_proxy_managers(proxy_managers_list,"master")
     print("\n\n      ------- Initiated Termination -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
 
-    print("Wait 40s until Master List re-evaluate. Press ctrl + z to break and show the final List.\n")
+    print("Wait 20s until Master List re-evaluate. Press ctrl + z to break and show the final List.\n")
     
-    for _ in range(20):  # 40 Seconds / 2 Seconds = 20
+    for _ in range(20):  # 20 Seconds / 2 Seconds = 10
         
-        await asyncio.sleep(2)
+        await asyncio.sleep(1)
             
         print('.', end='',flush=True)
     
@@ -38,12 +38,9 @@ async def rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_r
     print('\nEvaluate Master List again!\n')
 
     #TODO refresh the list with reliable proxys still not refilling enough proxys.
-    for manager in proxy_managers_list:
-        if len(manager.master_proxy_list) < proxy_number:
-            print("Need to Refill \n")
-            manager.ready_for_connection = False
-            await asyncio.sleep(5)
-            await manager.refresh_proxy_list(counter,proxy_number,evaluation_rounds)
+    
+    re_refresh_tasks = []
+    await Checker(proxy_managers_list,re_refresh_tasks,proxy_number,num_proto,counter,num_proto)
 
     reset_proxy_objects(proxy_managers_list) # reset proxy Objects and init Master/Proxy List for new evaluation Update
 
@@ -52,9 +49,9 @@ async def rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_r
     await asyncio.gather(*re_evaluate_tasks)
     await sort_proxy_managers(proxy_managers_list,proxy_number)
     await print_proxy_managers(proxy_managers_list,"master")
-    await print_proxy_managers(proxy_managers_list,"slave")
     
-    await rec_wait_and_evaluate_again(proxy_managers_list,counter,evaluation_rounds,proxy_number)
+    
+    await rec_wait_and_evaluate_again(proxy_managers_list,counter,evaluation_rounds,proxy_number,num_proto)
     
     
 async def generate_evaluate_tasks(proxy_managers_list, counter, evaluation_rounds,proxy_number):
@@ -64,40 +61,40 @@ async def generate_evaluate_tasks(proxy_managers_list, counter, evaluation_round
         
     return re_evaluate_tasks
 
+async def generate_refresh_tasks(proxy_managers_list, counter, evaluation_rounds,proxy_number):
+    re_refresh_tasks = []
+    for manager in proxy_managers_list:
+        re_refresh_tasks.append(manager.refresh_proxy_list(counter,proxy_number,evaluation_rounds ))
+        
+    return re_refresh_tasks
 
-
-async def Checker(proxy_managers_list,refresh_tasks,proxy_number,num_proto):
+async def Checker(proxy_managers_list,refresh_tasks:list,proxy_number,num_proto,counter,evaluation_rounds):
     unbalanced = True
+
     while unbalanced:
 
-        await asyncio.sleep(5)
+        
         print("CHECKER METHOD active\n")
-        
-        await print_proxy_managers(proxy_managers_list,0)
-        
-        await print_proxy_managers(proxy_managers_list,"master")
         await asyncio.sleep(5)
-
-        print(f"Query new reliable Proxys to MASTER List ")
-
-        "Remove/Add here desired protocols"
         
-        await asyncio.gather(*refresh_tasks)
-        
-        "Remove/Add here desired protocols in if - statement"
         checked = []
         for items in proxy_managers_list:
             
             if len(items.master_proxy_list) == proxy_number:
                     checked.append(1)
+            else:
+                items.ready_for_connection = False
 
         if checked.count(1) == num_proto:
             print("CHECK approved")
-            await asyncio.sleep(5)
+            await asyncio.sleep(3)
 
             unbalanced = False
             
         else:
             print("Notdoneyet")
-            await asyncio.sleep(5)
+            refresh_tasks = await generate_refresh_tasks(proxy_managers_list, counter, evaluation_rounds,proxy_number)
+            await asyncio.gather(*refresh_tasks)
+            await asyncio.sleep(3)
 
+        checked.clear()
