@@ -180,7 +180,7 @@ sequenceDiagram
       main->>main: Checker()
       loop
         alt CHECK APPROVED
-
+          Note right of main: Continue
         else CHECK Reject - Refill
           main-)main: await asyncio.gather(*refresh_tasks)
           main-)http: http.refresh_proxy_list()
