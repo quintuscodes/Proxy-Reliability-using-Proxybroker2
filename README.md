@@ -141,7 +141,9 @@ sequenceDiagram
           par evaluate proxys concurrently asyncio
             http-)proxy: proxy.evaluate()
             par
-              proxy
+              proxy-)proxy: evaluate_handshakes()
+              proxy-)proxy: evaluate_throughput()
+              proxy-)proxy: evaluate_request()
             end
             proxy->>proxy: proxy.calc_score()
             proxy-->>http: return
