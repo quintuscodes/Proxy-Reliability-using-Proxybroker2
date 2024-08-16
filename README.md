@@ -150,7 +150,7 @@ sequenceDiagram
         
       and evaluate socks5
         main-)socks5: socks5.evaluate_proxy_list(counter, evaluation_rounds,proxy_number)
-        while evaluation_rounds
+        
       end
 
       
