@@ -138,8 +138,8 @@ sequenceDiagram
           
         main-)http: http.evaluate_proxy_list(count, eval_rounds,proxy_num)
         loop evaluation_rounds
-          loop 
-            par
+          loop every proxy 
+            par evaluate proxys concurrently asyncio
               http-)Proxy: proxy.evaluate()
               Proxy->>Proxy: proxy.calc_score()
               Proxy-->>http: return
