@@ -171,7 +171,8 @@ sequenceDiagram
 
       main->>main: sort_proxy_managers(list)
       loop
-        Note over main,http: Remove Proxys with score <100
+        %%Note over main,http: Remove Proxys with score <100
+        Note right of main: Remove Proxys with score <100
         main->>http:sort_proxy_lists()
         main->>socks5: sort_proxy_lists()
       end 
