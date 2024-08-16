@@ -137,7 +137,7 @@ sequenceDiagram
       par evaluate http
           
         main-)http: http.evaluate_proxy_list(count, eval_rounds,proxy_num)
-        while evaluation_rounds
+        loop evaluation_rounds
           loop 
             par
               http-)Proxy: proxy.evaluate()
