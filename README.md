@@ -169,7 +169,7 @@ sequenceDiagram
       end
       
 
-      main->>main: sort_proxy_managers()
+      main->>main: await sort_proxy_managers()
       loop
         
         Note right of main: Remove Proxys with score <100
@@ -177,7 +177,7 @@ sequenceDiagram
         main->>socks5: sort_proxy_lists()
       end 
       
-      main->>main: Checker()
+      main->>main: await Checker()
       loop
         alt CHECK APPROVED
           Note right of main: Continue
@@ -187,7 +187,10 @@ sequenceDiagram
           main-)socks5: socks5.refresh_proxy_list()
           end
       end
-      main->>Functions: print_https(https_list, "master")
+
+      main->>functions:await rec_wait_and_evaluate_again()
+      functions->>http: log_scores()
+      functions->>socks5: log_scores()
       deactivate proxy
       deactivate http
       deactivate socks5
