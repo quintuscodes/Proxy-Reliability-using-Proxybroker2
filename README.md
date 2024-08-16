@@ -89,7 +89,7 @@ sequenceDiagram
     participant socks5 as "SOCKS5   :Proxy_Manager"
     participant http as "HTTP   :Proxy_Manager"
     participant broker as "Broker   :proxybroker"
-    participant proxy
+    participant proxy as Proxy
     participant Functions
 
     
@@ -138,7 +138,7 @@ sequenceDiagram
           
         main-)http: http.evaluate_proxy_list(count, eval_rounds,proxy_num)
         loop evaluation_rounds
-          par evaluate proxys concurrently asyncio
+          par evaluate proxys concurrently with asyncio
             http-)proxy: proxy.evaluate()
             par
               proxy-)proxy: evaluate_handshakes()
@@ -152,8 +152,19 @@ sequenceDiagram
         end
         
       and evaluate socks5
-        main-)socks5: socks5.evaluate_proxy_list(counter, evaluation_rounds,proxy_number)
-        
+        main-)socks5: socks5.evaluate_proxy_list(count, eval_rounds,proxy_num)
+        loop evaluation_rounds
+          par evaluate proxys concurrently with asyncio
+            socks5-)proxy: proxy.evaluate()
+            par
+              proxy-)proxy: evaluate_handshakes()
+              proxy-)proxy: evaluate_throughput()
+              proxy-)proxy: evaluate_request()
+            end
+            proxy->>proxy: proxy.calc_score()
+            proxy-->>http: return
+            socks5->>socks5: reward_best_proxys()
+          end
       end
 
       
