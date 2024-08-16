@@ -142,7 +142,7 @@ sequenceDiagram
             par
               http-)Proxy: proxy.evaluate()
               Proxy->>Proxy: proxy.calc_score()
-              Proxy-->>http
+              Proxy-->>http: return
               http->>http: reward_best_proxys()
             end
           end
