@@ -84,6 +84,7 @@ classDiagram
 ```mermaid 
 
 sequenceDiagram
+    autonumber
     actor main as "CLI - main"
     
     participant socks5 as "SOCKS5   :Proxy_Manager"
@@ -191,6 +192,7 @@ sequenceDiagram
       main->>functions:await rec_wait_and_evaluate_again()
       functions->>http: log_scores()
       functions->>socks5: log_scores()
+
       deactivate proxy
       deactivate http
       deactivate socks5
