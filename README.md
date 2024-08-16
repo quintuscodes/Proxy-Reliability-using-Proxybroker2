@@ -140,10 +140,10 @@ sequenceDiagram
         while evaluation_rounds
           loop 
             par
-            http-)Proxy: proxy.evaluate()
-            Proxy->>Proxy: proxy.calc_score()
-            Proxy-->http
-            http->>http: reward_best_proxys()
+              http-)Proxy: proxy.evaluate()
+              Proxy->>Proxy: proxy.calc_score()
+              Proxy-->http
+              http->>http: reward_best_proxys()
             end
         
       and evaluate socks5
