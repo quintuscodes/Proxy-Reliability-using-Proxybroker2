@@ -92,7 +92,7 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
 
     
     "Checker-Method"
-    await Checker(proxy_managers_list,refresh_tasks,proxy_number,num_proto,counter,evaluation_rounds)
+    #await Checker(proxy_managers_list,refresh_tasks,proxy_number,num_proto,counter,evaluation_rounds)
 
     end_time = time.perf_counter()
     evaluation_time = end_time - start_time
