@@ -78,29 +78,17 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     "Using Asyncio to concurrently find Proxy Objects using Proxybroker2 and evaluate them using the proxy_class methods "
     
     await asyncio.gather(*fetch_tasks)
-    start_time = time.perf_counter()
+    
     await asyncio.gather(*evaluate_tasks)
-    end_time = time.perf_counter()
+    
 
     
-    evaluation_time = end_time - start_time
-    num_proto = len(fetch_tasks)
-    print(f"The Evaluation of {proxy_number} Proxys in {evaluation_rounds} Evaluation Rounds of {num_proto}  protocols took {evaluation_time} s ")
     
+    num_proto = len(fetch_tasks)
     
     await sort_proxy_managers(proxy_managers_list,proxy_number) # Sort,remove and add reliable proxys to master list
 
-    
-    "Checker-Method"
-    #await Checker(proxy_managers_list,refresh_tasks,proxy_number,num_proto,counter,evaluation_rounds)
-
-    end_time = time.perf_counter()
-    evaluation_time = end_time - start_time
-    num_proto = len(fetch_tasks)
-              
-    
-    print(f"Die Evaluation von {proxy_number} Proxys bei {evaluation_rounds} Evaluationsrunden und {num_proto}  Protokollen dauerte {evaluation_time} s \n")
-
+        
     "Recursive Re-Evaluate List: Dynamic Approach"
     await rec_wait_and_evaluate_again(proxy_managers_list,counter,evaluation_rounds,proxy_number,num_proto)
     
