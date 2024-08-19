@@ -201,10 +201,10 @@ sequenceDiagram
       functions->>functions: reset_proxy_objects()
       
       functions->>http: reset_proxys()
-        
+      http->>Proxy: reset_attributes()
       
       functions->>socks5: reset_proxys()
-  
+      socks5->>Proxy: reset_attributes()
 
       functions-)functions: await asyncio.gather(*re_evaluate_tasks)
       
