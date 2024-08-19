@@ -178,10 +178,17 @@ sequenceDiagram
         main->>socks5: sort_proxy_lists()
       end 
       
-      main->>main: await Checker()
+      main->>functions:await rec_wait_and_evaluate_again()
+      functions->>http: log_scores()
+      functions->>socks5: log_scores()
+      main->>main: await print_proxy_managers()
+      loop Wait 20s
+
+      end
+      functions->>functions: await Checker()
       loop
         alt CHECK APPROVED
-          Note right of main: Continue
+          
         else CHECK Reject - Refill
           main-)main: await asyncio.gather(*refresh_tasks)
           main-)http: http.refresh_proxy_list()
@@ -189,9 +196,8 @@ sequenceDiagram
           end
       end
 
-      main->>functions:await rec_wait_and_evaluate_again()
-      functions->>http: log_scores()
-      functions->>socks5: log_scores()
+      
+      
 
       deactivate proxy
       deactivate http
