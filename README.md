@@ -91,7 +91,7 @@ sequenceDiagram
     participant http as "HTTP   :Proxy_Manager"
     participant broker as "Broker   :proxybroker"
     participant proxy as Proxy
-    participant Functions
+    participant functions as Functions
 
     
     main->>main: run(proxy_number: int, evaluation_rounds: int, protocols: set)
@@ -183,7 +183,7 @@ sequenceDiagram
       functions->>socks5: log_scores()
       main->>main: await print_proxy_managers()
       loop
-        Note right of functions: Wait 20s
+        Note over functions: Wait 20s
       end
       functions->>functions: await Checker()
       loop
