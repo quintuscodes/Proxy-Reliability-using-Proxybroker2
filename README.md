@@ -182,8 +182,8 @@ sequenceDiagram
       functions->>http: log_scores()
       functions->>socks5: log_scores()
       main->>main: await print_proxy_managers()
-      loop Wait 20s
-
+      loop
+        Note right of functions: Wait 20s
       end
       functions->>functions: await Checker()
       loop
