@@ -20,7 +20,7 @@ def log_scores(list):
         proxy_manager_item.log_scores() #Store Scores before Reset
 
 
-
+"Function to fulfill dynamic approach - Re-Evaluate every 20s, remove not reliable Proxys with avg_score < 100 and add new reliable Proxys with Score >= 100"
 async def rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_rounds,proxy_number,num_proto):
     log_scores(proxy_managers_list) #Log Score here before reset AND remove avg_score <= 100
     await print_proxy_managers(proxy_managers_list,"master")
@@ -84,15 +84,17 @@ async def Checker(proxy_managers_list,refresh_tasks:list,proxy_number,num_proto,
                     checked.append(1)
             else:
                 items.ready_for_connection = False
+                
 
         if checked.count(1) == num_proto:
-            print("CHECK approved")
-            await asyncio.sleep(3)
 
+            print("CHECK approved")
+            
             unbalanced = False
             
         else:
             print("CHECK rejected - Need to refill")
+            
             refresh_tasks = await generate_refresh_tasks(proxy_managers_list, counter, evaluation_rounds,proxy_number)
             await asyncio.gather(*refresh_tasks)
             await asyncio.sleep(3)

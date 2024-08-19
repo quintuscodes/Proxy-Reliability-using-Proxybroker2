@@ -43,12 +43,12 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     evaluate_tasks = []
     refresh_tasks = []   
     proxy_managers_list = []
-
+    
 
     "Filter by selected protocol and init the tasks"
     counter = 0
     if "HTTP" in protocols:
-        http = Proxy_Manager("HTTP")
+        http = Proxy_Manager("HTTP") # type: ignore
         proxy_managers_list.append(http)
         fetch_tasks.append(http.fetch_proxys_write_to_class(proxy_number,evaluation_rounds))
         evaluate_tasks.append(http.evaluate_proxy_list(counter, evaluation_rounds,proxy_number))
@@ -72,7 +72,7 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
         evaluate_tasks.append(connect25.evaluate_proxy_list(counter, evaluation_rounds,proxy_number))
         refresh_tasks.append(connect25.refresh_proxy_list(counter,proxy_number,evaluation_rounds ))
 
-    
+    num_proto = len(fetch_tasks)
     
     
     "Using Asyncio to concurrently find Proxy Objects using Proxybroker2 and evaluate them using the proxy_class methods "
@@ -81,12 +81,7 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
     
     await asyncio.gather(*evaluate_tasks)
     
-
-    
-    
-    num_proto = len(fetch_tasks)
-    
-    await sort_proxy_managers(proxy_managers_list,proxy_number) # Sort,remove and add reliable proxys to master list
+    await sort_proxy_managers(proxy_managers_list,proxy_number) #Sort, Remove not reliable Proxys
 
         
     "Recursive Re-Evaluate List: Dynamic Approach"
