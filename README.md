@@ -195,7 +195,15 @@ sequenceDiagram
           functions-)socks5: socks5.refresh_proxy_list()
           end
       end
+      functions->>functions: reset_proxy_objects()
+      par Refresh HTTP Proxy List
+        functions->>http: reset_proxys()
+        
+      and Refresh SOCKS5 Proxy List
+        functions->>socks5: reset_proxys()
+      end
 
+      functions-)functions: await asyncio.gather(*re_evaluate_tasks)
       
       
 
