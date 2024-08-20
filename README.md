@@ -97,9 +97,9 @@ sequenceDiagram
 
     
     main->>main: run(proxy_number: int, evaluation_rounds: int, protocols: set)
-    main->>main: asyncio.get_event_loop()
+    main->>+main: asyncio.get_event_loop()
     loop
-      activate main
+      
       main->>main: loop.run_until_complete(main(proxy_number, evaluation_rounds, protocols))
       
       
