@@ -7,7 +7,7 @@ The goal is to evaluate a dynamic proxy list for reliable proxy connections.  <b
 <br>
 
 # Class Diagram
-The portrayed Class Diagram for the proxy Manager. <br>
+The portrayed Class Diagram for the Proxy Manager. <br>
 <br>
 <br>
 
@@ -80,7 +80,9 @@ classDiagram
 ```
 
 # Sequence Diagram
-
+The portrayed Sequence Diagram for the Proxy Validation python script. <br>
+<br>
+<br>
 ```mermaid 
 
 sequenceDiagram
