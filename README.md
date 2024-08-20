@@ -213,7 +213,9 @@ sequenceDiagram
       and evaluate socks5
         functions-)socks5: socks5.evaluate_proxy_list()
       end
-      
+      functions->>functions: await sort_proxy_managers()
+      functions->>functions: await print_proxy_managers("master")
+      functions->>functions: await rec_wait_and_evaluate_again()
 
       deactivate proxy
       deactivate http
