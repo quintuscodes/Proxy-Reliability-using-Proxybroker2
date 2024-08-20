@@ -208,7 +208,11 @@ sequenceDiagram
 
       functions-)functions: await asyncio.gather(*re_evaluate_tasks)
       
-      
+      par evaluate http
+        functions-)http: http.evaluate_proxy_list()
+      and evaluate socks5
+        functions-)socks5: socks5.evaluate_proxy_list()
+      end
       
 
       deactivate proxy
