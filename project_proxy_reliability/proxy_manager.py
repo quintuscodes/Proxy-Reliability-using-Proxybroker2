@@ -73,54 +73,7 @@ class Proxy_Manager:
     
     attrs = vars(Proxy)
     print(f"\nAdded to List:\n" + ', \n'.join("%s: %s" % item for item in attrs.items()) + "\n")
-  """
-  async def print_proxy_list(self,arg):
-    
-    #Method to print the actual proxy_list
-    
-    
-    if arg == "master":
-      self.master_proxy_list.sort(key=lambda Proxy: Proxy.avg_score, reverse=True)
-      print("\n \n ")
-      print(f"{self.protocol} Proxy - Manager")
-      print(" ____________________________________________________________________________________________________________________________________________________________________")
-      print("|\n \n")
-      print("   **** MASTER **** Proxy - Liste")
-      print("   __________________________________________________________________________________________________________________________________________________________________")
-      print("  |\n")
-
-      for elements in self.master_proxy_list:
-          index = self.master_proxy_list.index(elements)
-          index += 1
-          attrs = vars(elements)
-          print(f"      > {index}. Proxy \n \n      " + ', \n      '.join("%s: %s" % item for item in attrs.items()) + "\n")
-         
-
-      print("  |__________________________________________________________________________________________________________________________________________________________________\n \n \n")
-      print("|_____________________________________________________________________________________________________________________________________________________________________")
-      print("\n \n") 
-
-    else:
-
-      print("\n \n ")
-      print(f"{self.protocol} Proxy - Manager")
-      print(" ____________________________________________________________________________________________________________________________________________________________________")
-      print("|\n \n")
-      print("   Proxy - Liste")
-      print("   __________________________________________________________________________________________________________________________________________________________________")
-      print("  |\n")
-
-      for elements in self.proxy_list:
-          index = self.proxy_list.index(elements)
-          index += 1
-          attrs = vars(elements)
-          print(f"      > {index}. Proxy \n \n      " + ', \n      '.join("%s: %s" % item for item in attrs.items()) + "\n")
-          
-
-      print("  |__________________________________________________________________________________________________________________________________________________________________\n \n \n")
-      print("|_____________________________________________________________________________________________________________________________________________________________________")
-      print("\n \n") 
-  """
+  
   async def print_proxy_list(self, arg):
     """
     Method to print the actual proxy_list with enhanced ASCII art representation designed by ChatGPT
