@@ -48,7 +48,7 @@ async def rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_r
     
     await asyncio.gather(*re_evaluate_tasks)
     await sort_proxy_managers(proxy_managers_list,proxy_number)
-    await print_proxy_managers(proxy_managers_list,"master")
+    #await print_proxy_managers(proxy_managers_list,"master")
     
     
     await rec_wait_and_evaluate_again(proxy_managers_list,counter,evaluation_rounds,proxy_number,num_proto)
@@ -74,8 +74,8 @@ async def Checker(proxy_managers_list,refresh_tasks:list,proxy_number,num_proto,
     while unbalanced:
 
         
-        print("CHECKER METHOD active\n")
-        await asyncio.sleep(5)
+        print("CHECKER ACTIVE\n")
+        await asyncio.sleep(3)
         
         checked = []
         for items in proxy_managers_list:
@@ -88,15 +88,15 @@ async def Checker(proxy_managers_list,refresh_tasks:list,proxy_number,num_proto,
 
         if checked.count(1) == num_proto:
 
-            print("CHECK approved")
-            
+            print("CHECK APPROVED - CONTINUE\n")
+            await asyncio.sleep(5)
             unbalanced = False
             
         else:
-            print("CHECK rejected - Need to refill")
-            
+            print("CHECK REJECT - REFILL\n")
+            await asyncio.sleep(5)
             refresh_tasks = await generate_refresh_tasks(proxy_managers_list, counter, evaluation_rounds,proxy_number)
             await asyncio.gather(*refresh_tasks)
-            await asyncio.sleep(3)
+            
 
         checked.clear()

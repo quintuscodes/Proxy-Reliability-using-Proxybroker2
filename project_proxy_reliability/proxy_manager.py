@@ -46,7 +46,7 @@ class Proxy_Manager:
     await broker.find( types=[ f'{self.protocol}'],lvl = 'HIGH', strict = True,limit=proxy_number)
     await self.write_proxy_to_class(f'{self.protocol}',proxies,evaluation_rounds)
       
-    #await self.print_proxy_list(0)
+    
     
   async def write_proxy_to_class(self,_type, proxies,evaluation_rounds):
     "Method to write proxys to customized class and adding to proxy list  "
@@ -234,9 +234,8 @@ class Proxy_Manager:
         self.proxy_list.clear() #TODO is this necessary?
         if self.ready_for_connection == False:
             if len(self.master_proxy_list) < proxy_number: 
-                print("Refreshing the Proxy List \n")
-                await asyncio.sleep(3)
-                print("Refreshing the Proxy List \n")
+                print(f"Refreshing the {self.protocol} Proxy List \n")
+                
                 
                 await asyncio.gather(self.fetch_proxys_write_to_class(proxy_number,evaluation_rounds))
                 await asyncio.gather(self.evaluate_proxy_list(counter, evaluation_rounds,proxy_number))
@@ -245,7 +244,10 @@ class Proxy_Manager:
                 await self.sort_proxy_lists(proxy_number)
 
                 if len(self.master_proxy_list) < proxy_number:
+                    print(f"{self.protocol} List NOT READY")
+                    await asyncio.sleep(2)
                     await self.refresh_proxy_list(counter,proxy_number,evaluation_rounds )
+                    
                 else:
                     self.ready_for_connection = True
                     

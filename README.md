@@ -123,8 +123,9 @@ sequenceDiagram
         http-)+broker: new   Broker()
         broker-)broker: find(protocol,lvl = 'HIGH',limit=proxy_num)
         broker--)http: return proxies
-        http-)http: write_proxy_to_class()
+        http-)http: write_proxy_to_class(proxies)
         http-)+proxy: new   proxy(type,ip,port,country,evaluation_rounds)
+        proxy--)http: return proxy
         proxy->>http: add_to_list(<proxy>)
         deactivate broker
       and fetch socks5
@@ -132,8 +133,9 @@ sequenceDiagram
         socks5-)+broker: new   Broker()
         broker-)broker: find(protocol,lvl = 'HIGH',limit=proxy_num)
         broker--)socks5: return proxies
-        socks5-)socks5: write_proxy_to_class()
+        socks5-)socks5: write_proxy_to_class(proxies)
         socks5-)proxy: new   proxy(type,ip,port,country,evaluation_rounds)
+        proxy--)socks5: return proxy
         proxy->>socks5: add_to_list(<proxy>)
         deactivate broker
       end
@@ -167,7 +169,7 @@ sequenceDiagram
               proxy-)proxy: evaluate_request()
             end
             proxy->>proxy: proxy.calc_score()
-            proxy-->>http: return
+            proxy-->>socks5: return
             socks5->>socks5: reward_best_proxys()
           end
         end
@@ -190,10 +192,10 @@ sequenceDiagram
         Note over functions: Wait 20s
       end
       functions->>functions: await Checker()
-      loop
-        alt CHECK APPROVED
+      loop CHECKER ACTIVE
+        alt CHECK APPROVED - CONTINUE
           
-        else CHECK Reject - Refill
+        else CHECK REJECT - REFILL
           functions-)functions: await asyncio.gather(*refresh_tasks)
           par Refresh HTTP Proxy List
             functions-)http: http.refresh_proxy_list()
@@ -205,9 +207,11 @@ sequenceDiagram
       functions->>functions: reset_proxy_objects()
       
       functions->>http: reset_proxys()
+      Note over http,proxy: Reset evaluated Fields of existing Proxy Objects before new Evaluation Round
       http->>proxy: reset_attributes()
       
       functions->>socks5: reset_proxys()
+      Note over socks5,proxy: Reset evaluated Fields of existing Proxy Objects before new Evaluation Round
       socks5->>proxy: reset_attributes()
 
       functions-)functions: await asyncio.gather(*re_evaluate_tasks)
