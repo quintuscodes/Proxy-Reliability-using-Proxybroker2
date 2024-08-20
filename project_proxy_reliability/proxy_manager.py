@@ -73,11 +73,11 @@ class Proxy_Manager:
     
     attrs = vars(Proxy)
     print(f"\nAdded to List:\n" + ', \n'.join("%s: %s" % item for item in attrs.items()) + "\n")
-
+  """
   async def print_proxy_list(self,arg):
-    """
-    Method to print the actual proxy_list
-    """
+    
+    #Method to print the actual proxy_list
+    
     
     if arg == "master":
       self.master_proxy_list.sort(key=lambda Proxy: Proxy.avg_score, reverse=True)
@@ -120,6 +120,49 @@ class Proxy_Manager:
       print("  |__________________________________________________________________________________________________________________________________________________________________\n \n \n")
       print("|_____________________________________________________________________________________________________________________________________________________________________")
       print("\n \n") 
+  """
+  async def print_proxy_list(self, arg):
+    """
+    Method to print the actual proxy_list with enhanced ASCII art representation designed by ChatGPT
+    """
+    border_top = "╔" + "═" * 150 + "╗"
+    border_bottom = "╚" + "═" * 150 + "╝"
+    separator = "╟" + "─" * 150 + "╢"
+    title_bar = "║{:^150}║"
+
+    def format_proxy(proxy, index):
+        fields = [
+            f"Protocol: {proxy.protocol}",
+            f"IP: {proxy.ip}",
+            f"Port: {proxy.port}",
+            f"Country: {proxy.country}",
+            f"Avg Score: {proxy.avg_score:.2f}",
+            f"Score: {proxy.score:.2f}",
+            f"Log Score: {proxy.log_score}",
+            f"Handshakes: {proxy.handshakes}",
+            f"Log Handshake: {proxy.log_handshake}",
+            f"Avg SYN-ACK Time: {proxy.avg_syn_ack_time:.2f} s",
+            f"Avg Transmission Time: {proxy.avg_transmission_time:.2f} s",
+            f"Avg Throughput: {proxy.avg_throughput:.2f} KB/s",
+            f"Log Request: {proxy.log_request}",
+        ]
+        proxy_info = "\n".join([f"║ {field:<148} ║" for field in fields])
+        return f"╠{'═'*150}╣\n║ Proxy {index+1:<143}║\n{proxy_info}\n"
+
+    
+    proxy_list_to_print = self.master_proxy_list if arg == "master" else self.proxy_list
+    list_type = "MASTER Proxy List" if arg == "master" else "Proxy List"
+
+    #Output
+    output = [border_top, title_bar.format(f"{self.protocol} Proxy - Manager"), separator, title_bar.format(f"**** {list_type} ****")]
+
+    for i, proxy in enumerate(proxy_list_to_print):
+        output.append(format_proxy(proxy, i))
+
+    output.append(border_bottom)
+
+    # Print the output
+    print("\n".join(output))
 
   async def evaluate_proxy_list(self,counter, evaluation_rounds,proxy_number):
     
