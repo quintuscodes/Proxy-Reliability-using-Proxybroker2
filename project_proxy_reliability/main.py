@@ -4,6 +4,7 @@ import click
 from proxy_class import *
 from proxy_manager import *
 from functions import *
+from plots import * 
 
 HTTP_PROTOS = {'HTTP', 'CONNECT:25', 'SOCKS4', 'SOCKS5'}
 global proxy_managers_list
@@ -40,8 +41,7 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
 
     """
     fetch_tasks = [] 
-    evaluate_tasks = []
-    refresh_tasks = []   
+    evaluate_tasks = [] 
     proxy_managers_list = []
     
 
@@ -84,7 +84,13 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
 
         
     "Recursive Re-Evaluate List: Dynamic Approach"
-    await rec_wait_and_evaluate_again(proxy_managers_list,counter,evaluation_rounds,proxy_number,num_proto)
+    global stop_counter
+    stop_counter = 0
+
+    await rec_wait_and_evaluate_again(proxy_managers_list,counter,evaluation_rounds,proxy_number,num_proto, stop_counter)
+
+    "Plotting"
+    await plot_avg_score_distribution(proxy_managers_list)
     
     
 

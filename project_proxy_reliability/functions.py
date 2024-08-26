@@ -21,7 +21,8 @@ def log_scores(list):
 
 
 "Function to fulfill dynamic approach - Re-Evaluate every 20s, remove not reliable Proxys with avg_score < 100 and add new reliable Proxys with Score >= 100"
-async def rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_rounds,proxy_number,num_proto):
+async def rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_rounds,proxy_number,num_proto,stop_counter):
+    stop_counter += 1
     log_scores(proxy_managers_list) #Log Score here before reset AND remove avg_score <= 100
     await print_proxy_managers(proxy_managers_list,"master")
     print("\n\n      ------- Initiated Termination -------\n\n     ^                                         ^\n     |   Here is the final Master Proxy List   |\n")
@@ -50,9 +51,10 @@ async def rec_wait_and_evaluate_again(proxy_managers_list, counter, evaluation_r
     await sort_proxy_managers(proxy_managers_list,proxy_number)
     #await print_proxy_managers(proxy_managers_list,"master")
     
+    if stop_counter != 6:
+        await rec_wait_and_evaluate_again(proxy_managers_list,counter,evaluation_rounds,proxy_number,num_proto,stop_counter)
     
-    await rec_wait_and_evaluate_again(proxy_managers_list,counter,evaluation_rounds,proxy_number,num_proto)
-    
+    else: return
     
 async def generate_evaluate_tasks(proxy_managers_list, counter, evaluation_rounds,proxy_number):
     re_evaluate_tasks = []
