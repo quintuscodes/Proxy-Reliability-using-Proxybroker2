@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 
-
 "Script for plotting the Project Proxy Manager Data."
 
 
