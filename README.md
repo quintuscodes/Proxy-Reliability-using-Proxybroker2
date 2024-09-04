@@ -85,6 +85,11 @@ The portrayed Sequence Diagram for the Proxy Validation python script. <br>
 <br>
 ```mermaid 
 
+%%{init: {"themeCSS": ".mermaid .blue-note { fill: #cce5ff; }
+                    .mermaid .teal-note { fill: #b3e6e0; }
+                    .mermaid .orange-note { fill: #ffd1a3; }
+                    .mermaid .lime-note { fill: #d2f5b0; }"}}%%
+
 sequenceDiagram
     autonumber
     actor main as "CLI - main"
@@ -110,6 +115,7 @@ sequenceDiagram
       
 
       main->>+socks5: new   Proxy_Manager("SOCKS5")
+      Note left of main: <div class='blue-note'> Step I. </div>
       socks5-->>main: socks5
 
       main->>main: fetch_tasks.append(socks5.fetch_proxy_write_to_class())
@@ -120,6 +126,7 @@ sequenceDiagram
       par fetch http
           
         main-)http: fetch_proxys_write_to_class()
+        Note left of main: <div class='teal-note'> Step II. </div>
         http-)+broker: new   Broker()
         broker-)broker: find(protocol,lvl = 'HIGH',limit=proxy_num)
         broker--)http: return proxies
@@ -160,6 +167,7 @@ sequenceDiagram
         
       and evaluate socks5
         main-)socks5: socks5.evaluate_proxy_list()
+        Note left of main: <div class='orange-note'> Step III. </div>
         loop evaluation_rounds
           par evaluate proxys concurrently with asyncio
             socks5-)proxy: proxy.evaluate()
@@ -185,6 +193,7 @@ sequenceDiagram
       end 
       
       main->>functions:await rec_wait_and_evaluate_again()
+      Note left of main: <div class='lime-note'> Step IV. </div>
       functions->>http: log_scores()
       functions->>socks5: log_scores()
       functions->>main: await print_proxy_managers()

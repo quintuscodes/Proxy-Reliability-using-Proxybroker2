@@ -1,4 +1,4 @@
-
+"""
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
@@ -23,9 +23,10 @@ def plot_avg_score_distribution(proxy_managers):
     plt.title('Distribution of avg_scores by Protocol')
     plt.show()
 
-    """ Violinplot (alternative)
+    Violinplot (alternative)
     plt.figure(figsize=(10, 6))
     sns.violinplot(x='protocol', y='avg_score', data=df)
     plt.title('Distribution of avg_scores by Protocol')
     plt.show()
     """
+    
