@@ -52,7 +52,7 @@ def plot_top_proxies_by_protocol(proxy_managers, top_n=3):
     data = []
     pastel_colors = ['#AEC6CF', '#FFB7B2', '#B39EB5', '#FFDAC1', '#FFD700', '#66CDAA', '#FF69B4', '#8A2BE2', '#DC143C', '#00CED1']
 
-    # Sammle die Daten für die Top N Proxies nach Protokoll
+    
     for manager in proxy_managers:
         protocol = manager.get_proto()
         sorted_proxies = sorted(manager.get_master_list(), key=lambda p: p.avg_score, reverse=True)
@@ -61,29 +61,28 @@ def plot_top_proxies_by_protocol(proxy_managers, top_n=3):
             data.append({
                 'protocol': protocol, 
                 'avg_score': proxy.avg_score, 
-                'ip': proxy.get_ip()  # Nur die IP-Adresse speichern, nicht IP:Port
+                'ip': proxy.get_ip()  
             })
 
     df = pd.DataFrame(data)
 
-    # Größere Abbildung, um Platz für die Legende zu machen
+    
     plt.figure(figsize=(12, 6))
     
-    # Barplot erstellen
+    
     sns.barplot(x='protocol', y='avg_score', hue='ip', data=df, palette=pastel_colors)
 
     plt.title(f'Top {top_n} Proxies by avg_score for each Protocol')
 
-    # Entferne die IP-Labels über den Balken im Diagramm
-    # plt.text-Aufruf wird entfernt
+    
 
-    # Anpassung der Legende: Nur die IPs, ohne doppelte Einträge und sortiert nach Protokoll
+    
     handles, labels = plt.gca().get_legend_handles_labels()
     
-    # Entferne doppelte IP-Adressen und behalte nur die IP, ohne Port
+  
     unique_labels = dict(zip(labels, handles))
 
-    # Manuelle Sortierung nach Protokoll (HTTP -> SOCKS4 -> SOCKS5 -> CONNECT:25)
+    
     sorted_protocols = ['HTTP', 'SOCKS4', 'SOCKS5', 'CONNECT:25']
     sorted_labels = []
 
@@ -92,7 +91,7 @@ def plot_top_proxies_by_protocol(proxy_managers, top_n=3):
 
     sorted_handles = [unique_labels[label] for label in sorted_labels]
 
-    # Baue die Legende neu, nur mit den IPs, sortiert nach Protokoll
+    
     plt.legend(sorted_handles, sorted_labels, title='Grouped by Protocol', bbox_to_anchor=(1.05, 1), loc='upper left')
 
     plt.tight_layout()
@@ -103,16 +102,14 @@ def plot_top_proxies_by_protocol(proxy_managers, top_n=3):
 
 
 def filter_final_proxies(proxy_manager):
-    """
     
-    """
     
     final_proxies = set(proxy.get_ip() for proxy in proxy_manager.get_master_list())
     print(f"Final Proxies in Master List: {final_proxies}")
 
-    # Sammle gefilterte Daten für die relevanten Proxies
+    
     filtered_data = []
-    for epoch_data in proxy_manager.get_hist_data():  # Iteriere über die historischen Daten jedes ProxyManager-Objekts
+    for epoch_data in proxy_manager.get_hist_data():  
         proxies = [proxy for proxy in epoch_data['proxies'] if proxy['ip'] in final_proxies]
         print(f"Epoch: {epoch_data['epoch']}, Filtered Proxies: {len(proxies)}, IPs: {[proxy['ip'] for proxy in proxies]}")
         filtered_data.append({'epoch': epoch_data['epoch'], 'proxies': proxies})
@@ -161,26 +158,22 @@ def plot_avg_throughput(proxy_manager_item):
     plt.clf()
 def plot_avg_syn_ack_time(proxy_manager_item):
 
-    """
-    AVG_SYN_ACK_Time
-
-    """
-    # Filter the data to retain only relevant proxies
+    
     filtered_data = filter_final_proxies(proxy_manager_item)
     proto = proxy_manager_item.get_proto()
 
-    # Erstelle eine Liste einzigartiger IPs
+    
     unique_ips = set()
     for epoch_data in filtered_data:
         for proxy in epoch_data['proxies']:
             ip = proxy['ip']
             unique_ips.add(ip)
 
-    # Erstelle eine Farbliste für jede IP
+    
     color_map = plt.cm.get_cmap('tab20', len(unique_ips))
     ip_colors = {ip: color_map(i) for i, ip in enumerate(unique_ips)}
 
-    # Plot avg_syn_ack_time for each epoch
+    
     plt.figure(figsize=(10, 6))
 
     for epoch_data in filtered_data:
@@ -188,23 +181,23 @@ def plot_avg_syn_ack_time(proxy_manager_item):
         for proxy in epoch_data['proxies']:
             ip = proxy['ip']
             
-            # Verwende eine zufällige Verschiebung entlang der x-Achse, um Überlappungen zu vermeiden
+            
             jittered_epoch = epoch + np.random.uniform(-0.1, 0.1)
 
-            # Zeichne den Punkt mit der zugeordneten Farbe
+            
             plt.scatter(jittered_epoch, proxy['avg_syn_ack_time'], color=ip_colors[ip])
 
     plt.xlabel('Epoch')
     plt.ylabel('Average SYN-ACK Time in [s]')
     plt.title(f'Average SYN-ACK Time per Epoch of the {proto} - Protokoll')
 
-    # Setze die x-Achse explizit auf die Epochen 1 bis 10
+    
     plt.xticks(np.arange(1, 11, 1))  # Setzt die Ticks auf die Werte 1 bis 10
 
-    # Setze die Y-Achse auf den Bereich 0 bis 1
+    
     plt.ylim(0, 1)
 
-    # Hinzufügen der Legende
+    
     handles = [plt.Line2D([0], [0], marker='o', color=ip_colors[ip], label=ip, linestyle='') for ip in unique_ips]
     plt.legend(handles=handles, title='IP Addresses', bbox_to_anchor=(1.05, 1), loc='upper left')
 

@@ -105,7 +105,7 @@ async def main(proxy_number: int,evaluation_rounds:int, protocols: set):
         for epoch_data in manager.historical_data:
             print(f"Epoch: {epoch_data['epoch']}, Proxies: {len(epoch_data['proxies'])}")
 
-    move_plots(run_number=12, proxy_num=5, eval_rounds=10)
+    move_plots(run_number=1, proxy_num=5, eval_rounds=10)
         
         
 
