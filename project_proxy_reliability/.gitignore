@@ -1,0 +1,11 @@
+#Environments
+.venv
+venv/
+
+#python
+__pycache__/
+
+#proxybroker examples
+
+basic_example_scripts/
+.txt

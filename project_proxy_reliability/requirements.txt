@@ -1,0 +1,9 @@
+#install proxybroker manually with sudo rights
+#other dependencies especially scapy also with sudo rights
+asyncio
+scapy
+requests
+click
+matplotlib
+seaborn
+pandas
